@@ -10,23 +10,42 @@ class Chess {
     this.column;
     this.board = undefined;
     this.currentlySelectedPiece = undefined;
+    this.availableMovePositions = [];
   }
 
   dragOver(e) {
     e.preventDefault();
   }
+
   dragEnter() {}
   dragLeave() {}
   dragDrop(e) {
     const { row, column } = e.target.dataset;
-    this.board[row][column].div.classList.add(
-      this.currentlySelectedPiece.piece
-    );
-
-    this.currentlySelectedPiece.div.classList.remove(
-      this.currentlySelectedPiece.piece
-    );
+    if (
+      this.currentlySelectedPiece &&
+      this.checkIfMoveIsAvailable(this.availableMovePositions, { row, column })
+    ) {
+      this.board[row][column].div.classList.add(
+        this.currentlySelectedPiece.piece
+      );
+      this.board[row][column].piece = this.currentlySelectedPiece.piece;
+      this.currentlySelectedPiece.div.classList.remove(
+        this.currentlySelectedPiece.piece
+      );
+    }
     this.deselectPosition();
+  }
+
+  checkIfMoveIsAvailable(availableMoves, { row, column }) {
+    let isAvailable = false;
+    availableMoves.map((item) => item.row === row && column);
+    for (let i in availableMoves) {
+      if (availableMoves[i].row == row && availableMoves[i].column == column) {
+        isAvailable = true;
+        break;
+      }
+    }
+    return isAvailable;
   }
 
   createChessTable() {
@@ -37,6 +56,19 @@ class Chess {
       matrix.push(row);
       for (let j = 0; j < 8; j++) {
         let square = document.createElement("div");
+        if (i % 2 !== 0) {
+          if (j % 2 !== 0) {
+            square.classList.add("dark");
+          } else {
+            square.classList.add("light");
+          }
+        } else if (i % 2 == 0) {
+          if (j % 2 !== 0) {
+            square.classList.add("light");
+          } else {
+            square.classList.add("dark");
+          }
+        }
         square.classList.add("square");
         square.dataset.column = j;
         square.dataset.row = i;
@@ -60,19 +92,7 @@ class Chess {
         /**
          * Set the colors of the chess table.
          */
-        if (i % 2 !== 0) {
-          if (j % 2 !== 0) {
-            square.classList.add("dark");
-          } else {
-            square.classList.add("light");
-          }
-        } else if (i % 2 == 0) {
-          if (j % 2 !== 0) {
-            square.classList.add("light");
-          } else {
-            square.classList.add("dark");
-          }
-        }
+
         main.appendChild(square);
       }
     }
@@ -89,6 +109,7 @@ class Chess {
         this.board[i][j].div.style.backgroundColor = "#819669";
 
         this.currentlySelectedPiece = this.board[i][j];
+        console.log(this.currentlySelectedPiece);
       }
       this.getAvailablePositions(i, j);
     }
@@ -102,19 +123,63 @@ class Chess {
   }
 
   getAvailablePositions(i, j) {
-    console.log(i, j);
     if (this.board[i][j].piece.includes("rook")) {
-      console.log("rook");
+      console.log("here");
+
+      let spaceToRight = 7 - i;
+      let spaceToLeft = 0 + i;
+      let spaceToTop = 0 + j;
+      let spaceToBottom = 7 - j;
+      let moves = [];
+
+      for (let y = 0; y < spaceToRight; y++) {
+        moves.push(this.board[i][y]);
+        this.board[i][y].div.style.backgroundColor = "#85784E";
+      }
+
+      for (let y = 0; y < spaceToLeft; y++) {
+        moves.push(this.board[i][y]);
+        this.board[i][y].div.style.backgroundColor = "#85784E";
+      }
+
+      for (let y = 0; y < spaceToTop; y++) {
+        moves.push(this.board[y][j]);
+        this.board[y][j].div.style.backgroundColor = "#85784E";
+      }
+      for (let y = 0; y < spaceToBottom; y++) {
+        moves.push(this.board[y][j]);
+        this.board[y][j].div.style.backgroundColor = "#85784E";
+      }
+
+      this.availableMovePositions = moves;
     } else if (this.board[i][j].piece.includes("pawn")) {
-      console.log("pawn");
-      if (i === 6) {
-        this.board[i - 1][j].div.style.backgroundColor = "#85784E";
-        this.board[i - 2][j].div.style.backgroundColor = "#85784E";
-        return [this.board[i - 1][j], this.board[i - 2][j]];
+      if (i === 6 || i === 1) {
+        if (i === 6) {
+          this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+          this.board[i - 2][j].div.style.backgroundColor = "#85784E";
+          this.availableMovePositions = [
+            this.board[i - 1][j],
+            this.board[i - 2][j],
+          ];
+          return [this.board[i - 1][j], this.board[i - 2][j]];
+        }
+        if (i === 1) {
+          this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+          this.board[i + 2][j].div.style.backgroundColor = "#85784E";
+          this.availableMovePositions = [
+            this.board[i + 1][j],
+            this.board[i + 2][j],
+          ];
+
+          return [this.board[i + 1][j], this.board[i + 2][j]];
+        }
       } else {
         this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+        this.availableMovePositions = [this.board[i - 1][j]];
         return [this.board[i - 1][j]];
       }
+    } else {
+      this.deselectPosition();
     }
   }
 
@@ -128,7 +193,6 @@ class Chess {
 
   movePiece(e) {
     var elements = document.elementsFromPoint(e.clientX, e.clientY);
-    console.log(elements);
     // console.log(this.currentlySelectedPiece);
     // let { column, row } = e.target.dataset;
     // console.log(column, row);
