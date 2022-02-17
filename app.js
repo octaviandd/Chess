@@ -20,7 +20,14 @@ class Chess {
   dragEnter() {}
   dragLeave() {}
   dragDrop(e) {
+    console.log(this.availableMovePositions);
     const { row, column } = e.target.dataset;
+    if (
+      row == this.currentlySelectedPiece.row &&
+      column == this.currentlySelectedPiece.column
+    ) {
+      return;
+    }
     if (
       this.currentlySelectedPiece &&
       this.checkIfMoveIsAvailable(this.availableMovePositions, { row, column })
@@ -109,7 +116,6 @@ class Chess {
         this.board[i][j].div.style.backgroundColor = "#819669";
 
         this.currentlySelectedPiece = this.board[i][j];
-        console.log(this.currentlySelectedPiece);
       }
       this.getAvailablePositions(i, j);
     }
@@ -124,17 +130,15 @@ class Chess {
 
   getAvailablePositions(i, j) {
     if (this.board[i][j].piece.includes("rook")) {
-      console.log("here");
-
-      let spaceToRight = 7 - i;
-      let spaceToLeft = 0 + i;
-      let spaceToTop = 0 + j;
-      let spaceToBottom = 7 - j;
+      let spaceToRight = 7 - j;
+      let spaceToLeft = 0 + j;
+      let spaceToTop = 0 + i;
+      let spaceToBottom = 7 - i;
       let moves = [];
 
-      for (let y = 0; y < spaceToRight; y++) {
-        moves.push(this.board[i][y]);
-        this.board[i][y].div.style.backgroundColor = "#85784E";
+      for (let y = 0; y <= spaceToRight; y++) {
+        moves.push(this.board[i][j + y]);
+        this.board[i][y + j].div.style.backgroundColor = "#85784E";
       }
 
       for (let y = 0; y < spaceToLeft; y++) {
@@ -146,9 +150,9 @@ class Chess {
         moves.push(this.board[y][j]);
         this.board[y][j].div.style.backgroundColor = "#85784E";
       }
-      for (let y = 0; y < spaceToBottom; y++) {
-        moves.push(this.board[y][j]);
-        this.board[y][j].div.style.backgroundColor = "#85784E";
+      for (let y = 0; y <= spaceToBottom; y++) {
+        moves.push(this.board[y + i][j]);
+        this.board[y + i][j].div.style.backgroundColor = "#85784E";
       }
 
       this.availableMovePositions = moves;
@@ -178,6 +182,46 @@ class Chess {
         this.availableMovePositions = [this.board[i - 1][j]];
         return [this.board[i - 1][j]];
       }
+    } else if (this.board[i][j].piece.includes("bishop")) {
+      let spaceToRight = 7 - j;
+      let spaceToLeft = 0 + j;
+      let spaceToTop = 0 + i;
+      let spaceToBottom = 7 - i;
+      let moves = [];
+
+      console.log({ spaceToBottom, spaceToTop, spaceToLeft, spaceToRight });
+
+      let x = 0;
+
+      while (x < spaceToTop && x < spaceToRight) {
+        x++;
+        moves.push(this.board[i - x][j + x]);
+        this.board[i - x][j + x].div.style.backgroundColor = "#85784E";
+      }
+
+      let o = 0;
+      while (o < spaceToBottom && o < spaceToRight) {
+        o++;
+        moves.push(this.board[i + o][j + o]);
+        this.board[i + o][j + o].div.style.backgroundColor = "#85784E";
+      }
+
+      let m = 0;
+      while (m < spaceToBottom && m < spaceToLeft) {
+        m++;
+        moves.push(this.board[i + m][j - m]);
+        this.board[i + m][j - m].div.style.backgroundColor = "#85784E";
+      }
+
+      let n = 0;
+      while (n < spaceToTop && n < spaceToLeft) {
+        console.log({ n, i, j });
+        n++;
+        moves.push(this.board[i - n][j - n]);
+        this.board[i - n][j - n].div.style.backgroundColor = "#85784E";
+      }
+
+      this.availableMovePositions = moves;
     } else {
       this.deselectPosition();
     }
@@ -193,17 +237,6 @@ class Chess {
 
   movePiece(e) {
     var elements = document.elementsFromPoint(e.clientX, e.clientY);
-    // console.log(this.currentlySelectedPiece);
-    // let { column, row } = e.target.dataset;
-    // console.log(column, row);
-    // this.board[row][column] = this.currentlySelectedPiece;
-    // console.log(this.board);
-    // if (this.currentlySelectedPiece) {
-    //   console.log(this.currentlySelectedPiece);
-    //   main.addEventListener("click", (e) => {
-    //     console.log(e.target);
-    //   });
-    // }
   }
 
   setDefaultPieces(row, col, square) {
