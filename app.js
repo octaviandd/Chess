@@ -189,8 +189,6 @@ class Chess {
       let spaceToBottom = 7 - i;
       let moves = [];
 
-      console.log({ spaceToBottom, spaceToTop, spaceToLeft, spaceToRight });
-
       let x = 0;
 
       while (x < spaceToTop && x < spaceToRight) {
@@ -221,6 +219,49 @@ class Chess {
         this.board[i - n][j - n].div.style.backgroundColor = "#85784E";
       }
 
+      this.availableMovePositions = moves;
+    } else if (this.board[i][j].piece.includes("king")) {
+      let moves = [];
+      if (i === 7) {
+        moves.push(this.board[i][j + 1]);
+        moves.push(this.board[i][j - 1]);
+        moves.push(this.board[i - 1][j]);
+        moves.push(this.board[i - 1][j + 1]);
+        moves.push(this.board[i - 1][j - 1]);
+        this.board[i][j + 1].div.style.backgroundColor = "#85784E";
+        this.board[i][j - 1].div.style.backgroundColor = "#85784E";
+        this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+        this.board[i - 1][j - 1].div.style.backgroundColor = "#85784E";
+        this.board[i - 1][j + 1].div.style.backgroundColor = "#85784E";
+      } else if (i === 0) {
+        moves.push(this.board[i][j + 1]);
+        moves.push(this.board[i][j - 1]);
+        moves.push(this.board[i + 1][j]);
+        moves.push(this.board[i + 1][j + 1]);
+        moves.push(this.board[i + 1][j - 1]);
+        this.board[i][j + 1].div.style.backgroundColor = "#85784E";
+        this.board[i][j - 1].div.style.backgroundColor = "#85784E";
+        this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+        this.board[i + 1][j - 1].div.style.backgroundColor = "#85784E";
+        this.board[i + 1][j + 1].div.style.backgroundColor = "#85784E";
+      } else {
+        moves.push(this.board[i][j + 1]);
+        moves.push(this.board[i][j - 1]);
+        moves.push(this.board[i + 1][j]);
+        moves.push(this.board[i + 1][j + 1]);
+        moves.push(this.board[i + 1][j - 1]);
+        moves.push(this.board[i - 1][j]);
+        moves.push(this.board[i - 1][j + 1]);
+        moves.push(this.board[i - 1][j - 1]);
+        this.board[i][j + 1].div.style.backgroundColor = "#85784E";
+        this.board[i][j - 1].div.style.backgroundColor = "#85784E";
+        this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+        this.board[i - 1][j + 1].div.style.backgroundColor = "#85784E";
+        this.board[i - 1][j - 1].div.style.backgroundColor = "#85784E";
+        this.board[i + 1][j - 1].div.style.backgroundColor = "#85784E";
+        this.board[i + 1][j + 1].div.style.backgroundColor = "#85784E";
+        this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+      }
       this.availableMovePositions = moves;
     } else {
       this.deselectPosition();
