@@ -263,6 +263,62 @@ class Chess {
         this.board[i + 1][j].div.style.backgroundColor = "#85784E";
       }
       this.availableMovePositions = moves;
+    } else if (this.board[i][j].piece.includes("queen")) {
+      let spaceToRight = 7 - j;
+      let spaceToLeft = 0 + j;
+      let spaceToTop = 0 + i;
+      let spaceToBottom = 7 - i;
+      let moves = [];
+      for (let y = 0; y <= spaceToRight; y++) {
+        moves.push(this.board[i][j + y]);
+        this.board[i][y + j].div.style.backgroundColor = "#85784E";
+      }
+
+      for (let y = 0; y < spaceToLeft; y++) {
+        moves.push(this.board[i][y]);
+        this.board[i][y].div.style.backgroundColor = "#85784E";
+      }
+
+      for (let y = 0; y < spaceToTop; y++) {
+        moves.push(this.board[y][j]);
+        this.board[y][j].div.style.backgroundColor = "#85784E";
+      }
+      for (let y = 0; y <= spaceToBottom; y++) {
+        moves.push(this.board[y + i][j]);
+        this.board[y + i][j].div.style.backgroundColor = "#85784E";
+      }
+
+      let x = 0;
+
+      while (x < spaceToTop && x < spaceToRight) {
+        x++;
+        moves.push(this.board[i - x][j + x]);
+        this.board[i - x][j + x].div.style.backgroundColor = "#85784E";
+      }
+
+      let o = 0;
+      while (o < spaceToBottom && o < spaceToRight) {
+        o++;
+        moves.push(this.board[i + o][j + o]);
+        this.board[i + o][j + o].div.style.backgroundColor = "#85784E";
+      }
+
+      let m = 0;
+      while (m < spaceToBottom && m < spaceToLeft) {
+        m++;
+        moves.push(this.board[i + m][j - m]);
+        this.board[i + m][j - m].div.style.backgroundColor = "#85784E";
+      }
+
+      let n = 0;
+      while (n < spaceToTop && n < spaceToLeft) {
+        console.log({ n, i, j });
+        n++;
+        moves.push(this.board[i - n][j - n]);
+        this.board[i - n][j - n].div.style.backgroundColor = "#85784E";
+      }
+
+      this.availableMovePositions = moves;
     } else {
       this.deselectPosition();
     }
