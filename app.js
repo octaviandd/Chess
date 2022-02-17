@@ -11,50 +11,9 @@ class Chess {
     this.board = undefined;
     this.currentlySelectedPiece = undefined;
     this.availableMovePositions = [];
+    this.leavingPosition = undefined;
+    this.goingPosition = undefined;
   }
-
-  dragOver(e) {
-    e.preventDefault();
-  }
-
-  dragEnter() {}
-  dragLeave() {}
-  dragDrop(e) {
-    console.log(this.availableMovePositions);
-    const { row, column } = e.target.dataset;
-    if (
-      row == this.currentlySelectedPiece.row &&
-      column == this.currentlySelectedPiece.column
-    ) {
-      return;
-    }
-    if (
-      this.currentlySelectedPiece &&
-      this.checkIfMoveIsAvailable(this.availableMovePositions, { row, column })
-    ) {
-      this.board[row][column].div.classList.add(
-        this.currentlySelectedPiece.piece
-      );
-      this.board[row][column].piece = this.currentlySelectedPiece.piece;
-      this.currentlySelectedPiece.div.classList.remove(
-        this.currentlySelectedPiece.piece
-      );
-    }
-    this.deselectPosition();
-  }
-
-  checkIfMoveIsAvailable(availableMoves, { row, column }) {
-    let isAvailable = false;
-    availableMoves.map((item) => item.row === row && column);
-    for (let i in availableMoves) {
-      if (availableMoves[i].row == row && availableMoves[i].column == column) {
-        isAvailable = true;
-        break;
-      }
-    }
-    return isAvailable;
-  }
-
   createChessTable() {
     let matrix = [];
 
@@ -107,6 +66,70 @@ class Chess {
     this.board = matrix;
   }
 
+  dragOver(e) {
+    e.preventDefault();
+  }
+
+  dragEnter() {}
+  dragLeave() {}
+  dragDrop(e) {
+    if (!this.currentlySelectedPiece) {
+      this.deselectPosition();
+      return;
+    } else {
+      const { row, column } = e.target.dataset;
+      if (this.board[row][column].piece) {
+        if (
+          this.currentlySelectedPiece.piece.includes(
+            this.board[row][column].piece.split("_")[0]
+          )
+        ) {
+          return;
+        } else {
+          this.board[row][column].div.classList.remove(
+            this.board[row][column].piece
+          );
+        }
+      }
+      if (
+        row == this.currentlySelectedPiece.row &&
+        column == this.currentlySelectedPiece.column
+      ) {
+        this.deselectPosition;
+        return;
+      }
+      if (
+        this.currentlySelectedPiece &&
+        this.checkIfMoveIsAvailable(this.availableMovePositions, {
+          row,
+          column,
+        })
+      ) {
+        this.board[row][column].div.classList.add(
+          this.currentlySelectedPiece.piece
+        );
+        this.board[row][column].piece = this.currentlySelectedPiece.piece;
+        this.currentlySelectedPiece.div.classList.remove(
+          this.currentlySelectedPiece.piece
+        );
+        this.leavingPosition.piece = null;
+      }
+      this.deselectPosition();
+    }
+  }
+
+  checkIfMoveIsAvailable(availableMoves, { row, column }) {
+    let isAvailable = false;
+    availableMoves.map((item) => item.row === row && column);
+    for (let i in availableMoves) {
+      if (availableMoves[i].row == row && availableMoves[i].column == column) {
+        isAvailable = true;
+        break;
+      }
+    }
+    return isAvailable;
+  }
+
   selectPiece(i, j) {
     if (!this.currentlySelectedPiece) {
       if (this.board[i][j].piece) {
@@ -114,10 +137,12 @@ class Chess {
           row.map((col) => (col.div.style.backgroundColor = ""))
         );
         this.board[i][j].div.style.backgroundColor = "#819669";
-
+        this.leavingPosition = this.board[i][j];
         this.currentlySelectedPiece = this.board[i][j];
+        this.getAvailablePositions(i, j);
       }
-      this.getAvailablePositions(i, j);
+    } else {
+      return;
     }
   }
 
@@ -136,51 +161,81 @@ class Chess {
       let spaceToBottom = 7 - i;
       let moves = [];
 
+      let currentPieceColor = this.currentlySelectedPiece.piece.split("_")[0];
+
       for (let y = 0; y <= spaceToRight; y++) {
-        moves.push(this.board[i][j + y]);
-        this.board[i][y + j].div.style.backgroundColor = "#85784E";
+        if (this.board[i][j + 1] && this.board[i][j + 1].piece === null) {
+          moves.push(this.board[i][j + y]);
+          this.board[i][y + j].div.style.backgroundColor = "#85784E";
+        }
       }
 
-      for (let y = 0; y < spaceToLeft; y++) {
-        moves.push(this.board[i][y]);
-        this.board[i][y].div.style.backgroundColor = "#85784E";
+      for (let y = 0; y <= spaceToLeft; y++) {
+        if (this.board[i][j - 1] && this.board[i][j - 1].piece === null) {
+          moves.push(this.board[i][j - y]);
+          this.board[i][j - y].div.style.backgroundColor = "#85784E";
+        }
       }
 
-      for (let y = 0; y < spaceToTop; y++) {
-        moves.push(this.board[y][j]);
-        this.board[y][j].div.style.backgroundColor = "#85784E";
+      for (let y = 1; y <= spaceToTop; y++) {
+        moves.push(this.board[i - y][j]);
+        this.board[i - y][j].div.style.backgroundColor = "#85784E";
+        if (this.board[i - y][j].piece !== null) {
+          break;
+        }
       }
-      for (let y = 0; y <= spaceToBottom; y++) {
+      for (let y = 1; y <= spaceToBottom; y++) {
         moves.push(this.board[y + i][j]);
         this.board[y + i][j].div.style.backgroundColor = "#85784E";
+        if (this.board[i + y][j].piece !== null) {
+          if (this.board[i + y][j].piece.includes(currentPieceColor)) {
+            break;
+          } else {
+            break;
+          }
+        }
       }
 
       this.availableMovePositions = moves;
     } else if (this.board[i][j].piece.includes("pawn")) {
       if (i === 6 || i === 1) {
         if (i === 6) {
-          this.board[i - 1][j].div.style.backgroundColor = "#85784E";
-          this.board[i - 2][j].div.style.backgroundColor = "#85784E";
-          this.availableMovePositions = [
-            this.board[i - 1][j],
-            this.board[i - 2][j],
-          ];
-          return [this.board[i - 1][j], this.board[i - 2][j]];
+          if (this.board[i - 1][j].piece === null) {
+            this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+            this.board[i - 2][j].div.style.backgroundColor = "#85784E";
+            this.availableMovePositions = [
+              this.board[i - 1][j],
+              this.board[i - 2][j],
+            ];
+            return [this.board[i - 1][j], this.board[i - 2][j]];
+          }
         }
         if (i === 1) {
-          this.board[i + 1][j].div.style.backgroundColor = "#85784E";
-          this.board[i + 2][j].div.style.backgroundColor = "#85784E";
-          this.availableMovePositions = [
-            this.board[i + 1][j],
-            this.board[i + 2][j],
-          ];
+          if (this.board[i + 1][j].piece === null) {
+            this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+            this.board[i + 2][j].div.style.backgroundColor = "#85784E";
+            this.availableMovePositions = [
+              this.board[i + 1][j],
+              this.board[i + 2][j],
+            ];
 
-          return [this.board[i + 1][j], this.board[i + 2][j]];
+            return [this.board[i + 1][j], this.board[i + 2][j]];
+          }
         }
       } else {
-        this.board[i - 1][j].div.style.backgroundColor = "#85784E";
-        this.availableMovePositions = [this.board[i - 1][j]];
-        return [this.board[i - 1][j]];
+        if (this.board[i][j].piece.includes("black")) {
+          if (this.board[i + 1][j].piece === null) {
+            this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+            this.availableMovePositions = [this.board[i + 1][j]];
+            return [this.board[i + 1][j]];
+          }
+        } else if (this.board[i][j].piece.includes("white")) {
+          if (this.board[i - 1][j].piece === null) {
+            this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+            this.availableMovePositions = [this.board[i - 1][j]];
+            return [this.board[i - 1][j]];
+          }
+        }
       }
     } else if (this.board[i][j].piece.includes("bishop")) {
       let spaceToRight = 7 - j;
@@ -414,8 +469,6 @@ const blackRook2 = new Piece();
 const blackBishop_1 = new Piece();
 const blackBishop_2 = new Piece();
 const blackPawn = new Piece();
-
-class BoardPosition {}
 
 let newBoard = new Chess();
 
