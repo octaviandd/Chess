@@ -6,8 +6,6 @@ let element = document.querySelector("#test");
 
 class Chess {
   constructor() {
-    this.row;
-    this.column;
     this.board = undefined;
     this.currentlySelectedPiece = undefined;
     this.availableMovePositions = [];
@@ -74,23 +72,26 @@ class Chess {
   dragLeave() {}
   dragDrop(e) {
     if (!this.currentlySelectedPiece) {
+      // In case there is no piece selected, deselect the position and return null
       this.deselectPosition();
       return;
     } else {
       const { row, column } = e.target.dataset;
-      if (this.board[row][column].piece) {
+      // get the position of the square where the piece was dropped.
+      let incomingSquare = this.board[row][column];
+
+      // if there is a piece in the selected to me moved to position
+      if (incomingSquare.piece) {
+        // if the future position contains a piece of the same color with the currently selected piece.
         if (
           this.currentlySelectedPiece.piece.includes(
-            this.board[row][column].piece.split("_")[0]
+            incomingSquare.piece.split("_")[0]
           )
         ) {
           return;
-        } else {
-          this.board[row][column].div.classList.remove(
-            this.board[row][column].piece
-          );
         }
       }
+      // The previous position is the same with the future position. Return null and deselect the position.
       if (
         row == this.currentlySelectedPiece.row &&
         column == this.currentlySelectedPiece.column
@@ -98,6 +99,8 @@ class Chess {
         this.deselectPosition;
         return;
       }
+
+      // if there is a piece selected; if the move is available, move the piece to the position.
       if (
         this.currentlySelectedPiece &&
         this.checkIfMoveIsAvailable(this.availableMovePositions, {
@@ -105,10 +108,14 @@ class Chess {
           column,
         })
       ) {
-        this.board[row][column].div.classList.add(
-          this.currentlySelectedPiece.piece
-        );
-        this.board[row][column].piece = this.currentlySelectedPiece.piece;
+        if (incomingSquare.piece !== null) {
+          console.log("here");
+          incomingSquare.div.classList.remove(incomingSquare.piece);
+          incomingSquare.piece = null;
+          console.log(incomingSquare);
+        }
+        incomingSquare.div.classList.add(this.currentlySelectedPiece.piece);
+        incomingSquare.piece = this.currentlySelectedPiece.piece;
         this.currentlySelectedPiece.div.classList.remove(
           this.currentlySelectedPiece.piece
         );
@@ -118,6 +125,12 @@ class Chess {
     }
   }
 
+  /**
+   *
+   * @param {*} availableMoves
+   * @param {*} param1
+   * @returns @isAvailable - boolean saying if the move is available.
+   */
   checkIfMoveIsAvailable(availableMoves, { row, column }) {
     let isAvailable = false;
     availableMoves.map((item) => item.row === row && column);
@@ -130,6 +143,12 @@ class Chess {
     return isAvailable;
   }
 
+  /**
+   * Select the piece for drop
+   * @param {*} i
+   * @param {*} j
+   * @returns
+   */
   selectPiece(i, j) {
     if (!this.currentlySelectedPiece) {
       if (this.board[i][j].piece) {
@@ -146,6 +165,11 @@ class Chess {
     }
   }
 
+  /**
+   * Deselects the position
+   * @param {*} i
+   * @param {*} j
+   */
   deselectPosition(i, j) {
     this.currentlySelectedPiece = undefined;
     this.board.map((row) =>
@@ -163,17 +187,27 @@ class Chess {
 
       let currentPieceColor = this.currentlySelectedPiece.piece.split("_")[0];
 
-      for (let y = 0; y <= spaceToRight; y++) {
-        if (this.board[i][j + 1] && this.board[i][j + 1].piece === null) {
-          moves.push(this.board[i][j + y]);
-          this.board[i][y + j].div.style.backgroundColor = "#85784E";
+      for (let y = 1; y <= spaceToRight; y++) {
+        moves.push(this.board[i][j + y]);
+        this.board[i][y + j].div.style.backgroundColor = "#85784E";
+        if (this.board[i][j + y].piece !== null) {
+          if (this.board[i][j + y].piece.includes(currentPieceColor)) {
+            break;
+          } else {
+            break;
+          }
         }
       }
 
-      for (let y = 0; y <= spaceToLeft; y++) {
-        if (this.board[i][j - 1] && this.board[i][j - 1].piece === null) {
-          moves.push(this.board[i][j - y]);
-          this.board[i][j - y].div.style.backgroundColor = "#85784E";
+      for (let y = 1; y <= spaceToLeft; y++) {
+        moves.push(this.board[i][j - y]);
+        this.board[i][j - y].div.style.backgroundColor = "#85784E";
+        if (this.board[i][j - y].piece !== null) {
+          if (this.board[i][j - y].piece.includes(currentPieceColor)) {
+            break;
+          } else {
+            break;
+          }
         }
       }
 
@@ -181,7 +215,11 @@ class Chess {
         moves.push(this.board[i - y][j]);
         this.board[i - y][j].div.style.backgroundColor = "#85784E";
         if (this.board[i - y][j].piece !== null) {
-          break;
+          if (this.board[i - y][j].piece.includes(currentPieceColor)) {
+            break;
+          } else {
+            break;
+          }
         }
       }
       for (let y = 1; y <= spaceToBottom; y++) {
@@ -243,6 +281,7 @@ class Chess {
       let spaceToTop = 0 + i;
       let spaceToBottom = 7 - i;
       let moves = [];
+      let currentPieceColor = this.currentlySelectedPiece.piece.split("_")[0];
 
       let x = 0;
 
@@ -250,6 +289,12 @@ class Chess {
         x++;
         moves.push(this.board[i - x][j + x]);
         this.board[i - x][j + x].div.style.backgroundColor = "#85784E";
+        if (this.board[i - x][j + x].piece !== null) {
+          console.log(this.board[i - x][j + x]);
+          if (this.board[i - x][j + x].piece.includes(currentPieceColor)) {
+            break;
+          }
+        }
       }
 
       let o = 0;
@@ -440,35 +485,6 @@ class Chess {
     }
   }
 }
-
-class Piece {
-  constructor(name, position, alive, color) {
-    this.name;
-    this.position;
-    this.alive;
-    this.color;
-  }
-}
-
-const whiteKing = new Piece();
-const whiteKnight_1 = new Piece();
-const whiteKnight_2 = new Piece();
-const whiteQueen = new Piece();
-const whiteRook_1 = new Piece();
-const whiteRook_2 = new Piece();
-const whiteBishop_1 = new Piece();
-const whiteBishop_2 = new Piece();
-const whitePawn = new Piece();
-
-const blackKing = new Piece();
-const blackQueen = new Piece();
-const blackKnight_1 = new Piece();
-const blackKnight_2 = new Piece();
-const blackRook1 = new Piece();
-const blackRook2 = new Piece();
-const blackBishop_1 = new Piece();
-const blackBishop_2 = new Piece();
-const blackPawn = new Piece();
 
 let newBoard = new Chess();
 
