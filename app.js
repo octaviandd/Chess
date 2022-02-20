@@ -290,8 +290,11 @@ class Chess {
         moves.push(this.board[i - x][j + x]);
         this.board[i - x][j + x].div.style.backgroundColor = "#85784E";
         if (this.board[i - x][j + x].piece !== null) {
-          console.log(this.board[i - x][j + x]);
           if (this.board[i - x][j + x].piece.includes(currentPieceColor)) {
+            break;
+          }
+          if (!this.board[i - x][j + x].piece.includes(currentPieceColor)) {
+            moves.push(this.board[i - x][j + x]);
             break;
           }
         }
@@ -302,6 +305,15 @@ class Chess {
         o++;
         moves.push(this.board[i + o][j + o]);
         this.board[i + o][j + o].div.style.backgroundColor = "#85784E";
+        if (this.board[i + o][j + o].piece !== null) {
+          if (this.board[i + o][j + o].piece.includes(currentPieceColor)) {
+            break;
+          }
+          if (!this.board[i + o][j + o].piece.includes(currentPieceColor)) {
+            moves.push(this.board[i + o][j + o]);
+            break;
+          }
+        }
       }
 
       let m = 0;
@@ -309,6 +321,15 @@ class Chess {
         m++;
         moves.push(this.board[i + m][j - m]);
         this.board[i + m][j - m].div.style.backgroundColor = "#85784E";
+        if (this.board[i + m][j - m].piece !== null) {
+          if (this.board[i + m][j - m].piece.includes(currentPieceColor)) {
+            break;
+          }
+          if (!this.board[i + m][j - m].piece.includes(currentPieceColor)) {
+            moves.push(this.board[i + m][j - m]);
+            break;
+          }
+        }
       }
 
       let n = 0;
@@ -316,6 +337,15 @@ class Chess {
         n++;
         moves.push(this.board[i - n][j - n]);
         this.board[i - n][j - n].div.style.backgroundColor = "#85784E";
+        if (this.board[i - n][j - n].piece !== null) {
+          if (this.board[i - n][j - n].piece.includes(currentPieceColor)) {
+            break;
+          }
+          if (!this.board[i - n][j - n].piece.includes(currentPieceColor)) {
+            moves.push(this.board[i - n][j - n]);
+            break;
+          }
+        }
       }
 
       this.availableMovePositions = moves;
