@@ -70,8 +70,10 @@ class Chess {
   switchTurn() {
     if (this.currentPlayer === "white") {
       this.currentPlayer = "black";
+      turn.innerHTML = this.currentPlayer;
     } else if (this.currentPlayer === "black") {
       this.currentPlayer = "white";
+      turn.innerHTML = this.currentPlayer;
     }
   }
 
@@ -253,82 +255,73 @@ class Chess {
 
       this.availableMovePositions = moves;
     } else if (this.board[i][j].piece.includes("pawn")) {
+      // get current piece color and its opposite
       let currentPieceColor = this.currentlySelectedPiece.piece.split("_")[0];
       let adversaryColor = "";
+
+      // check to see if its white moving or black moving.
       if (currentPieceColor === "white") {
         adversaryColor = "black";
       } else if (currentPieceColor === "black") {
         adversaryColor = "white";
       }
-
       if (currentPieceColor === "white") {
-        if (i === 6) {
-          if (this.board[i - 1][j].piece === null) {
-            this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+        if (this.board[i - 1][j] && this.board[i - 1][j].piece === null) {
+          this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+          this.availableMovePositions.push(this.board[i - 1][j]);
+          if (i === 6) {
+            this.availableMovePositions.push(this.board[i - 2][j]);
             this.board[i - 2][j].div.style.backgroundColor = "#85784E";
-            this.availableMovePositions = [
-              this.board[i - 1][j],
-              this.board[i - 2][j],
-            ];
           }
-        } else {
-          if (this.board[i][j].piece.includes("black")) {
-            if (this.board[i + 1][j].piece === null) {
-              this.board[i + 1][j].div.style.backgroundColor = "#85784E";
-              this.availableMovePositions = [this.board[i + 1][j]];
-              return [this.board[i + 1][j]];
+          if (
+            this.board[i - 1][j + 1].piece &&
+            this.board[i - 1][j + 1].piece.includes("black")
+          ) {
+            if (
+              this.board[i - 1][j + 1] &&
+              this.board[i + 1][j + 1].piece === null
+            ) {
+              this.board[i - 1][j + 1].div.style.backgroundColor = "#85784E";
+              this.availableMovePositions.push([this.board[i + 1][j]]);
             }
-          } else if (this.board[i][j].piece.includes("white")) {
-            if (this.board[i - 1][j].piece === null) {
-              this.board[i - 1][j].div.style.backgroundColor = "#85784E";
-              this.availableMovePositions = [this.board[i - 1][j]];
-            }
-            if (this.board[i - 1][j + 1].piece !== null) {
-              if (this.board[i - 1][j + 1].piece.includes(adversaryColor)) {
-                this.board[i - 1][j + 1].div.style.backgroundColor = "#85784E";
-                this.availableMovePositions.push(this.board[i - 1][j + 1]);
-              }
-            }
-            if (this.board[i - 1][j - 1].piece !== null) {
-              if (this.board[i - 1][j - 1].piece.includes(adversaryColor)) {
-                this.board[i - 1][j - 1].div.style.backgroundColor = "#85784E";
-                this.availableMovePositions.push(this.board[i - 1][j - 1]);
-              }
+          }
+          if (
+            this.board[i - 1][j - 1].piece &&
+            this.board[i - 1][j - 1].piece.includes("black")
+          ) {
+            if (
+              this.board[i - 1][j - 1] &&
+              this.board[i + 1][j - 1].piece === null
+            ) {
+              this.board[i - 1][j - 1].div.style.backgroundColor = "#85784E";
+              this.availableMovePositions.push([this.board[i - 1][j]]);
             }
           }
         }
       }
 
       if (currentPieceColor === "black") {
-        if (i === 1) {
-          if (this.board[i + 1][j].piece === null) {
-            this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+        if (this.board[i + 1][j] && this.board[i + 1][j].piece === null) {
+          this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+          this.availableMovePositions.push(this.board[i + 1][j]);
+          if (i === 1) {
             this.board[i + 2][j].div.style.backgroundColor = "#85784E";
-            this.availableMovePositions = [
-              this.board[i + 1][j],
-              this.board[i + 2][j],
-            ];
+            this.availableMovePositions.push(this.board[i + 2][j]);
           }
-        } else {
-          if (this.board[i][j].piece.includes("black")) {
-            if (this.board[i + 1][j].piece === null) {
-              this.board[i + 1][j].div.style.backgroundColor = "#85784E";
-              this.availableMovePositions = [this.board[i + 1][j]];
-            }
+          if (
+            this.board[i + 1][j + 1] &&
+            this.board[i + 1][j + 1].piece !== null
+          ) {
+            this.board[i + 1][j + 1].div.style.backgroundColor = "#85784E";
+            this.availableMovePositions.push(this.board[i + 1][j + 1]);
           }
-          if (currentPieceColor === "black") {
-            if (this.board[i + 1][j + 1].piece !== null) {
-              if (this.board[i + 1][j + 1].piece.includes(adversaryColor)) {
-                this.board[i + 1][j + 1].div.style.backgroundColor = "#85784E";
-                this.availableMovePositions.push(this.board[i + 1][j + 1]);
-              }
-            }
-            if (this.board[i + 1][j - 1].piece !== null) {
-              if (this.board[i + 1][j - 1].piece.includes(adversaryColor)) {
-                this.board[i + 1][j - 1].div.style.backgroundColor = "#85784E";
-                this.availableMovePositions.push(this.board[i + 1][j - 1]);
-              }
-            }
+
+          if (
+            this.board[i + 1][j - 1] &&
+            this.board[i + 1][j - 1].piece !== null
+          ) {
+            this.board[i + 1][j - 1].div.style.backgroundColor = "#85784E";
+            this.availableMovePositions.push(this.board[i + 1][j + -1]);
           }
         }
       }
