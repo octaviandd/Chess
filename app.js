@@ -1,6 +1,7 @@
 /** @format */
 
 const main = document.querySelector("#main");
+const turn = document.querySelector("#turns");
 
 class Chess {
   constructor() {
@@ -9,6 +10,8 @@ class Chess {
     this.availableMovePositions = [];
     this.leavingPosition = undefined;
     this.goingPosition = undefined;
+    this.isChecked = false;
+    this.currentPlayer = "white";
   }
   createChessTable() {
     let matrix = [];
@@ -60,6 +63,16 @@ class Chess {
     }
     // Set the current state for movement of pieces
     this.board = matrix;
+    this.currentPlayer = "white";
+    turn.innerHTML = this.currentPlayer;
+  }
+
+  switchTurn() {
+    if (this.currentPlayer === "white") {
+      this.currentPlayer = "black";
+    } else if (this.currentPlayer === "black") {
+      this.currentPlayer = "white";
+    }
   }
 
   dragOver(e) {
@@ -117,6 +130,7 @@ class Chess {
           this.currentlySelectedPiece.piece
         );
         this.leavingPosition.piece = null;
+        this.switchTurn();
       }
       this.deselectPosition();
     }
@@ -155,6 +169,12 @@ class Chess {
         this.board[i][j].div.style.backgroundColor = "#819669";
         this.leavingPosition = this.board[i][j];
         this.currentlySelectedPiece = this.board[i][j];
+        if (
+          this.currentPlayer !== this.currentlySelectedPiece.piece.split("_")[0]
+        ) {
+          this.currentlySelectedPiece = undefined;
+          return;
+        }
         this.getAvailablePositions(i, j);
       }
     } else {
