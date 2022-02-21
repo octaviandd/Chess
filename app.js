@@ -107,7 +107,6 @@ class Chess {
         })
       ) {
         if (incomingSquare.piece !== null) {
-          console.log("here");
           incomingSquare.div.classList.remove(incomingSquare.piece);
           incomingSquare.piece = null;
           console.log(incomingSquare);
@@ -251,11 +250,8 @@ class Chess {
               this.board[i - 1][j],
               this.board[i - 2][j],
             ];
-
-            return [this.board[i - 1][j], this.board[i - 2][j]];
           }
         } else {
-          console.log(this.board);
           if (this.board[i][j].piece.includes("black")) {
             if (this.board[i + 1][j].piece === null) {
               this.board[i + 1][j].div.style.backgroundColor = "#85784E";
@@ -266,7 +262,6 @@ class Chess {
             if (this.board[i - 1][j].piece === null) {
               this.board[i - 1][j].div.style.backgroundColor = "#85784E";
               this.availableMovePositions = [this.board[i - 1][j]];
-              return [this.board[i - 1][j]];
             }
             if (this.board[i - 1][j + 1].piece !== null) {
               if (this.board[i - 1][j + 1].piece.includes(adversaryColor)) {
@@ -293,15 +288,12 @@ class Chess {
               this.board[i + 1][j],
               this.board[i + 2][j],
             ];
-
-            return [this.board[i + 1][j], this.board[i + 2][j]];
           }
         } else {
           if (this.board[i][j].piece.includes("black")) {
             if (this.board[i + 1][j].piece === null) {
               this.board[i + 1][j].div.style.backgroundColor = "#85784E";
               this.availableMovePositions = [this.board[i + 1][j]];
-              return [this.board[i + 1][j]];
             }
           }
           if (currentPieceColor === "black") {
@@ -428,7 +420,7 @@ class Chess {
       }
 
       for (let y = 1; y <= spaceToLeft; y++) {
-        moves.push(this.board[i][y]);
+        moves.push(this.board[i][j - y]);
         this.board[i][j - y].div.style.backgroundColor = "#85784E";
         if (this.board[i][j - y].piece !== null) {
           if (this.board[i][j - y].piece.includes(currentPieceColor)) {
@@ -441,7 +433,7 @@ class Chess {
       }
 
       for (let y = 1; y <= spaceToTop; y++) {
-        moves.push(this.board[y][j]);
+        moves.push(this.board[i - y][j]);
         this.board[i - y][j].div.style.backgroundColor = "#85784E";
         if (this.board[i - y][j].piece !== null) {
           if (this.board[i - y][j].piece.includes(currentPieceColor)) {
