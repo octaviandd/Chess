@@ -234,7 +234,15 @@ class Chess {
 
       this.availableMovePositions = moves;
     } else if (this.board[i][j].piece.includes("pawn")) {
-      if (i === 6 || i === 1) {
+      let currentPieceColor = this.currentlySelectedPiece.piece.split("_")[0];
+      let adversaryColor = "";
+      if (currentPieceColor === "white") {
+        adversaryColor = "black";
+      } else if (currentPieceColor === "black") {
+        adversaryColor = "white";
+      }
+
+      if (currentPieceColor === "white") {
         if (i === 6) {
           if (this.board[i - 1][j].piece === null) {
             this.board[i - 1][j].div.style.backgroundColor = "#85784E";
@@ -243,9 +251,40 @@ class Chess {
               this.board[i - 1][j],
               this.board[i - 2][j],
             ];
+
             return [this.board[i - 1][j], this.board[i - 2][j]];
           }
+        } else {
+          console.log(this.board);
+          if (this.board[i][j].piece.includes("black")) {
+            if (this.board[i + 1][j].piece === null) {
+              this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+              this.availableMovePositions = [this.board[i + 1][j]];
+              return [this.board[i + 1][j]];
+            }
+          } else if (this.board[i][j].piece.includes("white")) {
+            if (this.board[i - 1][j].piece === null) {
+              this.board[i - 1][j].div.style.backgroundColor = "#85784E";
+              this.availableMovePositions = [this.board[i - 1][j]];
+              return [this.board[i - 1][j]];
+            }
+            if (this.board[i - 1][j + 1].piece !== null) {
+              if (this.board[i - 1][j + 1].piece.includes(adversaryColor)) {
+                this.board[i - 1][j + 1].div.style.backgroundColor = "#85784E";
+                this.availableMovePositions.push(this.board[i - 1][j + 1]);
+              }
+            }
+            if (this.board[i - 1][j - 1].piece !== null) {
+              if (this.board[i - 1][j - 1].piece.includes(adversaryColor)) {
+                this.board[i - 1][j - 1].div.style.backgroundColor = "#85784E";
+                this.availableMovePositions.push(this.board[i - 1][j - 1]);
+              }
+            }
+          }
         }
+      }
+
+      if (currentPieceColor === "black") {
         if (i === 1) {
           if (this.board[i + 1][j].piece === null) {
             this.board[i + 1][j].div.style.backgroundColor = "#85784E";
@@ -257,19 +296,27 @@ class Chess {
 
             return [this.board[i + 1][j], this.board[i + 2][j]];
           }
-        }
-      } else {
-        if (this.board[i][j].piece.includes("black")) {
-          if (this.board[i + 1][j].piece === null) {
-            this.board[i + 1][j].div.style.backgroundColor = "#85784E";
-            this.availableMovePositions = [this.board[i + 1][j]];
-            return [this.board[i + 1][j]];
+        } else {
+          if (this.board[i][j].piece.includes("black")) {
+            if (this.board[i + 1][j].piece === null) {
+              this.board[i + 1][j].div.style.backgroundColor = "#85784E";
+              this.availableMovePositions = [this.board[i + 1][j]];
+              return [this.board[i + 1][j]];
+            }
           }
-        } else if (this.board[i][j].piece.includes("white")) {
-          if (this.board[i - 1][j].piece === null) {
-            this.board[i - 1][j].div.style.backgroundColor = "#85784E";
-            this.availableMovePositions = [this.board[i - 1][j]];
-            return [this.board[i - 1][j]];
+          if (currentPieceColor === "black") {
+            if (this.board[i + 1][j + 1].piece !== null) {
+              if (this.board[i + 1][j + 1].piece.includes(adversaryColor)) {
+                this.board[i + 1][j + 1].div.style.backgroundColor = "#85784E";
+                this.availableMovePositions.push(this.board[i + 1][j + 1]);
+              }
+            }
+            if (this.board[i + 1][j - 1].piece !== null) {
+              if (this.board[i + 1][j - 1].piece.includes(adversaryColor)) {
+                this.board[i + 1][j - 1].div.style.backgroundColor = "#85784E";
+                this.availableMovePositions.push(this.board[i + 1][j - 1]);
+              }
+            }
           }
         }
       }
