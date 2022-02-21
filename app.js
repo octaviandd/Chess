@@ -39,7 +39,7 @@ class Chess {
         square.dataset.row = i;
         square.setAttribute("draggable", true);
         square.addEventListener("dragstart", (e) => this.selectPiece(i, j));
-        square.addEventListener("dragend", (e) => this.movePiece(e));
+        // square.addEventListener("dragend", (e) => this.movePiece(e));
         square.addEventListener("dragover", (e) => this.dragOver(e));
         square.addEventListener("dragenter", (e) => this.dragEnter(e));
         square.addEventListener("dragleave", (e) => this.dragLeave(e));
@@ -257,14 +257,7 @@ class Chess {
     } else if (this.board[i][j].piece.includes("pawn")) {
       // get current piece color and its opposite
       let currentPieceColor = this.currentlySelectedPiece.piece.split("_")[0];
-      let adversaryColor = "";
 
-      // check to see if its white moving or black moving.
-      if (currentPieceColor === "white") {
-        adversaryColor = "black";
-      } else if (currentPieceColor === "black") {
-        adversaryColor = "white";
-      }
       if (currentPieceColor === "white") {
         if (this.board[i - 1][j] && this.board[i - 1][j].piece === null) {
           this.board[i - 1][j].div.style.backgroundColor = "#85784E";
@@ -561,18 +554,6 @@ class Chess {
     }
   }
 
-  getCoords(i, j) {
-    return { row: i, column: j };
-  }
-
-  getBoard() {
-    return this.board;
-  }
-
-  movePiece(e) {
-    var elements = document.elementsFromPoint(e.clientX, e.clientY);
-  }
-
   setDefaultPieces(row, col, square) {
     if (row === 0 && col === 0) {
       square.classList.add("black_rook");
@@ -637,5 +618,3 @@ class Chess {
 let newBoard = new Chess();
 
 newBoard.createChessTable();
-newBoard.getCoords();
-newBoard.getBoard();
