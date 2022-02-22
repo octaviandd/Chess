@@ -8,6 +8,7 @@ class Chess {
     this.board = undefined;
     this.currentlySelectedPiece = undefined;
     this.availableMovePositions = [];
+    this.futureAvailableMovePositions = [];
     this.leavingPosition = undefined;
     this.goingPosition = undefined;
     this.isChecked = false;
@@ -50,6 +51,7 @@ class Chess {
           column: j,
           div: square,
           piece: this.setDefaultPieces(i, j, square),
+          availableFutureMoves: null,
         });
 
         // Set the default images of the pieces
@@ -124,7 +126,6 @@ class Chess {
         if (incomingSquare.piece !== null) {
           incomingSquare.div.classList.remove(incomingSquare.piece);
           incomingSquare.piece = null;
-          console.log(incomingSquare);
         }
         incomingSquare.div.classList.add(this.currentlySelectedPiece.piece);
         incomingSquare.piece = this.currentlySelectedPiece.piece;
@@ -132,9 +133,98 @@ class Chess {
           this.currentlySelectedPiece.piece
         );
         this.leavingPosition.piece = null;
+        this.checkIfKingIsChecked(Number(row), Number(column));
         this.switchTurn();
       }
       this.deselectPosition();
+    }
+  }
+
+  checkIfKingIsChecked(i, j) {
+    if (this.board[i][j].piece.includes("rook")) {
+      let spaceToRight = 7 - j;
+      let spaceToLeft = 0 + j;
+      let spaceToTop = 0 + i;
+      let spaceToBottom = 7 - i;
+      let moves = [];
+
+      let currentPieceColor = this.board[i][j].piece.split("_")[0];
+      let adversaryColor = "";
+      if (currentPieceColor === "black") {
+        adversaryColor = "white";
+      } else if (currentPieceColor === "white") {
+        adversaryColor = "black";
+      }
+
+      for (let y = 1; y <= spaceToRight; y++) {
+        moves.push(this.board[i][j + y]);
+        this.board[i][y + j].div.style.backgroundColor = "#85784E";
+        if (this.board[i][j + y].piece !== null) {
+          if (this.board[i][j + y].piece.includes(currentPieceColor)) {
+            break;
+          } else {
+            break;
+          }
+        }
+      }
+
+      for (let y = 1; y <= spaceToLeft; y++) {
+        moves.push(this.board[i][j - y]);
+        this.board[i][j - y].div.style.backgroundColor = "#85784E";
+        if (this.board[i][j - y].piece !== null) {
+          if (this.board[i][j - y].piece.includes(currentPieceColor)) {
+            break;
+          } else {
+            break;
+          }
+        }
+      }
+
+      for (let y = 1; y <= spaceToTop; y++) {
+        moves.push(this.board[i - y][j]);
+        this.board[i - y][j].div.style.backgroundColor = "#85784E";
+        if (this.board[i - y][j].piece !== null) {
+          if (this.board[i - y][j].piece.includes(currentPieceColor)) {
+            break;
+          } else {
+            break;
+          }
+        }
+      }
+      for (let y = 0; y < spaceToBottom; y++) {
+        moves.push(this.board[y + i][j]);
+        this.board[y + i][j].div.style.backgroundColor = "#85784E";
+        if (this.board[i + y][j].piece !== null) {
+          if (this.board[i + y][j].piece.includes(currentPieceColor)) {
+            break;
+          } else {
+            break;
+          }
+        }
+      }
+
+      this.futureAvailableMovePositions.map((item) => console.log(item));
+      this.board[i][j].availableFutureMoves = moves;
+
+      let checkCount = 0;
+
+      for (let i = 0; i < this.board.length; i++) {
+        for (let j = 0; j < this.board[i].length; j++) {
+          if (this.board[i][j].availableFutureMoves) {
+            if (
+              this.board[i][j].piece &&
+              !this.board[i][j].piece.includes(adversaryColor)
+            ) {
+              this.board[i][j].availableFutureMoves.find((item) =>
+                item.piece && item.piece === "black_king" ? checkCount++ : null
+              );
+            }
+          }
+        }
+      }
+      console.log(checkCount);
+
+      this.isChecked = checkCount > 0;
     }
   }
 
@@ -163,24 +253,27 @@ class Chess {
    * @returns
    */
   selectPiece(i, j) {
-    if (!this.currentlySelectedPiece) {
-      if (this.board[i][j].piece) {
-        this.board.map((row) =>
-          row.map((col) => (col.div.style.backgroundColor = ""))
-        );
-        this.board[i][j].div.style.backgroundColor = "#819669";
-        this.leavingPosition = this.board[i][j];
-        this.currentlySelectedPiece = this.board[i][j];
-        if (
-          this.currentPlayer !== this.currentlySelectedPiece.piece.split("_")[0]
-        ) {
-          this.currentlySelectedPiece = undefined;
-          return;
+    if (!this.isChecked) {
+      if (!this.currentlySelectedPiece) {
+        if (this.board[i][j].piece) {
+          this.board.map((row) =>
+            row.map((col) => (col.div.style.backgroundColor = ""))
+          );
+          this.board[i][j].div.style.backgroundColor = "#819669";
+          this.leavingPosition = this.board[i][j];
+          this.currentlySelectedPiece = this.board[i][j];
+          if (
+            this.currentPlayer !==
+            this.currentlySelectedPiece.piece.split("_")[0]
+          ) {
+            this.currentlySelectedPiece = undefined;
+            return;
+          }
+          this.getAvailablePositions(i, j);
         }
-        this.getAvailablePositions(i, j);
+      } else {
+        return;
       }
-    } else {
-      return;
     }
   }
 
@@ -257,56 +350,56 @@ class Chess {
     } else if (this.board[i][j].piece.includes("pawn")) {
       // get current piece color and its opposite
       let currentPieceColor = this.currentlySelectedPiece.piece.split("_")[0];
-
+      let moves = [];
       if (currentPieceColor === "white") {
         if (this.board[i - 1][j] && this.board[i - 1][j].piece === null) {
           this.board[i - 1][j].div.style.backgroundColor = "#85784E";
-          this.availableMovePositions.push(this.board[i - 1][j]);
+          moves.push(this.board[i - 1][j]);
           if (i === 6) {
-            this.availableMovePositions.push(this.board[i - 2][j]);
-            this.board[i - 2][j].div.style.backgroundColor = "#85784E";
-          }
-          if (
-            this.board[i - 1][j + 1].piece &&
-            this.board[i - 1][j + 1].piece.includes("black")
-          ) {
-            if (
-              this.board[i - 1][j + 1] &&
-              this.board[i + 1][j + 1].piece === null
-            ) {
-              this.board[i - 1][j + 1].div.style.backgroundColor = "#85784E";
-              this.availableMovePositions.push([this.board[i + 1][j]]);
+            if (this.board[i - 2][j].piece === null) {
+              moves.push(this.board[i - 2][j]);
+              this.board[i - 2][j].div.style.backgroundColor = "#85784E";
             }
           }
-          if (
-            this.board[i - 1][j - 1].piece &&
-            this.board[i - 1][j - 1].piece.includes("black")
-          ) {
+
+          if (this.board[i - 1][j + 1]) {
             if (
-              this.board[i - 1][j - 1] &&
-              this.board[i + 1][j - 1].piece === null
+              this.board[i - 1][j + 1].piece &&
+              this.board[i - 1][j + 1].piece.includes("black")
+            ) {
+              this.board[i - 1][j + 1].div.style.backgroundColor = "#85784E";
+              moves.push([this.board[i + 1][j]]);
+            }
+          }
+          if (this.board[i - 1][j - 1]) {
+            if (
+              this.board[i - 1][j - 1].piece &&
+              this.board[i - 1][j - 1].piece.includes("black")
             ) {
               this.board[i - 1][j - 1].div.style.backgroundColor = "#85784E";
-              this.availableMovePositions.push([this.board[i - 1][j]]);
+              moves.push([this.board[i - 1][j]]);
             }
           }
         }
+        this.availableMovePositions = moves;
       }
 
       if (currentPieceColor === "black") {
         if (this.board[i + 1][j] && this.board[i + 1][j].piece === null) {
           this.board[i + 1][j].div.style.backgroundColor = "#85784E";
-          this.availableMovePositions.push(this.board[i + 1][j]);
+          moves.push(this.board[i + 1][j]);
           if (i === 1) {
-            this.board[i + 2][j].div.style.backgroundColor = "#85784E";
-            this.availableMovePositions.push(this.board[i + 2][j]);
+            if (this.board[i + 2][j].piece === null) {
+              this.board[i + 2][j].div.style.backgroundColor = "#85784E";
+              moves.push(this.board[i + 2][j]);
+            }
           }
           if (
             this.board[i + 1][j + 1] &&
             this.board[i + 1][j + 1].piece !== null
           ) {
             this.board[i + 1][j + 1].div.style.backgroundColor = "#85784E";
-            this.availableMovePositions.push(this.board[i + 1][j + 1]);
+            moves.push(this.board[i + 1][j + 1]);
           }
 
           if (
@@ -314,9 +407,10 @@ class Chess {
             this.board[i + 1][j - 1].piece !== null
           ) {
             this.board[i + 1][j - 1].div.style.backgroundColor = "#85784E";
-            this.availableMovePositions.push(this.board[i + 1][j + -1]);
+            moves.push(this.board[i + 1][j - 1]);
           }
         }
+        this.availableMovePositions = moves;
       }
     } else if (this.board[i][j].piece.includes("bishop")) {
       let spaceToRight = 7 - j;
@@ -430,7 +524,6 @@ class Chess {
         this.board[i][j - y].div.style.backgroundColor = "#85784E";
         if (this.board[i][j - y].piece !== null) {
           if (this.board[i][j - y].piece.includes(currentPieceColor)) {
-            console.log(this.board[i][j - y]);
             break;
           } else {
             break;
