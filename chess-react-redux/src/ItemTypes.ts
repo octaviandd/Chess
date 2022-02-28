@@ -1,6 +1,6 @@
 /** @format */
 
-export const ItemTypes = {
+export const ItemTypes: any = {
   KNIGHT: "knight",
   ROOK: "rook",
   BISHOP: "bishop",

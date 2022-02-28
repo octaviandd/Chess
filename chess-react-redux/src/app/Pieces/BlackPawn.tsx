@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useDrag, DragPreviewImage } from "react-dnd";
+import { checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import PawnSVG from "./black_pawn.svg";
 
@@ -14,11 +15,39 @@ const style = {
 type Props = {
   row: any;
   col: any;
+  positionsOfCheck: any;
+  board: any;
 };
 
-export default function BlackPawn({ row, col }: Props) {
+export default function BlackPawn({
+  row,
+  col,
+  positionsOfCheck,
+  board,
+}: Props) {
+  let item = "black_pawn";
+  if (positionsOfCheck && positionsOfCheck.length > 0) {
+    console.log(
+      checkPossibleMovesInCheck(item, board, row, col, positionsOfCheck)
+    );
+  }
+
   const [collectedProps, drag, preview] = useDrag(
     () => ({
+      canDrag: () => {
+        if (positionsOfCheck && positionsOfCheck.length > 0) {
+          if (
+            checkPossibleMovesInCheck(item, board, row, col, positionsOfCheck)
+              .length < 1
+          ) {
+            return false;
+          } else {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      },
       type: ItemTypes.PAWN,
       item: { piece: "black_pawn", row: row, col: col },
       end: (item, monitor) => {},
@@ -29,7 +58,7 @@ export default function BlackPawn({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [positionsOfCheck]
   );
 
   return (

@@ -4,13 +4,21 @@ import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
 import { ItemTypes } from "../../ItemTypes";
 import BlackKingSVG from "./black_king.svg";
+import { checkBlackKing } from "../../game";
 
 type Props = {
   row: any;
   col: any;
+  setBlackKingCheck: any;
+  board: any;
 };
 
-export default function BlackKing({ row, col }: Props) {
+export default function BlackKing({
+  row,
+  col,
+  setBlackKingCheck,
+  board,
+}: Props) {
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       type: ItemTypes.PAWN,

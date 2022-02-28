@@ -4,18 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 import styled from "styled-components";
 import Square from "./Square";
-import BlackRook from "./app/Pieces/BlackRook";
-import BlackKnight from "./app/Pieces/BlackKnight";
-import BlackBishop from "./app/Pieces/BlackBishop";
-import BlackKing from "./app/Pieces/BlackKing";
-import BlackQueen from "./app/Pieces/BlackQueen";
-import BlackPawn from "./app/Pieces/BlackPawn";
-import WhitePawn from "./app/Pieces/WhitePawn";
-import WhiteRook from "./app/Pieces/WhiteRook";
-import WhiteKnight from "./app/Pieces/WhiteKnight";
-import WhiteBishop from "./app/Pieces/WhiteBishop";
-import WhiteKing from "./app/Pieces/WhiteKing";
-import WhiteQueen from "./app/Pieces/WhiteQueen";
 
 const initialBoard = [
   [
@@ -426,6 +414,16 @@ const initialBoard = [
 function App() {
   const [board, setBoard] = useState(initialBoard);
   const [turn, setTurn] = useState("white");
+  const [isBlackKingChecked, setBlackKingChecked] = useState(false);
+  const [positionsOfCheck, setPositionsOfCheck] = useState(null);
+
+  const handleTurn = () => {
+    if (turn === "white") {
+      setTurn("black");
+    } else if (turn === "black") {
+      setTurn("white");
+    }
+  };
 
   return (
     <div className="App">
@@ -444,7 +442,11 @@ function App() {
                     key={`${j + i}`}
                     piece={board[i][j]}
                     turn={turn}
-                    handleTurn={setTurn}
+                    handleTurn={handleTurn}
+                    positionsOfCheck={positionsOfCheck}
+                    setPositionsOfCheck={setPositionsOfCheck}
+                    isBlackKingChecked={isBlackKingChecked}
+                    setBlackKingChecked={setBlackKingChecked}
                   ></Square>
                 );
               } else {
@@ -458,7 +460,11 @@ function App() {
                     key={`${j + i}`}
                     piece={board[i][j]}
                     turn={turn}
-                    handleTurn={setTurn}
+                    handleTurn={handleTurn}
+                    positionsOfCheck={positionsOfCheck}
+                    setPositionsOfCheck={setPositionsOfCheck}
+                    isBlackKingChecked={isBlackKingChecked}
+                    setBlackKingChecked={setBlackKingChecked}
                   ></Square>
                 );
               }
@@ -474,7 +480,11 @@ function App() {
                     key={`${j + i}`}
                     piece={board[i][j]}
                     turn={turn}
-                    handleTurn={setTurn}
+                    handleTurn={handleTurn}
+                    positionsOfCheck={positionsOfCheck}
+                    setPositionsOfCheck={setPositionsOfCheck}
+                    isBlackKingChecked={isBlackKingChecked}
+                    setBlackKingChecked={setBlackKingChecked}
                   ></Square>
                 );
               } else {
@@ -488,7 +498,11 @@ function App() {
                     key={`${j + i}`}
                     piece={board[i][j]}
                     turn={turn}
-                    handleTurn={setTurn}
+                    handleTurn={handleTurn}
+                    positionsOfCheck={positionsOfCheck}
+                    setPositionsOfCheck={setPositionsOfCheck}
+                    isBlackKingChecked={isBlackKingChecked}
+                    setBlackKingChecked={setBlackKingChecked}
                   ></Square>
                 );
               }
