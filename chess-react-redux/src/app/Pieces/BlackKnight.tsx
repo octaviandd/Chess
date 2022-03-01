@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
+import { canKnightMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import BlackKnightSVG from "./black_knight.svg";
 
@@ -12,17 +13,62 @@ type Props = {
   kingsChecks: any;
 };
 
-const style = {
-  fontSize: 40,
-  fontWeight: "bold",
-  cursor: "move",
-};
-
-export default function BlackKnight({ row, col }: Props) {
+export default function BlackKnight({ row, col, board, kingsChecks }: Props) {
+  let item = "black_knight";
+  let moves = canKnightMove(board, row, col);
+  let returnable: any = [];
+  let canMove = false;
+  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
+    kingsChecks;
   const [collectedProps, drag, preview] = useDrag(
     () => ({
+      canDrag: () => {
+        if (moves && blackKingPositionsOfCheck) {
+          for (let i = 0; i < moves.length; i++) {
+            for (
+              let j = 0;
+              j < blackKingPositionsOnTheDirectionOfCheck.length;
+              j++
+            ) {
+              if (
+                moves[i].row ===
+                  blackKingPositionsOnTheDirectionOfCheck[j].row &&
+                moves[i].column ===
+                  blackKingPositionsOnTheDirectionOfCheck[j].column
+              ) {
+                returnable.push(moves[i]);
+                canMove = true;
+              }
+            }
+          }
+        }
+
+        if (blackKingPositionsOfCheck && blackKingPositionsOfCheck.length > 0) {
+          if (
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              blackKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      },
       type: ItemTypes.PAWN,
-      item: { piece: "black_knight", row: row, col: col },
+      item: {
+        piece: "black_knight",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -31,7 +77,7 @@ export default function BlackKnight({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [canMove, blackKingPositionsOfCheck]
   );
   return (
     <>
@@ -41,7 +87,7 @@ export default function BlackKnight({ row, col }: Props) {
       ></DragPreviewImage>
       <div
         ref={drag}
-        style={{ ...style, opacity: collectedProps.isDragging ? 0.5 : 1 }}
+        style={{ cursor: "move", opacity: collectedProps.isDragging ? 0.5 : 1 }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

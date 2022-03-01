@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
+import { canKnightMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import WhiteKnightSVG from "../Pieces/white_knight.svg";
 
@@ -12,17 +13,63 @@ type Props = {
   kingsChecks: any;
 };
 
-const style = {
-  fontSize: 40,
-  fontWeight: "bold",
-  cursor: "move",
-};
+export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
+  let item = "white_knight";
+  let moves = canKnightMove(board, row, col);
+  let returnable: any = [];
+  let canMove = false;
+  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
+    kingsChecks;
 
-export default function WhiteKnight({ row, col }: Props) {
   const [collectedProps, drag, preview] = useDrag(
     () => ({
+      canDrag: () => {
+        if (moves && whiteKingPositionsOfCheck) {
+          for (let i = 0; i < moves.length; i++) {
+            for (
+              let j = 0;
+              j < whiteKingPositionsOnTheDirectionOfCheck.length;
+              j++
+            ) {
+              if (
+                moves[i].row ===
+                  whiteKingPositionsOnTheDirectionOfCheck[j].row &&
+                moves[i].column ===
+                  whiteKingPositionsOnTheDirectionOfCheck[j].column
+              ) {
+                returnable.push(moves[i]);
+                canMove = true;
+              }
+            }
+          }
+        }
+
+        if (whiteKingPositionsOfCheck && whiteKingPositionsOfCheck.length > 0) {
+          if (
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              whiteKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      },
       type: ItemTypes.PAWN,
-      item: { piece: "white_knight", row: row, col: col },
+      item: {
+        piece: "white_knight",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -31,7 +78,7 @@ export default function WhiteKnight({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [canMove, whiteKingPositionsOfCheck]
   );
   return (
     <>
@@ -41,7 +88,7 @@ export default function WhiteKnight({ row, col }: Props) {
       ></DragPreviewImage>
       <div
         ref={drag}
-        style={{ ...style, opacity: collectedProps.isDragging ? 0.5 : 1 }}
+        style={{ cursor: "move", opacity: collectedProps.isDragging ? 0.5 : 1 }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -688,6 +688,8 @@ export const checkPossibleMovesInCheck = (
     }
   }
 
+  console.log("ere");
+
   return returnable;
 };
 
