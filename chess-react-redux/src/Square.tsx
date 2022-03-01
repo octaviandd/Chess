@@ -19,6 +19,7 @@ import { ItemTypes } from "./ItemTypes";
 import { Overlay, OverlayType } from "./Overlay";
 import {
   checkBlackKing,
+  checkWhiteKing,
   checkPossibleMovesForEveryPiece,
   searchForKings,
 } from "./game";
@@ -121,7 +122,7 @@ export default function Square({
     () => ({
       accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
       canDrop: (item: any) => {
-        if (kingChecks.blackKingIsChecked) {
+        if (kingChecks.blackKingIsChecked || kingChecks.whiteKingIsChecked) {
           if (item.availableMovesInCheck) {
             return item.availableMovesInCheck.find(
               (el: any) => el.row === row && el.column === col
@@ -167,8 +168,23 @@ export default function Square({
           "black"
         );
 
+        const {
+          numberOfChecks_white,
+          positionsOfCheck_white,
+          positionsOnTheDirectionOfCheck_white,
+        } = checkWhiteKing(
+          board,
+          whiteKingPositionsX,
+          whiteKingPositionsY,
+          "white"
+        );
+
         setKingChecks((prevState: any) => ({
           ...prevState,
+          whiteKingIsChecked: numberOfChecks_white !== 0,
+          whiteKingPositionsOfCheck: positionsOfCheck_white,
+          whiteKingPositionsOnTheDirectionOfCheck:
+            positionsOnTheDirectionOfCheck_white,
           blackKingIsChecked: numberOfChecks !== 0,
           blackKingPositionsOfCheck: positionsOfCheck,
           blackKingPositionsOnTheDirectionOfCheck:
@@ -207,13 +223,8 @@ export default function Square({
 
 const SquareDiv = styled.div<SquareProps>`
   position: relative;
-
   width: 80px;
   height: 80px;
   background-color: ${(props) =>
     props.color === "dark" ? "#b58863" : "#f0d9b5"};
-
-  /* :hover {
-    ${({ piece }) => piece && `background-color: #90ee90`}
-  } */
 `;

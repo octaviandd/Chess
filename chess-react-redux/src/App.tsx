@@ -414,10 +414,6 @@ const initialBoard = [
 function App() {
   const [board, setBoard] = useState(initialBoard);
   const [turn, setTurn] = useState("white");
-  const [isBlackKingChecked, setBlackKingChecked] = useState(false);
-  const [positionsOfCheck, setPositionsOfCheck] = useState(null);
-  const [positionsOnTheDirectionOfCheck, setPositionsOnTheDirectionOfCheck] =
-    useState(null);
 
   const [kingChecks, setKingChecks] = useState({
     whiteKingIsChecked: false,

@@ -17,28 +17,29 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
   let moves = canPawnMove(board, row, col, "white");
   let returnable: any = [];
   let canMove = false;
-  if (moves && kingsChecks.whiteKingPositionsOfCheck) {
-    for (let i = 0; i < moves.length; i++) {
-      for (
-        let j = 0;
-        j < kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.length;
-        j++
-      ) {
-        if (
-          moves[i].row ===
-            kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-          moves[i].column ===
-            kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].column
-        ) {
-          returnable.push(moves[i]);
-          canMove = true;
-        }
-      }
-    }
-  }
+
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
+        if (moves && kingsChecks.whiteKingPositionsOfCheck) {
+          for (let i = 0; i < moves.length; i++) {
+            for (
+              let j = 0;
+              j < kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.length;
+              j++
+            ) {
+              if (
+                moves[i].row ===
+                  kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].row &&
+                moves[i].column ===
+                  kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].column
+              ) {
+                returnable.push(moves[i]);
+                canMove = true;
+              }
+            }
+          }
+        }
         if (
           kingsChecks.whiteKingPositionsOfCheck &&
           kingsChecks.whiteKingPositionsOfCheck.length > 0

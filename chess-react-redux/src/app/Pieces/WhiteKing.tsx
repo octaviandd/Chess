@@ -3,7 +3,7 @@
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
 import { ItemTypes } from "../../ItemTypes";
-import WhiteKingSVG from "./white_knight.svg";
+import WhiteKingSVG from "./white_king.svg";
 
 type Props = {
   row: any;
