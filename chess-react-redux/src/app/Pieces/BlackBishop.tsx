@@ -3,25 +3,74 @@
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
 import styled from "styled-components";
+import { canBishopMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import BlackBishopSVG from "./black_bishop.svg";
 
 type Props = {
-  row: any;
-  col: any;
+  row: number;
+  col: number;
+  board: any;
+  kingsChecks: any;
 };
 
-const style = {
-  fontSize: 40,
-  fontWeight: "bold",
-  cursor: "move",
-};
+export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
+  let item = "black_bishop";
+  let moves = canBishopMove(board, row, col, "black");
+  let returnable: any = [];
+  let canMove = false;
+  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
+    kingsChecks;
 
-export default function BlackBishop({ row, col }: Props) {
   const [collectedProps, drag, preview] = useDrag(
     () => ({
-      type: ItemTypes.PAWN,
-      item: { piece: "black_bishop", row: row, col: col },
+      canDrag: () => {
+        if (moves && blackKingPositionsOfCheck) {
+          for (let i = 0; i < moves.length; i++) {
+            for (
+              let j = 0;
+              j < blackKingPositionsOnTheDirectionOfCheck.length;
+              j++
+            ) {
+              if (
+                moves[i].row ===
+                  blackKingPositionsOnTheDirectionOfCheck[j].row &&
+                moves[i].column ===
+                  blackKingPositionsOnTheDirectionOfCheck[j].column
+              ) {
+                returnable.push(moves[i]);
+                canMove = true;
+              }
+            }
+          }
+        }
+
+        if (blackKingPositionsOfCheck && blackKingPositionsOfCheck.length > 0) {
+          if (
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              blackKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      },
+      type: ItemTypes.BISHOP,
+      item: {
+        piece: "black_bishop",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -30,7 +79,7 @@ export default function BlackBishop({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [blackKingPositionsOfCheck, canMove]
   );
   return (
     <>
@@ -40,7 +89,7 @@ export default function BlackBishop({ row, col }: Props) {
       ></DragPreviewImage>
       <div
         ref={drag}
-        style={{ ...style, opacity: collectedProps.isDragging ? 0.5 : 1 }}
+        style={{ cursor: "move", opacity: collectedProps.isDragging ? 0.5 : 1 }}
       >
         <SVG
           xmlns="http://www.w3.org/2000/svg"

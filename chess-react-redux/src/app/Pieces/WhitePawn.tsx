@@ -7,8 +7,8 @@ import { ItemTypes } from "../../ItemTypes";
 import WhitePawnSVG from "./white_pawn.svg";
 
 type Props = {
-  row: any;
-  col: any;
+  row: number;
+  col: number;
   board: any;
   kingsChecks: any;
 };
@@ -18,21 +18,24 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
   let returnable: any = [];
   let canMove = false;
 
+  const { whiteKingPositionsOfCheck, whiteKingPositionsOnTheDirectionOfCheck } =
+    kingsChecks;
+
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        if (moves && kingsChecks.whiteKingPositionsOfCheck) {
+        if (moves && whiteKingPositionsOfCheck) {
           for (let i = 0; i < moves.length; i++) {
             for (
               let j = 0;
-              j < kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.length;
+              j < whiteKingPositionsOnTheDirectionOfCheck.length;
               j++
             ) {
               if (
                 moves[i].row ===
-                  kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].row &&
+                  whiteKingPositionsOnTheDirectionOfCheck[j].row &&
                 moves[i].column ===
-                  kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].column
+                  whiteKingPositionsOnTheDirectionOfCheck[j].column
               ) {
                 returnable.push(moves[i]);
                 canMove = true;
@@ -40,17 +43,14 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
             }
           }
         }
-        if (
-          kingsChecks.whiteKingPositionsOfCheck &&
-          kingsChecks.whiteKingPositionsOfCheck.length > 0
-        ) {
+        if (whiteKingPositionsOfCheck && whiteKingPositionsOfCheck.length > 0) {
           if (
             checkPossibleMovesInCheck(
               item,
               board,
               row,
               col,
-              kingsChecks.whiteKingPositionsOfCheck
+              whiteKingPositionsOfCheck
             ).length > 0 ||
             canMove
           ) {
@@ -77,7 +77,7 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    [kingsChecks.whiteKingPositionsOfCheck]
+    [whiteKingPositionsOfCheck, canMove]
   );
   return (
     <>

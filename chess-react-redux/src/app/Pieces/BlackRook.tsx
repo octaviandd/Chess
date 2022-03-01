@@ -6,8 +6,10 @@ import { ItemTypes } from "../../ItemTypes";
 import BlackRookSVG from "./black_rook.svg";
 
 type Props = {
-  row: any;
-  col: any;
+  row: number;
+  col: number;
+  board: any;
+  kingsChecks: any;
 };
 
 export default function BlackRook({ row, col }: Props) {

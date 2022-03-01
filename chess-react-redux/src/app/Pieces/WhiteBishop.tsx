@@ -2,25 +2,78 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
+import { canBishopMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import WhiteBishopSVG from "./white_bishop.svg";
 
 type Props = {
-  row: any;
-  col: any;
+  row: number;
+  col: number;
+  board: any;
+  kingsChecks: any;
 };
 
-const style = {
-  fontSize: 40,
-  fontWeight: "bold",
-  cursor: "move",
-};
+export default function WhiteBishop({ row, col, board, kingsChecks }: Props) {
+  let item = "white_bishop";
+  let moves = canBishopMove(board, row, col, "white");
+  let returnable: any = [];
+  let canMove = false;
+  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
+    kingsChecks;
 
-export default function WhiteBishop({ row, col }: Props) {
   const [collectedProps, drag, preview] = useDrag(
     () => ({
-      type: ItemTypes.PAWN,
-      item: { piece: "white_bishop", row: row, col: col },
+      canDrag: () => {
+        if (moves && whiteKingPositionsOfCheck) {
+          for (let i = 0; i < moves.length; i++) {
+            for (
+              let j = 0;
+              j < whiteKingPositionsOnTheDirectionOfCheck.length;
+              j++
+            ) {
+              if (
+                moves[i].row ===
+                  whiteKingPositionsOnTheDirectionOfCheck[j].row &&
+                moves[i].column ===
+                  whiteKingPositionsOnTheDirectionOfCheck[j].column
+              ) {
+                returnable.push(moves[i]);
+                canMove = true;
+              }
+            }
+          }
+        }
+        console.log({
+          returnable,
+          whiteKingPositionsOfCheck,
+          whiteKingPositionsOnTheDirectionOfCheck,
+        });
+        if (whiteKingPositionsOfCheck && whiteKingPositionsOfCheck.length > 0) {
+          if (
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              whiteKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      },
+      type: ItemTypes.BISHOP,
+      item: {
+        piece: "white_bishop",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -29,7 +82,7 @@ export default function WhiteBishop({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [whiteKingPositionsOfCheck, canMove]
   );
   return (
     <>
@@ -38,7 +91,7 @@ export default function WhiteBishop({ row, col }: Props) {
         src={WhiteBishopSVG}
       ></DragPreviewImage>
       <div
-        style={{ ...style, opacity: collectedProps.isDragging ? 0.5 : 1 }}
+        style={{ cursor: "move", opacity: collectedProps.isDragging ? 0.5 : 1 }}
         ref={drag}
       >
         <svg

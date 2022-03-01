@@ -6,8 +6,10 @@ import { ItemTypes } from "../../ItemTypes";
 import WhiteKingSVG from "./white_king.svg";
 
 type Props = {
-  row: any;
-  col: any;
+  row: number;
+  col: number;
+  board: any;
+  kingsChecks: any;
 };
 
 export default function WhiteKing({ row, col }: Props) {

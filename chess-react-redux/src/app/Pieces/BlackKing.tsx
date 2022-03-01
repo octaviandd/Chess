@@ -4,11 +4,12 @@ import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
 import { ItemTypes } from "../../ItemTypes";
 import BlackKingSVG from "./black_king.svg";
-import { checkBlackKing } from "../../game";
 
 type Props = {
-  row: any;
-  col: any;
+  row: number;
+  col: number;
+  board: any;
+  kingsChecks: any;
 };
 
 export default function BlackKing({ row, col }: Props) {

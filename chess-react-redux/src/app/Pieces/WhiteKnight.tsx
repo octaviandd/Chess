@@ -6,8 +6,10 @@ import { ItemTypes } from "../../ItemTypes";
 import WhiteKnightSVG from "../Pieces/white_knight.svg";
 
 type Props = {
-  row: any;
-  col: any;
+  row: number;
+  col: number;
+  board: any;
+  kingsChecks: any;
 };
 
 const style = {

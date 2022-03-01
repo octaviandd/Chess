@@ -407,7 +407,7 @@ export const canQueenMove = (
   return moves;
 };
 
-export const checkBlackKing = (
+export const checkForKingChecks = (
   board: any,
   i: number,
   j: number,
@@ -419,6 +419,7 @@ export const checkBlackKing = (
   let numberOfChecks = 0;
   let positionsOfCheck: any = [];
   let positionsOnTheDirectionOfCheck: any = [];
+  let oppositeColor = pieceColor === "white" ? "black" : "white";
 
   let knightMoves = [
     { x: 2, y: -1 },
@@ -438,7 +439,7 @@ export const checkBlackKing = (
 
       if (
         board[i + m.x][j + m.y].piece &&
-        board[i + m.x][j + m.y].piece === "white_knight"
+        board[i + m.x][j + m.y].piece === `${oppositeColor}_knight`
       ) {
         positionsOfCheck.push(board[i + m.x][j + m.y]);
         numberOfChecks++;
@@ -453,7 +454,12 @@ export const checkBlackKing = (
       if (board[i][j + y].piece.includes(pieceColor)) {
         break;
       } else {
-        positionsOfCheck.push(board[i][j + y]);
+        if (
+          board[i][j + y].piece.includes("rook") ||
+          board[i][j + y].piece.includes("queen")
+        ) {
+          positionsOfCheck.push(board[i][j + y]);
+        }
         break;
       }
     }
@@ -466,7 +472,12 @@ export const checkBlackKing = (
       if (board[i][j - y].piece.includes(pieceColor)) {
         break;
       } else {
-        positionsOfCheck.push(board[i][j - y]);
+        if (
+          board[i][j - y].piece.includes("rook") ||
+          board[i][j - y].piece.includes("queen")
+        ) {
+          positionsOfCheck.push(board[i][j - y]);
+        }
         break;
       }
     }
@@ -479,7 +490,12 @@ export const checkBlackKing = (
       if (board[i - y][j].piece.includes(pieceColor)) {
         break;
       } else {
-        positionsOfCheck.push(board[i - y][j]);
+        if (
+          board[i - y][j].piece.includes("rook") ||
+          board[i - y][j].piece.includes("queen")
+        ) {
+          positionsOfCheck.push(board[i - y][j]);
+        }
         break;
       }
     }
@@ -492,7 +508,12 @@ export const checkBlackKing = (
       if (board[y + i][j].piece.includes(pieceColor)) {
         break;
       } else {
-        positionsOfCheck.push(board[y + i][j]);
+        if (
+          board[y + i][j].piece.includes("rook") ||
+          board[y + i][j].piece.includes("queen")
+        ) {
+          positionsOfCheck.push(board[y + i][j]);
+        }
         break;
       }
     }
@@ -517,8 +538,6 @@ export const checkBlackKing = (
         ) {
           positionsOfCheck.push(board[i - x][j + x]);
           numberOfChecks++;
-
-          // positionsOnTheDirectionOfCheck.push(board[i - x][j + x]);
           for (let q = x; q > 0; q--) {
             positionsOnTheDirectionOfCheck.push(board[i - q][j + q]);
           }
@@ -574,7 +593,6 @@ export const checkBlackKing = (
         ) {
           positionsOfCheck.push(board[i + m][j - m]);
           numberOfChecks++;
-          // positionsOnTheDirectionOfCheck.push(board[i + m][j - m]);
           for (let q = m; q > 0; q--) {
             positionsOnTheDirectionOfCheck.push(board[i + q][j - q]);
           }
@@ -601,7 +619,6 @@ export const checkBlackKing = (
         ) {
           positionsOfCheck.push(board[i - n][j - n]);
           numberOfChecks++;
-          // positionsOnTheDirectionOfCheck.push(board[i - n][j - n]);
           for (let q = n; q > 0; q--) {
             positionsOnTheDirectionOfCheck.push(board[i - q][j - q]);
           }
@@ -616,220 +633,6 @@ export const checkBlackKing = (
     positionsOfCheck,
     moves: Array.from(new Set(moves)),
     numberOfChecks,
-  };
-};
-
-export const checkWhiteKing = (
-  board: any,
-  i: number,
-  j: number,
-  pieceColor: string
-) => {
-  let spaceToRight = 7 - j;
-  let spaceToBottom = 7 - i;
-  let moves = [];
-  let numberOfChecks_white = 0;
-  let positionsOfCheck_white: any = [];
-  let positionsOnTheDirectionOfCheck_white: any = [];
-
-  let knightMoves = [
-    { x: 2, y: -1 },
-    { x: 2, y: 1 },
-    { x: 1, y: -2 },
-    { x: 1, y: 2 },
-    { x: -2, y: -1 },
-    { x: -2, y: 1 },
-    { x: -1, y: -2 },
-    { x: -1, y: 2 },
-  ];
-
-  // check for knight checks
-  for (let m of knightMoves) {
-    if (board[i + m.x] && board[i + m.x][j + m.y]) {
-      moves.push(board[i + m.x][j + m.y]);
-
-      if (
-        board[i + m.x][j + m.y].piece &&
-        board[i + m.x][j + m.y].piece === "black_knight"
-      ) {
-        numberOfChecks_white++;
-        positionsOfCheck_white.push(board[i + m.x][j + m.y]);
-      }
-    }
-  }
-
-  //check for checks from horizontal right
-  for (let y = 1; y <= spaceToRight; y++) {
-    moves.push(board[i][j + y]);
-    if (board[i][j + y].piece !== null) {
-      if (board[i][j + y].piece.includes(pieceColor)) {
-        break;
-      } else {
-        positionsOfCheck_white.push(board[i][j + y]);
-        break;
-      }
-    }
-  }
-
-  //check for checks from horizontal left
-  for (let y = 1; y <= j; y++) {
-    moves.push(board[i][j - y]);
-    if (board[i][j - y].piece !== null) {
-      if (board[i][j - y].piece.includes(pieceColor)) {
-        break;
-      } else {
-        positionsOfCheck_white.push(board[i][j - y]);
-        break;
-      }
-    }
-  }
-
-  //check for checks from vertical top
-  for (let y = 1; y <= i; y++) {
-    moves.push(board[i - y][j]);
-    if (board[i - y][j].piece !== null) {
-      if (board[i - y][j].piece.includes(pieceColor)) {
-        break;
-      } else {
-        positionsOfCheck_white.push(board[i - y][j]);
-        break;
-      }
-    }
-  }
-
-  //check for checks from vertical down
-  for (let y = 1; y <= spaceToBottom; y++) {
-    moves.push(board[y + i][j]);
-    if (board[y + i][j].piece !== null) {
-      if (board[y + i][j].piece.includes(pieceColor)) {
-        break;
-      } else {
-        positionsOfCheck_white.push(board[y + i][j]);
-        break;
-      }
-    }
-  }
-
-  //check for checks from diagonal to right
-  let x = 0;
-
-  while (x < i && x < spaceToRight) {
-    x++;
-    moves.push(board[i - x][j + x]);
-    if (board[i - x][j + x].piece !== null) {
-      if (board[i - x][j + x].piece.includes(pieceColor)) {
-        positionsOnTheDirectionOfCheck_white = [];
-        break;
-      }
-      if (!board[i - x][j + x].piece.includes(pieceColor)) {
-        moves.push(board[i - x][j + x]);
-        if (
-          board[i - x][j + x].piece.includes("bishop") ||
-          board[i - x][j + x].piece.includes("queen")
-          // board[i - x][j + x].piece.includes("pawn")
-        ) {
-          positionsOfCheck_white.push(board[i - x][j + x]);
-          numberOfChecks_white++;
-          positionsOnTheDirectionOfCheck_white.push(board[i - x][j + x]);
-        } else {
-          positionsOnTheDirectionOfCheck_white = [];
-        }
-        break;
-      }
-    }
-  }
-
-  //checks from diagonal RIGHT -> LEFT/TOP
-  let o = 0;
-  while (o < spaceToBottom && o < spaceToRight) {
-    o++;
-    moves.push(board[i + o][j + o]);
-
-    if (board[i + o][j + o].piece !== null) {
-      if (board[i + o][j + o].piece.includes(pieceColor)) {
-        positionsOnTheDirectionOfCheck_white = [];
-        break;
-      }
-      if (!board[i + o][j + o].piece.includes(pieceColor)) {
-        moves.push(board[i + o][j + o]);
-        if (
-          board[i + o][j + o].piece.includes("bishop") ||
-          board[i + o][j + o].piece.includes("queen")
-          // board[i + o][j + o].piece.includes("pawn")
-        ) {
-          positionsOfCheck_white.push(board[i + o][j + o]);
-          numberOfChecks_white++;
-          positionsOnTheDirectionOfCheck_white.push(board[i + o][j + o]);
-        } else {
-          positionsOnTheDirectionOfCheck_white = [];
-        }
-        break;
-      }
-    } else {
-      positionsOnTheDirectionOfCheck_white.push(board[i + o][j + o]);
-    }
-  }
-
-  let m = 0;
-  while (m < spaceToBottom && m < j) {
-    m++;
-    moves.push(board[i + m][j - m]);
-    if (board[i + m][j - m].piece !== null) {
-      if (board[i + m][j - m].piece.includes(pieceColor)) {
-        break;
-      }
-      if (!board[i + m][j - m].piece.includes(pieceColor)) {
-        moves.push(board[i + m][j - m]);
-        if (
-          board[i + m][j - m].piece.includes("bishop") ||
-          board[i + m][j - m].piece.includes("queen")
-          // board[i + m][j - m].piece.includes("pawn")
-        ) {
-          positionsOfCheck_white.push(board[i + m][j - m]);
-          numberOfChecks_white++;
-          positionsOnTheDirectionOfCheck_white.push(board[i + m][j - m]);
-        } else {
-          positionsOnTheDirectionOfCheck_white = [];
-        }
-        break;
-      }
-    }
-  }
-
-  let n = 0;
-  while (n < i && n < j) {
-    n++;
-    moves.push(board[i - n][j - n]);
-    if (board[i - n][j - n].piece !== null) {
-      if (board[i - n][j - n].piece.includes(pieceColor)) {
-        break;
-      }
-      if (!board[i - n][j - n].piece.includes(pieceColor)) {
-        moves.push(board[i - n][j - n]);
-        if (!board[i - n][j - n].piece.includes(pieceColor)) {
-          moves.push(board[i - n][j - n]);
-          if (
-            board[i - n][j - n].piece.includes("bishop") ||
-            board[i - n][j - n].piece.includes("queen")
-            // board[i - n][j - n].piece.includes("pawn")
-          ) {
-            positionsOfCheck_white.push(board[i - n][j - n]);
-            numberOfChecks_white++;
-            positionsOnTheDirectionOfCheck_white.push(board[i - n][j - n]);
-          } else {
-            positionsOnTheDirectionOfCheck_white = [];
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  return {
-    positionsOnTheDirectionOfCheck_white,
-    positionsOfCheck_white,
-    moves: Array.from(new Set(moves)),
-    numberOfChecks_white,
   };
 };
 

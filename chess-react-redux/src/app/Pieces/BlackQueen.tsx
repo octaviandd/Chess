@@ -7,8 +7,10 @@ import { ItemTypes } from "../../ItemTypes";
 import BlackQueenSVG from "./black_queen.svg";
 
 type Props = {
-  row: any;
-  col: any;
+  row: number;
+  col: number;
+  board: any;
+  kingsChecks: any;
 };
 
 export default function BlackQueen({ row, col }: Props) {

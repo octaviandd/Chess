@@ -18,36 +18,91 @@ import { useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes";
 import { Overlay, OverlayType } from "./Overlay";
 import {
-  checkBlackKing,
-  checkWhiteKing,
   checkPossibleMovesForEveryPiece,
   searchForKings,
+  checkForKingChecks,
 } from "./game";
 
 const setDefaultPieces = (
   piece: any,
-  row: any,
-  col: any,
+  row: number,
+  col: number,
   board: any,
   kingChecks: any,
   setKingChecks: any
 ) => {
   if (piece === "black_rook") {
-    return <BlackRook row={row} col={col}></BlackRook>;
+    return (
+      <BlackRook
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></BlackRook>
+    );
   } else if (piece === "black_knight") {
-    return <BlackKnight row={row} col={col}></BlackKnight>;
+    return (
+      <BlackKnight
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></BlackKnight>
+    );
   } else if (piece === "black_bishop") {
-    return <BlackBishop row={row} col={col}></BlackBishop>;
+    return (
+      <BlackBishop
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></BlackBishop>
+    );
   } else if (piece === "black_king") {
-    return <BlackKing row={row} col={col}></BlackKing>;
+    return (
+      <BlackKing
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></BlackKing>
+    );
   } else if (piece === "black_queen") {
-    return <BlackQueen row={row} col={col}></BlackQueen>;
+    return (
+      <BlackQueen
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></BlackQueen>
+    );
   } else if (piece === "black_bishop") {
-    return <BlackBishop row={row} col={col}></BlackBishop>;
+    return (
+      <BlackBishop
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></BlackBishop>
+    );
   } else if (piece === "black_knight") {
-    return <BlackKnight row={row} col={col}></BlackKnight>;
+    return (
+      <BlackKnight
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></BlackKnight>
+    );
   } else if (piece === "black_rook") {
-    return <BlackRook row={row} col={col}></BlackRook>;
+    return (
+      <BlackRook
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></BlackRook>
+    );
   } else if (piece === "black_pawn") {
     return (
       <BlackPawn
@@ -58,21 +113,77 @@ const setDefaultPieces = (
       ></BlackPawn>
     );
   } else if (piece === "white_rook") {
-    return <WhiteRook row={row} col={col}></WhiteRook>;
+    return (
+      <WhiteRook
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhiteRook>
+    );
   } else if (piece === "white_knight") {
-    return <WhiteKnight row={row} col={col}></WhiteKnight>;
+    return (
+      <WhiteKnight
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhiteKnight>
+    );
   } else if (piece === "white_bishop") {
-    return <WhiteBishop row={row} col={col}></WhiteBishop>;
+    return (
+      <WhiteBishop
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhiteBishop>
+    );
   } else if (piece === "white_king") {
-    return <WhiteKing row={row} col={col}></WhiteKing>;
+    return (
+      <WhiteKing
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhiteKing>
+    );
   } else if (piece === "white_queen") {
-    return <WhiteQueen row={row} col={col}></WhiteQueen>;
+    return (
+      <WhiteQueen
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhiteQueen>
+    );
   } else if (piece === "white_bishop") {
-    return <WhiteBishop row={row} col={col}></WhiteBishop>;
+    return (
+      <WhiteBishop
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhiteBishop>
+    );
   } else if (piece === "white_knight") {
-    return <WhiteKnight row={row} col={col}></WhiteKnight>;
+    return (
+      <WhiteKnight
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhiteKnight>
+    );
   } else if (piece === "white_rook") {
-    return <WhiteRook row={row} col={col}></WhiteRook>;
+    return (
+      <WhiteRook
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhiteRook>
+    );
   } else if (piece === "white_pawn") {
     return (
       <WhitePawn
@@ -161,7 +272,7 @@ export default function Square({
           numberOfChecks,
           positionsOfCheck,
           positionsOnTheDirectionOfCheck,
-        } = checkBlackKing(
+        } = checkForKingChecks(
           board,
           blackKingPositionsX,
           blackKingPositionsY,
@@ -169,10 +280,10 @@ export default function Square({
         );
 
         const {
-          numberOfChecks_white,
-          positionsOfCheck_white,
-          positionsOnTheDirectionOfCheck_white,
-        } = checkWhiteKing(
+          numberOfChecks: numberOfChecks_white,
+          positionsOfCheck: positionsOfCheck_white,
+          positionsOnTheDirectionOfCheck: positionsOnTheDirectionOfCheck_white,
+        } = checkForKingChecks(
           board,
           whiteKingPositionsX,
           whiteKingPositionsY,
