@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useDrag, DragPreviewImage } from "react-dnd";
-import { checkPossibleMovesInCheck } from "../../game";
+import { canPawnMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import PawnSVG from "./black_pawn.svg";
 
@@ -15,41 +15,67 @@ const style = {
 type Props = {
   row: any;
   col: any;
-  positionsOfCheck: any;
   board: any;
+  kingsChecks: any;
 };
 
-export default function BlackPawn({
-  row,
-  col,
-  positionsOfCheck,
-  board,
-}: Props) {
+export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
   let item = "black_pawn";
-  if (positionsOfCheck && positionsOfCheck.length > 0) {
-    console.log(
-      checkPossibleMovesInCheck(item, board, row, col, positionsOfCheck)
-    );
+  let moves = canPawnMove(board, row, col, "black");
+  let returnable: any = [];
+  let canMove = false;
+  if (moves && kingsChecks.blackKingPositionsOnTheDirectionOfCheck) {
+    for (let i = 0; i < moves.length; i++) {
+      for (
+        let j = 0;
+        j < kingsChecks.blackKingPositionsOnTheDirectionOfCheck.length;
+        j++
+      ) {
+        if (
+          moves[i].row ===
+            kingsChecks.blackKingPositionsOnTheDirectionOfCheck[j].row &&
+          moves[i].column ===
+            kingsChecks.blackKingPositionsOnTheDirectionOfCheck[j].column
+        ) {
+          returnable.push(moves[i]);
+          canMove = true;
+        }
+      }
+    }
   }
 
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        if (positionsOfCheck && positionsOfCheck.length > 0) {
+        if (
+          kingsChecks.blackKingPositionsOfCheck &&
+          kingsChecks.blackKingPositionsOfCheck.length > 0
+        ) {
           if (
-            checkPossibleMovesInCheck(item, board, row, col, positionsOfCheck)
-              .length < 1
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              kingsChecks.blackKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
           ) {
-            return false;
-          } else {
             return true;
+          } else {
+            return false;
           }
         } else {
           return true;
         }
       },
       type: ItemTypes.PAWN,
-      item: { piece: "black_pawn", row: row, col: col },
+      item: {
+        piece: "black_pawn",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -58,7 +84,7 @@ export default function BlackPawn({
         item: monitor.getItem(),
       }),
     }),
-    [positionsOfCheck]
+    [kingsChecks.blackKingPositionsOfCheck]
   );
 
   return (

@@ -2,25 +2,72 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
+import { canPawnMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import WhitePawnSVG from "./white_pawn.svg";
-
-const style = {
-  fontSize: 40,
-  fontWeight: "bold",
-  cursor: "move",
-};
 
 type Props = {
   row: any;
   col: any;
+  board: any;
+  kingsChecks: any;
 };
-
-export default function WhitePawn({ row, col }: Props) {
+export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
+  let item = "white_pawn";
+  let moves = canPawnMove(board, row, col, "white");
+  let returnable: any = [];
+  let canMove = false;
+  if (moves && kingsChecks.whiteKingPositionsOfCheck) {
+    for (let i = 0; i < moves.length; i++) {
+      for (
+        let j = 0;
+        j < kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.length;
+        j++
+      ) {
+        if (
+          moves[i].row ===
+            kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].row &&
+          moves[i].column ===
+            kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].column
+        ) {
+          returnable.push(moves[i]);
+          canMove = true;
+        }
+      }
+    }
+  }
   const [collectedProps, drag, preview] = useDrag(
     () => ({
+      canDrag: () => {
+        if (
+          kingsChecks.whiteKingPositionsOfCheck &&
+          kingsChecks.whiteKingPositionsOfCheck.length > 0
+        ) {
+          if (
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              kingsChecks.whiteKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      },
       type: ItemTypes.PAWN,
-      item: { piece: "white_pawn", row: row, col: col },
+      item: {
+        piece: "white_pawn",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -29,7 +76,7 @@ export default function WhitePawn({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [kingsChecks.whiteKingPositionsOfCheck]
   );
   return (
     <>

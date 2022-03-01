@@ -18,22 +18,18 @@ import { useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes";
 import { Overlay, OverlayType } from "./Overlay";
 import {
-  canBishopMove,
-  canKingMove,
-  canPawnMove,
-  canRookMove,
-  canKnightMove,
-  canQueenMove,
   checkBlackKing,
+  checkPossibleMovesForEveryPiece,
+  searchForKings,
 } from "./game";
 
 const setDefaultPieces = (
   piece: any,
   row: any,
   col: any,
-  setBlackKingCheck: any,
   board: any,
-  positionsOfCheck: any
+  kingChecks: any,
+  setKingChecks: any
 ) => {
   if (piece === "black_rook") {
     return <BlackRook row={row} col={col}></BlackRook>;
@@ -42,14 +38,7 @@ const setDefaultPieces = (
   } else if (piece === "black_bishop") {
     return <BlackBishop row={row} col={col}></BlackBishop>;
   } else if (piece === "black_king") {
-    return (
-      <BlackKing
-        row={row}
-        col={col}
-        setBlackKingCheck={setBlackKingCheck}
-        board={board}
-      ></BlackKing>
-    );
+    return <BlackKing row={row} col={col}></BlackKing>;
   } else if (piece === "black_queen") {
     return <BlackQueen row={row} col={col}></BlackQueen>;
   } else if (piece === "black_bishop") {
@@ -63,8 +52,8 @@ const setDefaultPieces = (
       <BlackPawn
         row={row}
         col={col}
-        positionsOfCheck={positionsOfCheck}
         board={board}
+        kingsChecks={kingChecks}
       ></BlackPawn>
     );
   } else if (piece === "white_rook") {
@@ -84,17 +73,20 @@ const setDefaultPieces = (
   } else if (piece === "white_rook") {
     return <WhiteRook row={row} col={col}></WhiteRook>;
   } else if (piece === "white_pawn") {
-    return <WhitePawn row={row} col={col}></WhitePawn>;
+    return (
+      <WhitePawn
+        row={row}
+        col={col}
+        board={board}
+        kingsChecks={kingChecks}
+      ></WhitePawn>
+    );
   } else {
     return null;
   }
 };
 
 type Props = {
-  positionsOfCheck: any;
-  setPositionsOfCheck: any;
-  isBlackKingChecked: boolean;
-  setBlackKingChecked: any;
   color: string;
   row: number;
   col: number;
@@ -104,73 +96,13 @@ type Props = {
   turn: string;
   piece: any;
   handleTurn: any;
+  kingChecks: any;
+  setKingChecks: any;
 };
 
 type SquareProps = {
   piece: boolean;
   color: string;
-};
-
-const searchForBlackKing = (board: any) => {
-  let blackKingPositionsX = 0;
-  let blackKingPositionsY = 0;
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].piece === "black_king") {
-        blackKingPositionsX = board[i][j].row;
-        blackKingPositionsY = board[i][j].column;
-      }
-    }
-  }
-  return { blackKingPositionsX, blackKingPositionsY };
-};
-
-const checkPossibleMoves = (
-  item: any,
-  piece: any,
-  board: any,
-  row: any,
-  col: any,
-  turn: any
-) => {
-  let pieceColor = item.piece.split("_")[0];
-  let incomingPiece = item.piece.split("_")[1];
-  if (piece.piece !== null) {
-    if (piece.piece && piece.piece.includes(pieceColor)) {
-      return false;
-    }
-  }
-  if (turn !== pieceColor) {
-    return false;
-  } else {
-    if (incomingPiece === "pawn") {
-      return canPawnMove(board, item.row, item.col, pieceColor).find(
-        (el: any) => el.row === row && el.column === col
-      );
-    } else if (incomingPiece === "knight") {
-      return canKnightMove(board, item.row, item.col).find(
-        (el: any) => el.row === row && el.column === col
-      );
-    } else if (incomingPiece === "bishop") {
-      return canBishopMove(board, item.row, item.col, piece).find(
-        (el: any) => el.row === row && el.column === col
-      );
-    } else if (incomingPiece === "rook") {
-      return canRookMove(board, item.row, item.col, pieceColor).find(
-        (el: any) => el.row === row && el.column === col
-      );
-    } else if (incomingPiece === "king") {
-      return canKingMove(board, item.row, item.col, pieceColor).find(
-        (el: any) => el.row === row && el.column === col
-      );
-    } else if (incomingPiece === "queen") {
-      return canQueenMove(board, item.row, item.col, pieceColor).find(
-        (el: any) => el.row === row && el.column === col
-      );
-    } else {
-      return false;
-    }
-  }
 };
 
 export default function Square({
@@ -182,19 +114,31 @@ export default function Square({
   piece,
   turn,
   handleTurn,
-  isBlackKingChecked,
-  setPositionsOfCheck,
-  positionsOfCheck,
-  setBlackKingChecked,
+  setKingChecks,
+  kingChecks,
 }: Props) {
-  const [{ isOver, canDrop, didDrop }, drop]: any = useDrop(
+  const [{ isOver, canDrop }, drop]: any = useDrop(
     () => ({
       accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
       canDrop: (item: any) => {
-        return checkPossibleMoves(item, piece, board, row, col, turn);
+        if (kingChecks.blackKingIsChecked) {
+          if (item.availableMovesInCheck) {
+            return item.availableMovesInCheck.find(
+              (el: any) => el.row === row && el.column === col
+            );
+          }
+        } else {
+          return checkPossibleMovesForEveryPiece(
+            item,
+            piece,
+            board,
+            row,
+            col,
+            turn
+          );
+        }
       },
       drop: (item: any, monitor) => {
-        console.log(item);
         setBoard((prevState: any) => {
           let copy = [...prevState];
           copy[row][col].piece = item.piece;
@@ -202,24 +146,34 @@ export default function Square({
           return copy;
         });
 
-        let blackKingPosition = searchForBlackKing(board);
+        let kingColor = turn === "white" ? "black" : "white";
 
-        setBlackKingChecked(
-          checkBlackKing(
-            board,
-            blackKingPosition.blackKingPositionsX,
-            blackKingPosition.blackKingPositionsY,
-            "black"
-          ).check.isCheckedFromKnight
+        let kingsPositions = searchForKings(board, kingColor);
+        const {
+          blackKingPositionsX,
+          blackKingPositionsY,
+          whiteKingPositionsX,
+          whiteKingPositionsY,
+        } = kingsPositions;
+
+        const {
+          numberOfChecks,
+          positionsOfCheck,
+          positionsOnTheDirectionOfCheck,
+        } = checkBlackKing(
+          board,
+          blackKingPositionsX,
+          blackKingPositionsY,
+          "black"
         );
-        setPositionsOfCheck(
-          checkBlackKing(
-            board,
-            blackKingPosition.blackKingPositionsX,
-            blackKingPosition.blackKingPositionsY,
-            "black"
-          ).positionsOfCheck
-        );
+
+        setKingChecks((prevState: any) => ({
+          ...prevState,
+          blackKingIsChecked: numberOfChecks !== 0,
+          blackKingPositionsOfCheck: positionsOfCheck,
+          blackKingPositionsOnTheDirectionOfCheck:
+            positionsOnTheDirectionOfCheck,
+        }));
 
         handleTurn();
       },
@@ -231,7 +185,7 @@ export default function Square({
         item: monitor.getItem(),
       }),
     }),
-    [turn, isBlackKingChecked]
+    [turn, kingChecks.isBlackKingChecked]
   );
 
   return (
@@ -240,9 +194,9 @@ export default function Square({
         piece.piece,
         row,
         col,
-        setBlackKingChecked,
         board,
-        positionsOfCheck
+        kingChecks,
+        setKingChecks
       )}
       {isOver && !canDrop && <Overlay type={OverlayType.IllegalMoveHover} />}
       {!isOver && canDrop && <Overlay type={OverlayType.PossibleMove} />}

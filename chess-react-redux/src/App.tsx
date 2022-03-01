@@ -416,6 +416,17 @@ function App() {
   const [turn, setTurn] = useState("white");
   const [isBlackKingChecked, setBlackKingChecked] = useState(false);
   const [positionsOfCheck, setPositionsOfCheck] = useState(null);
+  const [positionsOnTheDirectionOfCheck, setPositionsOnTheDirectionOfCheck] =
+    useState(null);
+
+  const [kingChecks, setKingChecks] = useState({
+    whiteKingIsChecked: false,
+    whiteKingPositionsOfCheck: null,
+    whiteKingPositionsOnTheDirectionOfCheck: null,
+    blackKingIsChecked: false,
+    blackKingPositionsOfCheck: null,
+    blackKingPositionsOnTheDirectionOfCheck: null,
+  });
 
   const handleTurn = () => {
     if (turn === "white") {
@@ -443,10 +454,8 @@ function App() {
                     piece={board[i][j]}
                     turn={turn}
                     handleTurn={handleTurn}
-                    positionsOfCheck={positionsOfCheck}
-                    setPositionsOfCheck={setPositionsOfCheck}
-                    isBlackKingChecked={isBlackKingChecked}
-                    setBlackKingChecked={setBlackKingChecked}
+                    kingChecks={kingChecks}
+                    setKingChecks={setKingChecks}
                   ></Square>
                 );
               } else {
@@ -461,10 +470,8 @@ function App() {
                     piece={board[i][j]}
                     turn={turn}
                     handleTurn={handleTurn}
-                    positionsOfCheck={positionsOfCheck}
-                    setPositionsOfCheck={setPositionsOfCheck}
-                    isBlackKingChecked={isBlackKingChecked}
-                    setBlackKingChecked={setBlackKingChecked}
+                    kingChecks={kingChecks}
+                    setKingChecks={setKingChecks}
                   ></Square>
                 );
               }
@@ -481,10 +488,8 @@ function App() {
                     piece={board[i][j]}
                     turn={turn}
                     handleTurn={handleTurn}
-                    positionsOfCheck={positionsOfCheck}
-                    setPositionsOfCheck={setPositionsOfCheck}
-                    isBlackKingChecked={isBlackKingChecked}
-                    setBlackKingChecked={setBlackKingChecked}
+                    kingChecks={kingChecks}
+                    setKingChecks={setKingChecks}
                   ></Square>
                 );
               } else {
@@ -499,10 +504,8 @@ function App() {
                     piece={board[i][j]}
                     turn={turn}
                     handleTurn={handleTurn}
-                    positionsOfCheck={positionsOfCheck}
-                    setPositionsOfCheck={setPositionsOfCheck}
-                    isBlackKingChecked={isBlackKingChecked}
-                    setBlackKingChecked={setBlackKingChecked}
+                    kingChecks={kingChecks}
+                    setKingChecks={setKingChecks}
                   ></Square>
                 );
               }

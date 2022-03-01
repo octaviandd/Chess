@@ -1,5 +1,34 @@
 /** @format */
 
+export const searchForKings = (board: any, kingColor: any) => {
+  let kingsPositions = {
+    blackKingPositionsX: 0,
+    blackKingPositionsY: 3,
+    whiteKingPositionsX: 7,
+    whiteKingPositionsY: 3,
+  };
+  if (kingColor === "black") {
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[i].length; j++) {
+        if (board[i][j].piece === "black_king") {
+          kingsPositions.blackKingPositionsX = board[i][j].row;
+          kingsPositions.blackKingPositionsY = board[i][j].column;
+        }
+      }
+    }
+  } else if (kingColor === "white") {
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[i].length; j++) {
+        if (board[i][j].piece === "white_king") {
+          kingsPositions.whiteKingPositionsX = board[i][j].row;
+          kingsPositions.whiteKingPositionsY = board[i][j].column;
+        }
+      }
+    }
+  }
+  return kingsPositions;
+};
+
 export const canPawnMove = (board: any, i: any, j: any, pieceColor: string) => {
   let moves = [];
   if (pieceColor === "black") {
@@ -356,11 +385,9 @@ export const checkBlackKing = (
   let spaceToRight = 7 - j;
   let spaceToBottom = 7 - i;
   let moves = [];
-  let isCheckedFromKnight = false;
-  let isCheckedFromQueenRook = false;
-  let isCheckedFromQueenBishop = false;
-  let isCheckedFromQueenBishopPawn = false;
+  let numberOfChecks = 0;
   let positionsOfCheck: any = [];
+  let positionsOnTheDirectionOfCheck: any = [];
 
   let knightMoves = [
     { x: 2, y: -1 },
@@ -451,26 +478,40 @@ export const checkBlackKing = (
       }
       if (!board[i - x][j + x].piece.includes(pieceColor)) {
         moves.push(board[i - x][j + x]);
-        console.log("here");
+        positionsOfCheck.push([i - x][j + x]);
         break;
       }
     }
   }
 
-  //  checks from diagonal RIGHT -> LEFT/TOP
+  //checks from diagonal RIGHT -> LEFT/TOP
   let o = 0;
   while (o < spaceToBottom && o < spaceToRight) {
     o++;
     moves.push(board[i + o][j + o]);
+
     if (board[i + o][j + o].piece !== null) {
       if (board[i + o][j + o].piece.includes(pieceColor)) {
+        positionsOnTheDirectionOfCheck = [];
         break;
       }
       if (!board[i + o][j + o].piece.includes(pieceColor)) {
         moves.push(board[i + o][j + o]);
-        positionsOfCheck.push(board[i + o][j + o]);
+        if (
+          board[i + o][j + o].piece.includes("bishop") ||
+          board[i + o][j + o].piece.includes("queen") ||
+          board[i + o][j + o].piece.includes("pawn")
+        ) {
+          positionsOfCheck.push(board[i + o][j + o]);
+          numberOfChecks++;
+          positionsOnTheDirectionOfCheck.push(board[i + o][j + o]);
+        } else {
+          positionsOnTheDirectionOfCheck = [];
+        }
         break;
       }
+    } else {
+      positionsOnTheDirectionOfCheck.push(board[i + o][j + o]);
     }
   }
 
@@ -484,7 +525,7 @@ export const checkBlackKing = (
       }
       if (!board[i + m][j - m].piece.includes(pieceColor)) {
         moves.push(board[i + m][j - m]);
-        console.log("here2");
+        positionsOfCheck.push(board[i + m][j - m]);
         break;
       }
     }
@@ -500,23 +541,17 @@ export const checkBlackKing = (
       }
       if (!board[i - n][j - n].piece.includes(pieceColor)) {
         moves.push(board[i - n][j - n]);
-        console.log("here3");
+        positionsOfCheck.push(board[i - n][j - n]);
         break;
       }
     }
   }
 
-  console.log(positionsOfCheck);
-
   return {
+    positionsOnTheDirectionOfCheck,
     positionsOfCheck,
     moves: Array.from(new Set(moves)),
-    check: {
-      isCheckedFromKnight,
-      isCheckedFromQueenBishop,
-      isCheckedFromQueenBishopPawn,
-      isCheckedFromQueenRook,
-    },
+    numberOfChecks,
   };
 };
 
@@ -546,15 +581,79 @@ export const checkPossibleMovesInCheck = (
     moves = canRookMove(board, row, col, pieceColor);
   }
   let returnable: any = [];
-  for (let i = 0; i < moves.length; i++) {
-    for (let j = 0; j < positionsOfCheck.length; j++) {
-      if (
-        moves[i].row === positionsOfCheck[j].row &&
-        moves[i].column === positionsOfCheck[j].column
-      ) {
-        returnable.push(moves[i]);
+  if (incomingPiece === "knight") {
+    for (let i = 0; i < moves.length; i++) {
+      for (let j = 0; j < positionsOfCheck.length; j++) {
+        if (
+          moves[i].row === positionsOfCheck[j].row &&
+          moves[i].column === positionsOfCheck[j].column
+        ) {
+          returnable.push(moves[i]);
+        }
       }
     }
   }
+
+  if (incomingPiece === "bishop") {
+    for (let i = 0; i < moves.length; i++) {
+      for (let j = 0; j < positionsOfCheck.length; j++) {
+        if (
+          moves[i].row === positionsOfCheck[j].row &&
+          moves[i].column === positionsOfCheck[j].column
+        ) {
+          returnable.push(moves[i]);
+        }
+      }
+    }
+  }
+
   return returnable;
+};
+
+export const checkPossibleMovesForEveryPiece = (
+  item: any,
+  piece: any,
+  board: any,
+  row: any,
+  col: any,
+  turn: any
+) => {
+  let pieceColor = item.piece.split("_")[0];
+  let incomingPiece = item.piece.split("_")[1];
+  if (piece.piece !== null) {
+    if (piece.piece && piece.piece.includes(pieceColor)) {
+      return false;
+    }
+  }
+  if (turn !== pieceColor) {
+    return false;
+  } else {
+    if (incomingPiece === "pawn") {
+      return canPawnMove(board, item.row, item.col, pieceColor).find(
+        (el: any) => el.row === row && el.column === col
+      );
+    } else if (incomingPiece === "knight") {
+      return canKnightMove(board, item.row, item.col).find(
+        (el: any) => el.row === row && el.column === col
+      );
+    } else if (incomingPiece === "bishop") {
+      return canBishopMove(board, item.row, item.col, piece).find(
+        (el: any) => el.row === row && el.column === col
+      );
+    } else if (incomingPiece === "rook") {
+      return canRookMove(board, item.row, item.col, pieceColor).find(
+        (el: any) => el.row === row && el.column === col
+      );
+    } else if (incomingPiece === "king") {
+      return canKingMove(board, item.row, item.col, pieceColor).find(
+        (el: any) => el.row === row && el.column === col
+      );
+    } else if (incomingPiece === "queen") {
+      return canQueenMove(board, item.row, item.col, pieceColor).find(
+        (el: any) => el.row === row && el.column === col
+      );
+    } else {
+      return false;
+    }
+  }
 };

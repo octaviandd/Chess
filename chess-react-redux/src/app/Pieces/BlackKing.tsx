@@ -9,16 +9,9 @@ import { checkBlackKing } from "../../game";
 type Props = {
   row: any;
   col: any;
-  setBlackKingCheck: any;
-  board: any;
 };
 
-export default function BlackKing({
-  row,
-  col,
-  setBlackKingCheck,
-  board,
-}: Props) {
+export default function BlackKing({ row, col }: Props) {
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       type: ItemTypes.PAWN,
