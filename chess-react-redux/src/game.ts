@@ -287,7 +287,6 @@ export const canKingMove = (board: any, i: any, j: any, pieceColor: string) => {
       }
     }
   }
-
   return moves;
 };
 
@@ -303,7 +302,7 @@ export const canQueenMove = (
 
   for (let y = 1; y <= spaceToRight; y++) {
     moves.push(board[i][j + y]);
-    if (board[i][j + y].piece !== null) {
+    if (board[i][j + y] && board[i][j + y].piece !== null) {
       if (board[i][j + y].piece.includes(pieceColor)) {
         break;
       } else {
@@ -314,7 +313,7 @@ export const canQueenMove = (
 
   for (let y = 1; y <= j; y++) {
     moves.push(board[i][j - y]);
-    if (board[i][j - y].piece !== null) {
+    if (board[i][j - y] && board[i][j - y].piece !== null) {
       if (board[i][j - y].piece.includes(pieceColor)) {
         break;
       } else {
@@ -325,7 +324,7 @@ export const canQueenMove = (
 
   for (let y = 1; y <= i; y++) {
     moves.push(board[i - y][j]);
-    if (board[i - y][j].piece !== null) {
+    if (board[i - y][j] && board[i - y][j].piece !== null) {
       if (board[i - y][j].piece.includes(pieceColor)) {
         break;
       } else {
@@ -335,7 +334,7 @@ export const canQueenMove = (
   }
   for (let y = 1; y <= spaceToBottom; y++) {
     moves.push(board[y + i][j]);
-    if (board[y + i][j].piece !== null) {
+    if (board[y + i][j] && board[y + i][j].piece !== null) {
       if (board[y + i][j].piece.includes(pieceColor)) {
         break;
       } else {
@@ -738,5 +737,49 @@ export const checkPossibleMovesForEveryPiece = (
     } else {
       return false;
     }
+  }
+};
+
+export const checkPossibleMovesForEveryPieceKing = (
+  item: any,
+  piece: any,
+  board: any,
+  row: any,
+  col: any
+) => {
+  let pieceColor = item.piece.split("_")[0];
+  let incomingPiece = item.piece.split("_")[1];
+  if (piece.piece !== null) {
+    if (piece.piece && piece.piece.includes(pieceColor)) {
+      return false;
+    }
+  }
+
+  if (incomingPiece === "pawn") {
+    return canPawnMove(board, item.row, item.col, pieceColor).find(
+      (el: any) => el.row === row && el.column === col
+    );
+  } else if (incomingPiece === "knight") {
+    return canKnightMove(board, item.row, item.col).find(
+      (el: any) => el.row === row && el.column === col
+    );
+  } else if (incomingPiece === "bishop") {
+    return canBishopMove(board, item.row, item.col, piece).find(
+      (el: any) => el.row === row && el.column === col
+    );
+  } else if (incomingPiece === "rook") {
+    return canRookMove(board, item.row, item.col, pieceColor).find(
+      (el: any) => el.row === row && el.column === col
+    );
+  } else if (incomingPiece === "king") {
+    return canKingMove(board, item.row, item.col, pieceColor).find(
+      (el: any) => el.row === row && el.column === col
+    );
+  } else if (incomingPiece === "queen") {
+    return canQueenMove(board, item.row, item.col, pieceColor).find(
+      (el: any) => el.row === row && el.column === col
+    );
+  } else {
+    return false;
   }
 };

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
+import { canRookMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import BlackRookSVG from "./black_rook.svg";
 
@@ -12,11 +13,62 @@ type Props = {
   kingsChecks: any;
 };
 
-export default function BlackRook({ row, col }: Props) {
+export default function BlackRook({ row, col, board, kingsChecks }: Props) {
+  let item = "black_rook";
+  let moves = canRookMove(board, row, col, "black");
+  let returnable: any = [];
+  let canMove = false;
+  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
+    kingsChecks;
   const [collectedProps, drag, preview] = useDrag(
     () => ({
-      type: ItemTypes.PAWN,
-      item: { piece: "black_rook", row: row, col: col },
+      canDrag: () => {
+        if (moves && blackKingPositionsOfCheck) {
+          for (let i = 0; i < moves.length; i++) {
+            for (
+              let j = 0;
+              j < blackKingPositionsOnTheDirectionOfCheck.length;
+              j++
+            ) {
+              if (
+                moves[i].row ===
+                  blackKingPositionsOnTheDirectionOfCheck[j].row &&
+                moves[i].column ===
+                  blackKingPositionsOnTheDirectionOfCheck[j].column
+              ) {
+                returnable.push(moves[i]);
+                canMove = true;
+              }
+            }
+          }
+        }
+
+        if (blackKingPositionsOfCheck && blackKingPositionsOfCheck.length > 0) {
+          if (
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              blackKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      },
+      type: ItemTypes.ROOK,
+      item: {
+        piece: "black_rook",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -25,7 +77,7 @@ export default function BlackRook({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [canMove, blackKingPositionsOfCheck]
   );
   return (
     <>

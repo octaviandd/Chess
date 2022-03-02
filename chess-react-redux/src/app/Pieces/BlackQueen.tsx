@@ -3,6 +3,7 @@
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
 import styled from "styled-components";
+import { canQueenMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import BlackQueenSVG from "./black_queen.svg";
 
@@ -13,11 +14,62 @@ type Props = {
   kingsChecks: any;
 };
 
-export default function BlackQueen({ row, col }: Props) {
+export default function BlackQueen({ row, col, board, kingsChecks }: Props) {
+  let item = "black_queen";
+  let moves = canQueenMove(board, row, col, "black");
+  let returnable: any = [];
+  let canMove = false;
+  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
+    kingsChecks;
   const [collectedProps, drag, preview] = useDrag(
     () => ({
+      canDrag: () => {
+        if (moves && blackKingPositionsOfCheck) {
+          for (let i = 0; i < moves.length; i++) {
+            for (
+              let j = 0;
+              j < blackKingPositionsOnTheDirectionOfCheck.length;
+              j++
+            ) {
+              if (
+                moves[i].row ===
+                  blackKingPositionsOnTheDirectionOfCheck[j].row &&
+                moves[i].column ===
+                  blackKingPositionsOnTheDirectionOfCheck[j].column
+              ) {
+                returnable.push(moves[i]);
+                canMove = true;
+              }
+            }
+          }
+        }
+
+        if (blackKingPositionsOfCheck && blackKingPositionsOfCheck.length > 0) {
+          if (
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              blackKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      },
       type: ItemTypes.PAWN,
-      item: { piece: "black_queen", row: row, col: col },
+      item: {
+        piece: "black_queen",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -26,7 +78,7 @@ export default function BlackQueen({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [canMove, blackKingPositionsOfCheck]
   );
   return (
     <>

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
+import { canQueenMove, checkPossibleMovesInCheck } from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import WhiteQueenSVG from "./white_queen.svg";
 
@@ -12,11 +13,67 @@ type Props = {
   kingsChecks: any;
 };
 
-export default function WhiteQueen({ row, col }: Props) {
+export default function WhiteQueen({ row, col, board, kingsChecks }: Props) {
+  let item = "white_queen";
+  let moves = canQueenMove(board, row, col, "white");
+  let returnable: any = [];
+  let canMove = false;
+  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
+    kingsChecks;
   const [collectedProps, drag, preview] = useDrag(
     () => ({
-      type: ItemTypes.PAWN,
-      item: { piece: "white_queen", row: row, col: col },
+      canDrag: () => {
+        if (moves && whiteKingPositionsOfCheck) {
+          for (let i = 0; i < moves.length; i++) {
+            for (
+              let j = 0;
+              j < whiteKingPositionsOnTheDirectionOfCheck.length;
+              j++
+            ) {
+              if (
+                moves[i].row ===
+                  whiteKingPositionsOnTheDirectionOfCheck[j].row &&
+                moves[i].column ===
+                  whiteKingPositionsOnTheDirectionOfCheck[j].column
+              ) {
+                returnable.push(moves[i]);
+                canMove = true;
+              }
+            }
+          }
+        }
+        console.log({
+          returnable,
+          whiteKingPositionsOfCheck,
+          whiteKingPositionsOnTheDirectionOfCheck,
+        });
+
+        if (whiteKingPositionsOfCheck && whiteKingPositionsOfCheck.length > 0) {
+          if (
+            checkPossibleMovesInCheck(
+              item,
+              board,
+              row,
+              col,
+              whiteKingPositionsOfCheck
+            ).length > 0 ||
+            canMove
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      },
+      type: ItemTypes.QUEEN,
+      item: {
+        piece: "white_queen",
+        row: row,
+        col: col,
+        availableMovesInCheck: returnable,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -25,7 +82,7 @@ export default function WhiteQueen({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [canMove, whiteKingPositionsOfCheck]
   );
   return (
     <>

@@ -2,6 +2,14 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
+import {
+  canBishopMove,
+  canKingMove,
+  canKnightMove,
+  canPawnMove,
+  canQueenMove,
+  canRookMove,
+} from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import WhiteKingSVG from "./white_king.svg";
 
@@ -12,11 +20,91 @@ type Props = {
   kingsChecks: any;
 };
 
-export default function WhiteKing({ row, col }: Props) {
+export default function WhiteKing({ row, col, board, kingsChecks }: Props) {
+  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
+    kingsChecks;
+
+  let possibleMoves = canKingMove(board, row, col, "white");
+  let possibleAttackingMoves: any = [];
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      if (board[i][j].piece != null && !board[i][j].piece.includes("white")) {
+        let pieceColor = board[i][j].piece.split("_")[0];
+        let incomingPiece = board[i][j].piece.split("_")[1];
+        if (incomingPiece === "pawn") {
+          canPawnMove(
+            board,
+            board[i][j].row,
+            board[i][j].column,
+            pieceColor
+          ).map((item) => possibleAttackingMoves.push(item));
+        } else if (incomingPiece === "knight") {
+          canKnightMove(board, board[i][j].row, board[i][j].column).map(
+            (item) => possibleAttackingMoves.push(item)
+          );
+        } else if (incomingPiece === "bishop") {
+          canBishopMove(
+            board,
+            board[i][j].row,
+            board[i][j].column,
+            pieceColor
+          ).map((item) => possibleAttackingMoves.push(item));
+        } else if (incomingPiece === "rook") {
+          canRookMove(
+            board,
+            board[i][j].row,
+            board[i][j].column,
+            pieceColor
+          ).map((item) => possibleAttackingMoves.push(item));
+        } else if (incomingPiece === "king") {
+          canKingMove(
+            board,
+            board[i][j].row,
+            board[i][j].column,
+            pieceColor
+          ).map((item) => possibleAttackingMoves.push(item));
+        } else if (incomingPiece === "queen") {
+          canQueenMove(
+            board,
+            board[i][j].row,
+            board[i][j].column,
+            pieceColor
+          ).map((item) => possibleAttackingMoves.push(item));
+        }
+      }
+    }
+  }
+
+  console.log({ possibleAttackingMoves });
+  // console.log("before");
+
+  for (let i = 0; i < possibleMoves.length; i++) {
+    for (let j = 0; j < possibleAttackingMoves.length; j++) {
+      // console.log(possibleMoves, i);
+      if (possibleAttackingMoves[j] && possibleMoves[i]) {
+        if (
+          possibleAttackingMoves[j].row === possibleMoves[i].row &&
+          possibleAttackingMoves[j].column === possibleMoves[i].column
+        ) {
+          possibleMoves.splice(i, 1);
+        }
+      }
+    }
+  }
+
   const [collectedProps, drag, preview] = useDrag(
     () => ({
-      type: ItemTypes.PAWN,
-      item: { piece: "white_king", row: row, col: col },
+      canDrag: () => {
+        return true;
+      },
+      type: ItemTypes.KING,
+      item: {
+        piece: "white_king",
+        row: row,
+        col: col,
+        availableMovesInCheck: possibleMoves,
+      },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -25,7 +113,7 @@ export default function WhiteKing({ row, col }: Props) {
         item: monitor.getItem(),
       }),
     }),
-    []
+    [possibleMoves, possibleAttackingMoves]
   );
   return (
     <>

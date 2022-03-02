@@ -233,6 +233,11 @@ export default function Square({
     () => ({
       accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
       canDrop: (item: any) => {
+        if (item.piece === "white_king") {
+          return item.availableMovesInCheck.find(
+            (el: any) => el.row === row && el.column === col
+          );
+        }
         if (kingChecks.blackKingIsChecked || kingChecks.whiteKingIsChecked) {
           if (item.availableMovesInCheck) {
             return item.availableMovesInCheck.find(
@@ -303,6 +308,7 @@ export default function Square({
         }));
 
         handleTurn();
+        console.log("change turn");
       },
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
