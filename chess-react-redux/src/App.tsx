@@ -419,9 +419,11 @@ function App() {
     whiteKingIsChecked: false,
     whiteKingPositionsOfCheck: null,
     whiteKingPositionsOnTheDirectionOfCheck: null,
+    whiteKingDefendingPieces: null,
     blackKingIsChecked: false,
     blackKingPositionsOfCheck: null,
     blackKingPositionsOnTheDirectionOfCheck: null,
+    blackKingDefendingPieces: null,
   });
 
   const handleTurn = () => {

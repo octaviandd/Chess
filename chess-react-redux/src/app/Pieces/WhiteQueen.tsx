@@ -42,11 +42,6 @@ export default function WhiteQueen({ row, col, board, kingsChecks }: Props) {
             }
           }
         }
-        console.log({
-          returnable,
-          whiteKingPositionsOfCheck,
-          whiteKingPositionsOnTheDirectionOfCheck,
-        });
 
         if (whiteKingPositionsOfCheck && whiteKingPositionsOfCheck.length > 0) {
           if (

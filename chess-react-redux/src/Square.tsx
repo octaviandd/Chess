@@ -234,9 +234,18 @@ export default function Square({
       accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
       canDrop: (item: any) => {
         if (item.piece === "white_king") {
-          return item.availableMovesInCheck.find(
-            (el: any) => el.row === row && el.column === col
-          );
+          if (turn === "white") {
+            return item.availableMovesInCheck.find(
+              (el: any) => el.row === row && el.column === col
+            );
+          }
+        }
+        if (item.piece === "black_king") {
+          if (turn === "black") {
+            return item.availableMovesInCheck.find(
+              (el: any) => el.row === row && el.column === col
+            );
+          }
         }
         if (kingChecks.blackKingIsChecked || kingChecks.whiteKingIsChecked) {
           if (item.availableMovesInCheck) {
@@ -256,6 +265,10 @@ export default function Square({
         }
       },
       drop: (item: any, monitor) => {
+        let copyOfBoard = board;
+        copyOfBoard[row][col].piece = item.piece;
+        copyOfBoard[item.row][item.col].piece = null;
+
         setBoard((prevState: any) => {
           let copy = [...prevState];
           copy[row][col].piece = item.piece;
@@ -265,7 +278,7 @@ export default function Square({
 
         let kingColor = turn === "white" ? "black" : "white";
 
-        let kingsPositions = searchForKings(board, kingColor);
+        let kingsPositions = searchForKings(copyOfBoard, kingColor);
         const {
           blackKingPositionsX,
           blackKingPositionsY,
@@ -277,8 +290,9 @@ export default function Square({
           numberOfChecks,
           positionsOfCheck,
           positionsOnTheDirectionOfCheck,
+          kingDefendingPieces,
         } = checkForKingChecks(
-          board,
+          copyOfBoard,
           blackKingPositionsX,
           blackKingPositionsY,
           "black"
@@ -288,8 +302,9 @@ export default function Square({
           numberOfChecks: numberOfChecks_white,
           positionsOfCheck: positionsOfCheck_white,
           positionsOnTheDirectionOfCheck: positionsOnTheDirectionOfCheck_white,
+          kingDefendingPieces: kingDefendingPieces_white,
         } = checkForKingChecks(
-          board,
+          copyOfBoard,
           whiteKingPositionsX,
           whiteKingPositionsY,
           "white"
@@ -301,14 +316,14 @@ export default function Square({
           whiteKingPositionsOfCheck: positionsOfCheck_white,
           whiteKingPositionsOnTheDirectionOfCheck:
             positionsOnTheDirectionOfCheck_white,
+          whiteKingDefendingPieces: kingDefendingPieces_white,
           blackKingIsChecked: numberOfChecks !== 0,
           blackKingPositionsOfCheck: positionsOfCheck,
           blackKingPositionsOnTheDirectionOfCheck:
             positionsOnTheDirectionOfCheck,
+          blackKingDefendingPieces: kingDefendingPieces,
         }));
-
         handleTurn();
-        console.log("change turn");
       },
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
@@ -318,7 +333,7 @@ export default function Square({
         item: monitor.getItem(),
       }),
     }),
-    [turn, kingChecks.isBlackKingChecked]
+    [turn, kingChecks.isBlackKingChecked, kingChecks.isWhiteKingChecked, board]
   );
 
   return (

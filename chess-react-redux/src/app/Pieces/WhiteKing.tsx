@@ -76,22 +76,11 @@ export default function WhiteKing({ row, col, board, kingsChecks }: Props) {
     }
   }
 
-  console.log({ possibleAttackingMoves });
-  // console.log("before");
+  let newSet: any = Array.from(new Set(possibleAttackingMoves));
 
-  for (let i = 0; i < possibleMoves.length; i++) {
-    for (let j = 0; j < possibleAttackingMoves.length; j++) {
-      // console.log(possibleMoves, i);
-      if (possibleAttackingMoves[j] && possibleMoves[i]) {
-        if (
-          possibleAttackingMoves[j].row === possibleMoves[i].row &&
-          possibleAttackingMoves[j].column === possibleMoves[i].column
-        ) {
-          possibleMoves.splice(i, 1);
-        }
-      }
-    }
-  }
+  let moves = possibleMoves.filter(
+    (o) => !newSet.some((i: any) => i.row === o.row && i.column === o.column)
+  );
 
   const [collectedProps, drag, preview] = useDrag(
     () => ({
@@ -103,7 +92,7 @@ export default function WhiteKing({ row, col, board, kingsChecks }: Props) {
         piece: "white_king",
         row: row,
         col: col,
-        availableMovesInCheck: possibleMoves,
+        availableMovesInCheck: moves,
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

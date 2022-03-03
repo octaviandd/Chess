@@ -2,7 +2,11 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import { canPawnMove, checkPossibleMovesInCheck } from "../../game";
+import {
+  canPawnMove,
+  canPieceMoveInCheck,
+  checkPossibleMovesInCheck,
+} from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import WhitePawnSVG from "./white_pawn.svg";
 
@@ -18,31 +22,45 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
   let returnable: any = [];
   let canMove = false;
 
-  const { whiteKingPositionsOfCheck, whiteKingPositionsOnTheDirectionOfCheck } =
-    kingsChecks;
+  const {
+    whiteKingPositionsOfCheck,
+    whiteKingPositionsOnTheDirectionOfCheck,
+    whiteKingDefendingPieces,
+  } = kingsChecks;
+
+  if (moves && whiteKingPositionsOfCheck) {
+    for (let i = 0; i < moves.length; i++) {
+      for (let j = 0; j < whiteKingPositionsOnTheDirectionOfCheck.length; j++) {
+        if (
+          moves[i].row === whiteKingPositionsOnTheDirectionOfCheck[j].row &&
+          moves[i].column === whiteKingPositionsOnTheDirectionOfCheck[j].column
+        ) {
+          returnable.push(moves[i]);
+          canMove = true;
+        }
+      }
+    }
+  }
 
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        if (moves && whiteKingPositionsOfCheck) {
-          for (let i = 0; i < moves.length; i++) {
-            for (
-              let j = 0;
-              j < whiteKingPositionsOnTheDirectionOfCheck.length;
-              j++
-            ) {
-              if (
-                moves[i].row ===
-                  whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-                moves[i].column ===
-                  whiteKingPositionsOnTheDirectionOfCheck[j].column
-              ) {
-                returnable.push(moves[i]);
-                canMove = true;
-              }
-            }
-          }
-        }
+        // if (whiteKingDefendingPieces) {
+        //   console.log(whiteKingDefendingPieces);
+        //   for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
+        //     console.log(whiteKingDefendingPieces[i]);
+        //     if (
+        //       whiteKingDefendingPieces[i].row === row &&
+        //       whiteKingDefendingPieces[i].column === col
+        //     ) {
+        //       console.log(
+        //         canPieceMoveInCheck(board, row, col, "white").isPinned
+        //       );
+        //       return canPieceMoveInCheck(board, row, col, "white").isPinned;
+        //     }
+        //   }
+        // }
+
         if (whiteKingPositionsOfCheck && whiteKingPositionsOfCheck.length > 0) {
           if (
             checkPossibleMovesInCheck(
