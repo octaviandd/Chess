@@ -3,7 +3,11 @@
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
 import styled from "styled-components";
-import { canQueenMove, checkPossibleMovesInCheck } from "../../game";
+import {
+  canPieceMoveInCheck,
+  canQueenMove,
+  checkPossibleMovesInCheck,
+} from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import BlackQueenSVG from "./black_queen.svg";
 
@@ -19,8 +23,12 @@ export default function BlackQueen({ row, col, board, kingsChecks }: Props) {
   let moves = canQueenMove(board, row, col, "black");
   let returnable: any = [];
   let canMove = false;
-  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
-    kingsChecks;
+  let availableMovesInPinned: any = [];
+  const {
+    blackKingPositionsOnTheDirectionOfCheck,
+    blackKingPositionsOfCheck,
+    blackKingDefendingPieces,
+  } = kingsChecks;
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
@@ -39,6 +47,36 @@ export default function BlackQueen({ row, col, board, kingsChecks }: Props) {
               ) {
                 returnable.push(moves[i]);
                 canMove = true;
+              }
+            }
+          }
+        }
+
+        if (blackKingDefendingPieces) {
+          for (let i = 0; i < blackKingDefendingPieces.length; i++) {
+            if (
+              blackKingDefendingPieces[i].row === row &&
+              blackKingDefendingPieces[i].column === col
+            ) {
+              let { isPinned, attackingPiece } = canPieceMoveInCheck(
+                board,
+                row,
+                col,
+                "black"
+              );
+              if (attackingPiece.length > 0) {
+                for (let i = 0; i < moves.length; i++) {
+                  for (let j = 0; j < attackingPiece.length; j++) {
+                    if (
+                      moves[i].row === attackingPiece[j].row &&
+                      moves[i].column === attackingPiece[j].column
+                    ) {
+                      availableMovesInPinned.push(moves[i]);
+                    }
+                  }
+                }
+              } else {
+                return !isPinned;
               }
             }
           }
@@ -69,6 +107,7 @@ export default function BlackQueen({ row, col, board, kingsChecks }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
+        availableMovesInPinned,
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

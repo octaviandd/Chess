@@ -16,11 +16,15 @@ type Props = {
   board: any;
   kingsChecks: any;
 };
+
+const isKingBehindDirection = () => {};
+
 export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
   let item = "white_pawn";
   let moves = canPawnMove(board, row, col, "white");
   let returnable: any = [];
   let canMove = false;
+  let availableMovesInPinned: any = [];
 
   const {
     whiteKingPositionsOfCheck,
@@ -45,21 +49,34 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        // if (whiteKingDefendingPieces) {
-        //   console.log(whiteKingDefendingPieces);
-        //   for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
-        //     console.log(whiteKingDefendingPieces[i]);
-        //     if (
-        //       whiteKingDefendingPieces[i].row === row &&
-        //       whiteKingDefendingPieces[i].column === col
-        //     ) {
-        //       console.log(
-        //         canPieceMoveInCheck(board, row, col, "white").isPinned
-        //       );
-        //       return canPieceMoveInCheck(board, row, col, "white").isPinned;
-        //     }
-        //   }
-        // }
+        if (whiteKingDefendingPieces) {
+          for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
+            if (
+              whiteKingDefendingPieces[i].row === row &&
+              whiteKingDefendingPieces[i].column === col
+            ) {
+              let { isPinned, attackingPiece, directionOfPinning } =
+                canPieceMoveInCheck(board, row, col, "white");
+
+              if (attackingPiece.length > 0) {
+                for (let i = 0; i < moves.length; i++) {
+                  for (let j = 0; j < attackingPiece.length; j++) {
+                    if (
+                      moves[i].row === attackingPiece[j].row &&
+                      moves[i].column === attackingPiece[j].column
+                    ) {
+                      availableMovesInPinned.push(moves[i]);
+                    }
+                  }
+                }
+              }
+
+              if (isPinned && availableMovesInPinned.length < 1) {
+                return false;
+              }
+            }
+          }
+        }
 
         if (whiteKingPositionsOfCheck && whiteKingPositionsOfCheck.length > 0) {
           if (
@@ -86,6 +103,7 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
+        availableMovesInPinned,
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

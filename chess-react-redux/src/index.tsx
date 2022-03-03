@@ -4,19 +4,15 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-import { store } from "./app/store";
-import { Provider } from "react-redux";
 import * as serviceWorker from "./serviceWorker";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <DndProvider backend={HTML5Backend}>
-        <App />
-      </DndProvider>
-    </Provider>
+    <DndProvider backend={HTML5Backend}>
+      <App />
+    </DndProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

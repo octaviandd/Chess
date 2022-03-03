@@ -456,13 +456,18 @@ export const checkForKingChecks = (
     moves.push(board[i][j + y]);
     if (board[i][j + y].piece !== null) {
       if (board[i][j + y].piece.includes(pieceColor)) {
+        kingDefendingPieces.push(board[i][j + y]);
         break;
       } else {
         if (
           board[i][j + y].piece.includes("rook") ||
           board[i][j + y].piece.includes("queen")
         ) {
+          numberOfChecks++;
           positionsOfCheck.push(board[i][j + y]);
+          for (let q = y; q > 0; q--) {
+            positionsOnTheDirectionOfCheck.push(board[i][j + q]);
+          }
         }
         break;
       }
@@ -474,13 +479,18 @@ export const checkForKingChecks = (
     moves.push(board[i][j - y]);
     if (board[i][j - y].piece !== null) {
       if (board[i][j - y].piece.includes(pieceColor)) {
+        kingDefendingPieces.push(board[i][j - y]);
         break;
       } else {
         if (
           board[i][j - y].piece.includes("rook") ||
           board[i][j - y].piece.includes("queen")
         ) {
+          numberOfChecks++;
           positionsOfCheck.push(board[i][j - y]);
+          for (let q = y; q > 0; q--) {
+            positionsOnTheDirectionOfCheck.push(board[i][j - q]);
+          }
         }
         break;
       }
@@ -492,13 +502,18 @@ export const checkForKingChecks = (
     moves.push(board[i - y][j]);
     if (board[i - y][j].piece !== null) {
       if (board[i - y][j].piece.includes(pieceColor)) {
+        kingDefendingPieces.push(board[i - y][j]);
         break;
       } else {
         if (
           board[i - y][j].piece.includes("rook") ||
           board[i - y][j].piece.includes("queen")
         ) {
+          numberOfChecks++;
           positionsOfCheck.push(board[i - y][j]);
+          for (let q = y; q > 0; q--) {
+            positionsOnTheDirectionOfCheck.push(board[i - q][j]);
+          }
         }
         break;
       }
@@ -510,6 +525,7 @@ export const checkForKingChecks = (
     moves.push(board[y + i][j]);
     if (board[y + i][j].piece !== null) {
       if (board[y + i][j].piece.includes(pieceColor)) {
+        kingDefendingPieces.push(board[y + i][j]);
         break;
       } else {
         if (
@@ -801,7 +817,9 @@ export const canPieceMoveInCheck = (
   let spaceToBottom = 7 - i;
   let moves = [];
   let numberOfChecks = 0;
-  let isPinned = true;
+  let isPinned = false;
+  let attackingPiece = [];
+  let directionOfPinning = "";
 
   //check for checks from horizontal right
   for (let y = 1; y <= spaceToRight; y++) {
@@ -814,7 +832,12 @@ export const canPieceMoveInCheck = (
           board[i][j + y].piece.includes("rook") ||
           board[i][j + y].piece.includes("queen")
         ) {
-          isPinned = false;
+          isPinned = true;
+          directionOfPinning = "horizontal_left_to_right";
+          attackingPiece.push(board[i][j + y]);
+          for (let q = y; q > 0; q--) {
+            attackingPiece.push(board[i][j + q]);
+          }
         }
         break;
       }
@@ -832,7 +855,12 @@ export const canPieceMoveInCheck = (
           board[i][j - y].piece.includes("rook") ||
           board[i][j - y].piece.includes("queen")
         ) {
-          isPinned = false;
+          isPinned = true;
+          directionOfPinning = "horizontal_right_to_left";
+          attackingPiece.push(board[i][j - y]);
+          for (let q = y; q > 0; q--) {
+            attackingPiece.push(board[i][j - q]);
+          }
         }
         break;
       }
@@ -850,7 +878,12 @@ export const canPieceMoveInCheck = (
           board[i - y][j].piece.includes("rook") ||
           board[i - y][j].piece.includes("queen")
         ) {
-          isPinned = false;
+          isPinned = true;
+          directionOfPinning = "vertical_bottom_to_top";
+          attackingPiece.push(board[i - y][j]);
+          for (let q = y; q > 0; q--) {
+            attackingPiece.push(board[i - q][j]);
+          }
         }
         break;
       }
@@ -868,7 +901,12 @@ export const canPieceMoveInCheck = (
           board[y + i][j].piece.includes("rook") ||
           board[y + i][j].piece.includes("queen")
         ) {
-          isPinned = false;
+          isPinned = true;
+          directionOfPinning = "vertical_top_to_bottom";
+          attackingPiece.push(board[y + i][j]);
+          for (let q = y; q > 0; q--) {
+            attackingPiece.push(board[i + q][j]);
+          }
         }
         break;
       }
@@ -883,6 +921,7 @@ export const canPieceMoveInCheck = (
     moves.push(board[i - x][j + x]);
     if (board[i - x][j + x].piece !== null) {
       if (board[i - x][j + x].piece.includes(pieceColor)) {
+        break;
       }
       if (!board[i - x][j + x].piece.includes(pieceColor)) {
         moves.push(board[i - x][j + x]);
@@ -891,7 +930,12 @@ export const canPieceMoveInCheck = (
           board[i - x][j + x].piece.includes("queen")
           // board[i - x][j + x].piece.includes("pawn")
         ) {
-          isPinned = false;
+          isPinned = true;
+          directionOfPinning = "diagonal_top_right_to_left";
+          attackingPiece.push(board[i - x][j + x]);
+          for (let q = x; q > 0; q--) {
+            attackingPiece.push(board[i - q][j + q]);
+          }
         }
         break;
       }
@@ -906,6 +950,7 @@ export const canPieceMoveInCheck = (
 
     if (board[i + o][j + o].piece !== null) {
       if (board[i + o][j + o].piece.includes(pieceColor)) {
+        break;
       }
       if (!board[i + o][j + o].piece.includes(pieceColor)) {
         moves.push(board[i + o][j + o]);
@@ -914,7 +959,12 @@ export const canPieceMoveInCheck = (
           board[i + o][j + o].piece.includes("queen")
           // board[i + o][j + o].piece.includes("pawn")
         ) {
-          isPinned = false;
+          isPinned = true;
+          directionOfPinning = "diagonal_bottom_right_to_left";
+          attackingPiece.push(board[i + o][j + o]);
+          for (let q = o; q > 0; q--) {
+            attackingPiece.push(board[i + q][j + q]);
+          }
         }
         break;
       }
@@ -927,6 +977,7 @@ export const canPieceMoveInCheck = (
     moves.push(board[i + m][j - m]);
     if (board[i + m][j - m].piece !== null) {
       if (board[i + m][j - m].piece.includes(pieceColor)) {
+        break;
       }
       if (!board[i + m][j - m].piece.includes(pieceColor)) {
         moves.push(board[i + m][j - m]);
@@ -935,7 +986,12 @@ export const canPieceMoveInCheck = (
           board[i + m][j - m].piece.includes("queen")
           // board[i + m][j - m].piece.includes("pawn")
         ) {
-          isPinned = false;
+          isPinned = true;
+          directionOfPinning = "diagonal_bottom_left_to_right";
+          attackingPiece.push(board[i + m][j - m]);
+          for (let q = m; q > 0; q--) {
+            attackingPiece.push(board[i + q][j - q]);
+          }
         }
         break;
       }
@@ -948,6 +1004,7 @@ export const canPieceMoveInCheck = (
     moves.push(board[i - n][j - n]);
     if (board[i - n][j - n].piece !== null) {
       if (board[i - n][j - n].piece.includes(pieceColor)) {
+        break;
       }
       if (!board[i - n][j - n].piece.includes(pieceColor)) {
         moves.push(board[i - n][j - n]);
@@ -956,14 +1013,23 @@ export const canPieceMoveInCheck = (
           board[i - n][j - n].piece.includes("queen")
           // board[i - n][j - n].piece.includes("pawn")
         ) {
-          isPinned = false;
+          isPinned = true;
+          directionOfPinning = "diagonal_top_left_to_right";
+          attackingPiece.push(board[i - n][j - n]);
+          for (let q = n; q > 0; q--) {
+            attackingPiece.push(board[i + n][j - n]);
+          }
         }
         break;
       }
     }
   }
 
+  let cleanArray = Array.from(new Set(attackingPiece));
+
   return {
+    attackingPiece: cleanArray,
+    directionOfPinning,
     isPinned,
     moves: Array.from(new Set(moves)),
     numberOfChecks,

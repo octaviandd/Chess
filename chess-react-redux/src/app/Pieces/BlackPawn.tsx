@@ -2,7 +2,11 @@
 
 import React, { useState } from "react";
 import { useDrag, DragPreviewImage } from "react-dnd";
-import { canPawnMove, checkPossibleMovesInCheck } from "../../game";
+import {
+  canPawnMove,
+  canPieceMoveInCheck,
+  checkPossibleMovesInCheck,
+} from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import PawnSVG from "./black_pawn.svg";
 
@@ -19,33 +23,98 @@ type Props = {
   kingsChecks: any;
 };
 
+const isKingBehindDirection = (
+  direction: string,
+  board: any,
+  i: number,
+  j: number
+) => {
+  if (direction === "diagonal_bottom_left_to_right") {
+    let spaceToRight = 7 - j;
+    let pieceColor = "black";
+    let isKingBehind = false;
+
+    let x = 0;
+    while (x < i && x < spaceToRight) {
+      x++;
+      if (board[i - x][j + x].piece !== null) {
+        if (board[i - x][j + x].piece.includes(pieceColor)) {
+          if (board[i - x][j + x] === "black_king") {
+            isKingBehind = true;
+          }
+        }
+      }
+    }
+    return isKingBehind;
+  }
+};
+
 export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
   let item = "black_pawn";
   let moves = canPawnMove(board, row, col, "black");
   let returnable: any = [];
   let canMove = false;
+  let availableMovesInPinned: any = [];
 
-  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
-    kingsChecks;
+  const {
+    blackKingPositionsOnTheDirectionOfCheck,
+    blackKingPositionsOfCheck,
+    blackKingDefendingPieces,
+  } = kingsChecks;
+
+  if (moves && blackKingPositionsOfCheck) {
+    for (let i = 0; i < moves.length; i++) {
+      for (let j = 0; j < blackKingPositionsOnTheDirectionOfCheck.length; j++) {
+        if (
+          moves[i].row === blackKingPositionsOnTheDirectionOfCheck[j].row &&
+          moves[i].column === blackKingPositionsOnTheDirectionOfCheck[j].column
+        ) {
+          returnable.push(moves[i]);
+          canMove = true;
+        }
+      }
+    }
+  }
 
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        if (moves && blackKingPositionsOfCheck) {
-          for (let i = 0; i < moves.length; i++) {
-            for (
-              let j = 0;
-              j < blackKingPositionsOnTheDirectionOfCheck.length;
-              j++
+        let isKingBehind: any = false;
+        if (blackKingDefendingPieces) {
+          for (let i = 0; i < blackKingDefendingPieces.length; i++) {
+            if (
+              blackKingDefendingPieces[i].row === row &&
+              blackKingDefendingPieces[i].column === col
             ) {
+              let { isPinned, attackingPiece, directionOfPinning } =
+                canPieceMoveInCheck(board, row, col, "black");
+
+              if (directionOfPinning !== "") {
+                isKingBehind = isKingBehindDirection(
+                  directionOfPinning,
+                  board,
+                  row,
+                  col
+                );
+              }
+
+              console.log({ isPinned, attackingPiece, directionOfPinning });
+              if (attackingPiece.length > 0) {
+                for (let i = 0; i < moves.length; i++) {
+                  if (
+                    moves[i].row === attackingPiece[0].row &&
+                    moves[i].column === attackingPiece[0].column
+                  ) {
+                    availableMovesInPinned.push(moves[i]);
+                  }
+                }
+              }
               if (
-                moves[i].row ===
-                  blackKingPositionsOnTheDirectionOfCheck[j].row &&
-                moves[i].column ===
-                  blackKingPositionsOnTheDirectionOfCheck[j].column
+                isPinned &&
+                availableMovesInPinned.length < 1 &&
+                isKingBehind
               ) {
-                returnable.push(moves[i]);
-                canMove = true;
+                return false;
               }
             }
           }
@@ -76,6 +145,7 @@ export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
+        availableMovesInPinned,
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

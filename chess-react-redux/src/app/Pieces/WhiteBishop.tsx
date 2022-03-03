@@ -2,7 +2,11 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import { canBishopMove, checkPossibleMovesInCheck } from "../../game";
+import {
+  canBishopMove,
+  canPieceMoveInCheck,
+  checkPossibleMovesInCheck,
+} from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import WhiteBishopSVG from "./white_bishop.svg";
 
@@ -18,27 +22,56 @@ export default function WhiteBishop({ row, col, board, kingsChecks }: Props) {
   let moves = canBishopMove(board, row, col, "white");
   let returnable: any = [];
   let canMove = false;
-  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
-    kingsChecks;
+  let availableMovesInPinned: any = [];
+  const {
+    whiteKingPositionsOnTheDirectionOfCheck,
+    whiteKingPositionsOfCheck,
+    whiteKingDefendingPieces,
+  } = kingsChecks;
+
+  if (moves && whiteKingPositionsOfCheck) {
+    for (let i = 0; i < moves.length; i++) {
+      for (let j = 0; j < whiteKingPositionsOnTheDirectionOfCheck.length; j++) {
+        if (
+          moves[i].row === whiteKingPositionsOnTheDirectionOfCheck[j].row &&
+          moves[i].column === whiteKingPositionsOnTheDirectionOfCheck[j].column
+        ) {
+          returnable.push(moves[i]);
+          canMove = true;
+        }
+      }
+    }
+  }
 
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        if (moves && whiteKingPositionsOfCheck) {
-          for (let i = 0; i < moves.length; i++) {
-            for (
-              let j = 0;
-              j < whiteKingPositionsOnTheDirectionOfCheck.length;
-              j++
+        if (whiteKingDefendingPieces) {
+          for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
+            if (
+              whiteKingDefendingPieces[i].row === row &&
+              whiteKingDefendingPieces[i].column === col
             ) {
-              if (
-                moves[i].row ===
-                  whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-                moves[i].column ===
-                  whiteKingPositionsOnTheDirectionOfCheck[j].column
-              ) {
-                returnable.push(moves[i]);
-                canMove = true;
+              let { isPinned, attackingPiece } = canPieceMoveInCheck(
+                board,
+                row,
+                col,
+                "white"
+              );
+              if (attackingPiece.length > 0) {
+                for (let i = 0; i < moves.length; i++) {
+                  for (let j = 0; j < attackingPiece.length; j++) {
+                    if (
+                      moves[i].row === attackingPiece[j].row &&
+                      moves[i].column === attackingPiece[j].column
+                    ) {
+                      availableMovesInPinned.push(moves[i]);
+                    }
+                  }
+                }
+              }
+              if (isPinned && availableMovesInPinned.length < 1) {
+                return false;
               }
             }
           }
@@ -69,6 +102,7 @@ export default function WhiteBishop({ row, col, board, kingsChecks }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
+        availableMovesInPinned,
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

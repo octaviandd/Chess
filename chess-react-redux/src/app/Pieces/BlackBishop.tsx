@@ -3,7 +3,11 @@
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
 import styled from "styled-components";
-import { canBishopMove, checkPossibleMovesInCheck } from "../../game";
+import {
+  canBishopMove,
+  canPieceMoveInCheck,
+  checkPossibleMovesInCheck,
+} from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import BlackBishopSVG from "./black_bishop.svg";
 
@@ -19,8 +23,12 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
   let moves = canBishopMove(board, row, col, "black");
   let returnable: any = [];
   let canMove = false;
-  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
-    kingsChecks;
+  let availableMovesInPinned: any = [];
+  const {
+    blackKingPositionsOnTheDirectionOfCheck,
+    blackKingPositionsOfCheck,
+    blackKingDefendingPieces,
+  } = kingsChecks;
 
   const [collectedProps, drag, preview] = useDrag(
     () => ({
@@ -40,6 +48,37 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
               ) {
                 returnable.push(moves[i]);
                 canMove = true;
+              }
+            }
+          }
+        }
+        if (blackKingDefendingPieces) {
+          for (let i = 0; i < blackKingDefendingPieces.length; i++) {
+            if (
+              blackKingDefendingPieces[i].row === row &&
+              blackKingDefendingPieces[i].column === col
+            ) {
+              let { isPinned, attackingPiece } = canPieceMoveInCheck(
+                board,
+                row,
+                col,
+                "black"
+              );
+              if (attackingPiece.length > 0) {
+                for (let i = 0; i < moves.length; i++) {
+                  for (let j = 0; j < attackingPiece.length; j++) {
+                    if (
+                      moves[i].row === attackingPiece[j].row &&
+                      moves[i].column === attackingPiece[j].column
+                    ) {
+                      availableMovesInPinned.push(moves[i]);
+                    }
+                  }
+                }
+              }
+
+              if (isPinned && availableMovesInPinned.length < 1) {
+                return false;
               }
             }
           }
@@ -70,6 +109,7 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
+        availableMovesInPinned,
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

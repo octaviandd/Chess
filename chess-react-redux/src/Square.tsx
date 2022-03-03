@@ -254,14 +254,23 @@ export default function Square({
             );
           }
         } else {
-          return checkPossibleMovesForEveryPiece(
-            item,
-            piece,
-            board,
-            row,
-            col,
-            turn
-          );
+          if (
+            item.availableMovesInPinned &&
+            item.availableMovesInPinned.length > 0
+          ) {
+            return item.availableMovesInPinned.find(
+              (el: any) => el.row === row && el.column === col
+            );
+          } else {
+            return checkPossibleMovesForEveryPiece(
+              item,
+              piece,
+              board,
+              row,
+              col,
+              turn
+            );
+          }
         }
       },
       drop: (item: any, monitor) => {

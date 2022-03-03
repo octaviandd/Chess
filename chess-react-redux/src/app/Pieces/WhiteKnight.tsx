@@ -2,7 +2,11 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import { canKnightMove, checkPossibleMovesInCheck } from "../../game";
+import {
+  canKnightMove,
+  canPieceMoveInCheck,
+  checkPossibleMovesInCheck,
+} from "../../game";
 import { ItemTypes } from "../../ItemTypes";
 import WhiteKnightSVG from "../Pieces/white_knight.svg";
 
@@ -18,8 +22,12 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
   let moves = canKnightMove(board, row, col);
   let returnable: any = [];
   let canMove = false;
-  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
-    kingsChecks;
+  let availableMovesInPinned: any = [];
+  const {
+    whiteKingPositionsOnTheDirectionOfCheck,
+    whiteKingPositionsOfCheck,
+    whiteKingDefendingPieces,
+  } = kingsChecks;
 
   const [collectedProps, drag, preview] = useDrag(
     () => ({
@@ -39,6 +47,36 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
               ) {
                 returnable.push(moves[i]);
                 canMove = true;
+              }
+            }
+          }
+        }
+
+        if (whiteKingDefendingPieces) {
+          for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
+            if (
+              whiteKingDefendingPieces[i].row === row &&
+              whiteKingDefendingPieces[i].column === col
+            ) {
+              let { isPinned, attackingPiece } = canPieceMoveInCheck(
+                board,
+                row,
+                col,
+                "white"
+              );
+              if (attackingPiece.length > 0) {
+                for (let i = 0; i < moves.length; i++) {
+                  for (let j = 0; j < attackingPiece.length; j++) {
+                    if (
+                      moves[i].row === attackingPiece[j].row &&
+                      moves[i].column === attackingPiece[j].column
+                    ) {
+                      availableMovesInPinned.push(moves[i]);
+                    }
+                  }
+                }
+              } else {
+                availableMovesInPinned = moves;
               }
             }
           }
@@ -69,6 +107,7 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
+        availableMovesInPinned,
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({
