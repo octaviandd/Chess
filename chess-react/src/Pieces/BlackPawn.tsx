@@ -6,6 +6,7 @@ import {
   canPawnMove,
   canPieceMoveInCheck,
   checkPossibleMovesInCheck,
+  isKingBehindDirection,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import PawnSVG from "./black_pawn.svg";
@@ -21,32 +22,6 @@ type Props = {
   col: number;
   board: any;
   kingsChecks: any;
-};
-
-const isKingBehindDirection = (
-  direction: string,
-  board: any,
-  i: number,
-  j: number
-) => {
-  if (direction === "diagonal_bottom_left_to_right") {
-    let spaceToRight = 7 - j;
-    let pieceColor = "black";
-    let isKingBehind = false;
-
-    let x = 0;
-    while (x < i && x < spaceToRight) {
-      x++;
-      if (board[i - x][j + x].piece !== null) {
-        if (board[i - x][j + x].piece.includes(pieceColor)) {
-          if (board[i - x][j + x] === "black_king") {
-            isKingBehind = true;
-          }
-        }
-      }
-    }
-    return isKingBehind;
-  }
 };
 
 export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
@@ -94,11 +69,11 @@ export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
                   directionOfPinning,
                   board,
                   row,
-                  col
+                  col,
+                  "black"
                 );
               }
 
-              console.log({ isPinned, attackingPiece, directionOfPinning });
               if (attackingPiece.length > 0) {
                 for (let i = 0; i < moves.length; i++) {
                   if (

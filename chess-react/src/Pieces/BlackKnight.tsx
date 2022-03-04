@@ -2,7 +2,12 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import { canKnightMove, checkPossibleMovesInCheck } from "../game";
+import {
+  canKnightMove,
+  canPieceMoveInCheck,
+  checkPossibleMovesInCheck,
+  isKingBehindDirection,
+} from "../game";
 import { ItemTypes } from "../ItemTypes";
 import BlackKnightSVG from "./black_knight.svg";
 
@@ -18,8 +23,13 @@ export default function BlackKnight({ row, col, board, kingsChecks }: Props) {
   let moves = canKnightMove(board, row, col);
   let returnable: any = [];
   let canMove = false;
-  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
-    kingsChecks;
+  let availableMovesInPinned: any = [];
+  const {
+    blackKingPositionsOnTheDirectionOfCheck,
+    blackKingPositionsOfCheck,
+    blackKingDefendingPieces,
+  } = kingsChecks;
+  let isKingBehind: any = false;
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
@@ -38,6 +48,48 @@ export default function BlackKnight({ row, col, board, kingsChecks }: Props) {
               ) {
                 returnable.push(moves[i]);
                 canMove = true;
+              }
+            }
+          }
+        }
+        if (blackKingDefendingPieces) {
+          for (let i = 0; i < blackKingDefendingPieces.length; i++) {
+            if (
+              blackKingDefendingPieces[i].row === row &&
+              blackKingDefendingPieces[i].column === col
+            ) {
+              let { isPinned, attackingPiece, directionOfPinning } =
+                canPieceMoveInCheck(board, row, col, "black");
+
+              if (directionOfPinning !== "") {
+                isKingBehind = isKingBehindDirection(
+                  directionOfPinning,
+                  board,
+                  row,
+                  col,
+                  "black"
+                );
+              }
+
+              if (attackingPiece.length > 0) {
+                for (let i = 0; i < moves.length; i++) {
+                  for (let j = 0; j < attackingPiece.length; j++) {
+                    if (
+                      moves[i].row === attackingPiece[j].row &&
+                      moves[i].column === attackingPiece[j].column
+                    ) {
+                      availableMovesInPinned.push(moves[i]);
+                    }
+                  }
+                }
+              }
+
+              if (
+                isPinned &&
+                availableMovesInPinned.length < 1 &&
+                isKingBehind
+              ) {
+                return false;
               }
             }
           }
@@ -68,6 +120,7 @@ export default function BlackKnight({ row, col, board, kingsChecks }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
+        availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

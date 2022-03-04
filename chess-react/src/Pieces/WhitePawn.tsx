@@ -6,6 +6,7 @@ import {
   canPawnMove,
   canPieceMoveInCheck,
   checkPossibleMovesInCheck,
+  isKingBehindDirection,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import WhitePawnSVG from "./white_pawn.svg";
@@ -17,14 +18,13 @@ type Props = {
   kingsChecks: any;
 };
 
-const isKingBehindDirection = () => {};
-
 export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
   let item = "white_pawn";
   let moves = canPawnMove(board, row, col, "white");
   let returnable: any = [];
   let canMove = false;
   let availableMovesInPinned: any = [];
+  let isKingBehind: any = false;
 
   const {
     whiteKingPositionsOfCheck,
@@ -58,6 +58,15 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
               let { isPinned, attackingPiece, directionOfPinning } =
                 canPieceMoveInCheck(board, row, col, "white");
 
+              if (directionOfPinning !== "") {
+                isKingBehind = isKingBehindDirection(
+                  directionOfPinning,
+                  board,
+                  row,
+                  col,
+                  "black"
+                );
+              }
               if (attackingPiece.length > 0) {
                 for (let i = 0; i < moves.length; i++) {
                   for (let j = 0; j < attackingPiece.length; j++) {
@@ -71,7 +80,11 @@ export default function WhitePawn({ row, col, board, kingsChecks }: Props) {
                 }
               }
 
-              if (isPinned && availableMovesInPinned.length < 1) {
+              if (
+                isPinned &&
+                availableMovesInPinned.length < 1 &&
+                isKingBehind
+              ) {
                 return false;
               }
             }
