@@ -6,6 +6,7 @@ import {
   canKnightMove,
   canPieceMoveInCheck,
   checkPossibleMovesInCheck,
+  isKingBehindDirection,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import WhiteKnightSVG from "../Pieces/white_knight.svg";
@@ -23,6 +24,7 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
   let returnable: any = [];
   let canMove = false;
   let availableMovesInPinned: any = [];
+  let isKingBehind: any = false;
   const {
     whiteKingPositionsOnTheDirectionOfCheck,
     whiteKingPositionsOfCheck,
@@ -58,12 +60,18 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
               whiteKingDefendingPieces[i].row === row &&
               whiteKingDefendingPieces[i].column === col
             ) {
-              let { isPinned, attackingPiece } = canPieceMoveInCheck(
-                board,
-                row,
-                col,
-                "white"
-              );
+              let { isPinned, attackingPiece, directionOfPinning } =
+                canPieceMoveInCheck(board, row, col, "white");
+
+              if (directionOfPinning !== "") {
+                isKingBehind = isKingBehindDirection(
+                  directionOfPinning,
+                  board,
+                  row,
+                  col,
+                  "white"
+                );
+              }
               if (attackingPiece.length > 0) {
                 for (let i = 0; i < moves.length; i++) {
                   for (let j = 0; j < attackingPiece.length; j++) {
@@ -75,8 +83,13 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
                     }
                   }
                 }
-              } else {
-                availableMovesInPinned = moves;
+              }
+              if (
+                isPinned &&
+                availableMovesInPinned.length < 1 &&
+                isKingBehind
+              ) {
+                return false;
               }
             }
           }
@@ -107,7 +120,7 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
-        availableMovesInPinned,
+        availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

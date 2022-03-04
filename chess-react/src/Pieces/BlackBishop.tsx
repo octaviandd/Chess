@@ -7,6 +7,7 @@ import {
   canBishopMove,
   canPieceMoveInCheck,
   checkPossibleMovesInCheck,
+  isKingBehindDirection,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import BlackBishopSVG from "./black_bishop.svg";
@@ -29,6 +30,7 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
     blackKingPositionsOfCheck,
     blackKingDefendingPieces,
   } = kingsChecks;
+  let isKingBehind: any = false;
 
   const [collectedProps, drag, preview] = useDrag(
     () => ({
@@ -52,18 +54,26 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
             }
           }
         }
+
         if (blackKingDefendingPieces) {
           for (let i = 0; i < blackKingDefendingPieces.length; i++) {
             if (
               blackKingDefendingPieces[i].row === row &&
               blackKingDefendingPieces[i].column === col
             ) {
-              let { isPinned, attackingPiece } = canPieceMoveInCheck(
-                board,
-                row,
-                col,
-                "black"
-              );
+              let { isPinned, attackingPiece, directionOfPinning } =
+                canPieceMoveInCheck(board, row, col, "black");
+
+              if (directionOfPinning !== "") {
+                isKingBehind = isKingBehindDirection(
+                  directionOfPinning,
+                  board,
+                  row,
+                  col,
+                  "black"
+                );
+              }
+
               if (attackingPiece.length > 0) {
                 for (let i = 0; i < moves.length; i++) {
                   for (let j = 0; j < attackingPiece.length; j++) {
@@ -77,7 +87,11 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
                 }
               }
 
-              if (isPinned && availableMovesInPinned.length < 1) {
+              if (
+                isPinned &&
+                availableMovesInPinned.length < 1 &&
+                isKingBehind
+              ) {
                 return false;
               }
             }
@@ -109,7 +123,7 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
-        availableMovesInPinned,
+        availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({

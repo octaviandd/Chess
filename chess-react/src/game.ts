@@ -1017,7 +1017,7 @@ export const canPieceMoveInCheck = (
           directionOfPinning = "diagonal_top_left_to_right";
           attackingPiece.push(board[i - n][j - n]);
           for (let q = n; q > 0; q--) {
-            attackingPiece.push(board[i + n][j - n]);
+            attackingPiece.push(board[i - n][j - n]);
           }
         }
         break;
@@ -1034,4 +1034,72 @@ export const canPieceMoveInCheck = (
     moves: Array.from(new Set(moves)),
     numberOfChecks,
   };
+};
+
+export const isKingBehindDirection = (
+  direction: string,
+  board: any,
+  i: number,
+  j: number,
+  pieceColor: string
+) => {
+  let spaceToRight = 7 - j;
+  let spaceToBottom = 7 - i;
+  let isKingBehind = false;
+  let oppositeColor = pieceColor === "black" ? "white" : "black";
+  if (direction === "diagonal_bottom_left_to_right") {
+    let x = 0;
+    while (x < i && x < spaceToRight) {
+      x++;
+      if (board[i - x][j + x].piece !== null) {
+        if (board[i - x][j + x].piece.includes(pieceColor)) {
+          if (board[i - x][j + x].piece === `${oppositeColor}_king`) {
+            isKingBehind = true;
+          }
+        }
+      }
+    }
+  } else if (direction === "diagonal_bottom_right_to_left") {
+    let x = 0;
+    while (x < i && x < j) {
+      x++;
+      console.log(board[i - x][j - x]);
+      if (board[i - x][j - x].piece !== null) {
+        if (board[i - x][j - x].piece.includes(pieceColor)) {
+          if (board[i - x][j - x].piece === `${oppositeColor}_king`) {
+            isKingBehind = true;
+          }
+        }
+      }
+    }
+  } else if (direction === "diagonal_top_left_to_right") {
+    let x = 0;
+    while (x < spaceToBottom && x < spaceToRight) {
+      x++;
+      if (board[i + x][j + x].piece !== null) {
+        if (board[i + x][j + x].piece.includes(pieceColor)) {
+          if (board[i + x][j + x].piece === `${oppositeColor}_king`) {
+            isKingBehind = true;
+          }
+        }
+      }
+    }
+  } else if (direction === "diagonal_top_right_to_left") {
+    let x = 0;
+    while (x < spaceToBottom && x < spaceToRight) {
+      x++;
+      if (board[i + x][j - x].piece !== null) {
+        if (board[i + x][j - x].piece.includes(pieceColor)) {
+          if (board[i + x][j - x].piece === `${oppositeColor}_king`) {
+            isKingBehind = true;
+          }
+        }
+      }
+    }
+  } else if (direction === "vertical_top_to_bottom") {
+  } else if (direction === "vertical_bottom_to_top") {
+  } else if (direction === "horizontal_left_to_right") {
+  } else if (direction === "horizontal_right_to_left") {
+  }
+  return isKingBehind;
 };

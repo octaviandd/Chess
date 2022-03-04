@@ -2,7 +2,12 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import { canRookMove, checkPossibleMovesInCheck } from "../game";
+import {
+  canPieceMoveInCheck,
+  canRookMove,
+  checkPossibleMovesInCheck,
+  isKingBehindDirection,
+} from "../game";
 import { ItemTypes } from "../ItemTypes";
 import WhiteRookSVG from "./white_rook.svg";
 
@@ -18,8 +23,13 @@ export default function WhiteRook({ row, col, board, kingsChecks }: Props) {
   let moves = canRookMove(board, row, col, "white");
   let returnable: any = [];
   let canMove = false;
-  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
-    kingsChecks;
+  let availableMovesInPinned: any = [];
+  let isKingBehind: any = false;
+  const {
+    whiteKingPositionsOnTheDirectionOfCheck,
+    whiteKingPositionsOfCheck,
+    whiteKingDefendingPieces,
+  } = kingsChecks;
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
@@ -38,6 +48,43 @@ export default function WhiteRook({ row, col, board, kingsChecks }: Props) {
               ) {
                 returnable.push(moves[i]);
                 canMove = true;
+              }
+            }
+          }
+        }
+
+        if (whiteKingDefendingPieces) {
+          for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
+            if (
+              whiteKingDefendingPieces[i].row === row &&
+              whiteKingDefendingPieces[i].column === col
+            ) {
+              let { isPinned, attackingPiece, directionOfPinning } =
+                canPieceMoveInCheck(board, row, col, "white");
+
+              if (directionOfPinning !== "") {
+                isKingBehind = isKingBehindDirection(
+                  directionOfPinning,
+                  board,
+                  row,
+                  col,
+                  "white"
+                );
+              }
+              if (attackingPiece.length > 0) {
+                for (let i = 0; i < moves.length; i++) {
+                  for (let j = 0; j < attackingPiece.length; j++) {
+                    if (
+                      moves[i].row === attackingPiece[j].row &&
+                      moves[i].column === attackingPiece[j].column
+                    ) {
+                      availableMovesInPinned.push(moves[i]);
+                    }
+                  }
+                }
+              }
+              if (isPinned && availableMovesInPinned.length < 1) {
+                return false;
               }
             }
           }
@@ -68,6 +115,7 @@ export default function WhiteRook({ row, col, board, kingsChecks }: Props) {
         row: row,
         col: col,
         availableMovesInCheck: returnable,
+        availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({
