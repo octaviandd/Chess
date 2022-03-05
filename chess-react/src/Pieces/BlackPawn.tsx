@@ -9,33 +9,21 @@ import {
   isKingBehindDirection,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
+import { IPiece, ISquare } from "../types";
 import PawnSVG from "./black_pawn.svg";
 
-const style = {
-  fontSize: 40,
-  fontWeight: "bold",
-  cursor: "move",
-};
-
-type Props = {
-  row: number;
-  col: number;
-  board: any;
-  kingsChecks: any;
-};
-
-export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
+export default function BlackPawn({ row, col, board, kingsChecks }: IPiece) {
   let item = "black_pawn";
-  let moves = canPawnMove(board, row, col, "black");
-  let returnable: any = [];
-  let canMove = false;
-  let availableMovesInPinned: any = [];
-
+  let moves = canPawnMove({ board, row, col, pieceColor: "black" });
+  let availableMovesInCheck: ISquare[] = [];
+  let canMove: boolean = false;
+  let availableMovesInPinned: ISquare[] = [];
   const {
     blackKingPositionsOnTheDirectionOfCheck,
     blackKingPositionsOfCheck,
     blackKingDefendingPieces,
   } = kingsChecks;
+  let isKingBehind: boolean = false;
 
   if (moves && blackKingPositionsOfCheck) {
     for (let i = 0; i < moves.length; i++) {
@@ -44,7 +32,7 @@ export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
           moves[i].row === blackKingPositionsOnTheDirectionOfCheck[j].row &&
           moves[i].column === blackKingPositionsOnTheDirectionOfCheck[j].column
         ) {
-          returnable.push(moves[i]);
+          availableMovesInCheck.push(moves[i]);
           canMove = true;
         }
       }
@@ -119,15 +107,11 @@ export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
         piece: "black_pawn",
         row: row,
         col: col,
-        availableMovesInCheck: returnable,
-        availableMovesInPinned,
+        availableMovesInCheck,
+        availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
-      end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
-        didDrop: !!monitor.didDrop(),
-        dropResults: monitor.getDropResult(),
-        item: monitor.getItem(),
       }),
     }),
     [blackKingPositionsOfCheck, canMove]
@@ -138,7 +122,7 @@ export default function BlackPawn({ row, col, board, kingsChecks }: Props) {
       <DragPreviewImage connect={preview} src={PawnSVG} />
       <div
         ref={drag}
-        style={{ ...style, opacity: collectedProps.isDragging ? 0.5 : 1 }}
+        style={{ cursor: "move", opacity: collectedProps.isDragging ? 0.5 : 1 }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

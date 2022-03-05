@@ -9,27 +9,21 @@ import {
   isKingBehindDirection,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
+import { IPiece, ISquare } from "../types";
 import BlackKnightSVG from "./black_knight.svg";
 
-type Props = {
-  row: number;
-  col: number;
-  board: any;
-  kingsChecks: any;
-};
-
-export default function BlackKnight({ row, col, board, kingsChecks }: Props) {
+export default function BlackKnight({ row, col, board, kingsChecks }: IPiece) {
   let item = "black_knight";
-  let moves = canKnightMove(board, row, col);
-  let returnable: any = [];
-  let canMove = false;
-  let availableMovesInPinned: any = [];
+  let moves = canKnightMove({ board, row, col, pieceColor: "black" });
+  let availableMovesInCheck: ISquare[] = [];
+  let canMove: boolean = false;
+  let availableMovesInPinned: ISquare[] = [];
   const {
     blackKingPositionsOnTheDirectionOfCheck,
     blackKingPositionsOfCheck,
     blackKingDefendingPieces,
   } = kingsChecks;
-  let isKingBehind: any = false;
+  let isKingBehind: boolean = false;
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
@@ -46,7 +40,7 @@ export default function BlackKnight({ row, col, board, kingsChecks }: Props) {
                 moves[i].column ===
                   blackKingPositionsOnTheDirectionOfCheck[j].column
               ) {
-                returnable.push(moves[i]);
+                availableMovesInCheck.push(moves[i]);
                 canMove = true;
               }
             }
@@ -119,15 +113,11 @@ export default function BlackKnight({ row, col, board, kingsChecks }: Props) {
         piece: "black_knight",
         row: row,
         col: col,
-        availableMovesInCheck: returnable,
+        availableMovesInCheck: availableMovesInCheck,
         availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
-      end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
-        didDrop: !!monitor.didDrop(),
-        dropResults: monitor.getDropResult(),
-        item: monitor.getItem(),
       }),
     }),
     [canMove, blackKingPositionsOfCheck]

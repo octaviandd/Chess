@@ -10,21 +10,15 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import WhiteKnightSVG from "../Pieces/white_knight.svg";
+import { IPiece, ISquare } from "../types";
 
-type Props = {
-  row: number;
-  col: number;
-  board: any;
-  kingsChecks: any;
-};
-
-export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
+export default function WhiteKnight({ row, col, board, kingsChecks }: IPiece) {
   let item = "white_knight";
-  let moves = canKnightMove(board, row, col);
-  let returnable: any = [];
-  let canMove = false;
-  let availableMovesInPinned: any = [];
-  let isKingBehind: any = false;
+  let moves = canKnightMove({ board, row, col, pieceColor: "white" });
+  let availableMovesInCheck: ISquare[] = [];
+  let canMove: boolean = false;
+  let availableMovesInPinned: ISquare[] = [];
+  let isKingBehind: boolean = false;
   const {
     whiteKingPositionsOnTheDirectionOfCheck,
     whiteKingPositionsOfCheck,
@@ -47,7 +41,7 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
                 moves[i].column ===
                   whiteKingPositionsOnTheDirectionOfCheck[j].column
               ) {
-                returnable.push(moves[i]);
+                availableMovesInCheck.push(moves[i]);
                 canMove = true;
               }
             }
@@ -119,15 +113,12 @@ export default function WhiteKnight({ row, col, board, kingsChecks }: Props) {
         piece: "white_knight",
         row: row,
         col: col,
-        availableMovesInCheck: returnable,
+        availableMovesInCheck,
         availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
-        didDrop: !!monitor.didDrop(),
-        dropResults: monitor.getDropResult(),
-        item: monitor.getItem(),
       }),
     }),
     [canMove, whiteKingPositionsOfCheck]

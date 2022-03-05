@@ -11,6 +11,7 @@ import {
   canRookMove,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
+import { ISquare } from "../types";
 import BlackKingSVG from "./black_king.svg";
 
 type Props = {
@@ -24,8 +25,8 @@ export default function BlackKing({ row, col, board, kingsChecks }: Props) {
   const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
     kingsChecks;
 
-  let possibleMoves = canKingMove(board, row, col, "black");
-  let possibleAttackingMoves: any = [];
+  let possibleMoves = canKingMove({ board, row, col, pieceColor: "black" });
+  let possibleAttackingMoves: ISquare[] = [];
 
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
@@ -33,53 +34,57 @@ export default function BlackKing({ row, col, board, kingsChecks }: Props) {
         let pieceColor = board[i][j].piece.split("_")[0];
         let incomingPiece = board[i][j].piece.split("_")[1];
         if (incomingPiece === "pawn") {
-          canPawnMove(
+          canPawnMove({
             board,
-            board[i][j].row,
-            board[i][j].column,
-            pieceColor
-          ).map((item) => possibleAttackingMoves.push(item));
+            row: board[i][j].row,
+            col: board[i][j].column,
+            pieceColor,
+          }).map((item) => possibleAttackingMoves.push(item));
         } else if (incomingPiece === "knight") {
-          canKnightMove(board, board[i][j].row, board[i][j].column).map(
-            (item) => possibleAttackingMoves.push(item)
-          );
+          canKnightMove({
+            board,
+            row: board[i][j].row,
+            col: board[i][j].column,
+            pieceColor,
+          }).map((item) => possibleAttackingMoves.push(item));
         } else if (incomingPiece === "bishop") {
-          canBishopMove(
+          canBishopMove({
             board,
-            board[i][j].row,
-            board[i][j].column,
-            pieceColor
-          ).map((item) => possibleAttackingMoves.push(item));
+            row: board[i][j].row,
+            col: board[i][j].column,
+            pieceColor,
+          }).map((item) => possibleAttackingMoves.push(item));
         } else if (incomingPiece === "rook") {
-          canRookMove(
+          canRookMove({
             board,
-            board[i][j].row,
-            board[i][j].column,
-            pieceColor
-          ).map((item) => possibleAttackingMoves.push(item));
+            row: board[i][j].row,
+            col: board[i][j].column,
+            pieceColor,
+          }).map((item) => possibleAttackingMoves.push(item));
         } else if (incomingPiece === "king") {
-          canKingMove(
+          canKingMove({
             board,
-            board[i][j].row,
-            board[i][j].column,
-            pieceColor
-          ).map((item) => possibleAttackingMoves.push(item));
+            row: board[i][j].row,
+            col: board[i][j].column,
+            pieceColor,
+          }).map((item) => possibleAttackingMoves.push(item));
         } else if (incomingPiece === "queen") {
-          canQueenMove(
+          canQueenMove({
             board,
-            board[i][j].row,
-            board[i][j].column,
-            pieceColor
-          ).map((item) => possibleAttackingMoves.push(item));
+            row: board[i][j].row,
+            col: board[i][j].column,
+            pieceColor,
+          }).map((item) => possibleAttackingMoves.push(item));
         }
       }
     }
   }
 
-  let newSet: any = Array.from(new Set(possibleAttackingMoves));
+  let newSet: ISquare[] = Array.from(new Set(possibleAttackingMoves));
 
   let moves = possibleMoves.filter(
-    (o) => !newSet.some((i: any) => i.row === o.row && i.column === o.column)
+    (o) =>
+      !newSet.some((i: ISquare) => i.row === o.row && i.column === o.column)
   );
 
   const [collectedProps, drag, preview] = useDrag(
@@ -94,9 +99,6 @@ export default function BlackKing({ row, col, board, kingsChecks }: Props) {
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
-        didDrop: !!monitor.didDrop(),
-        dropResults: monitor.getDropResult(),
-        item: monitor.getItem(),
       }),
     }),
     [possibleMoves, possibleAttackingMoves]

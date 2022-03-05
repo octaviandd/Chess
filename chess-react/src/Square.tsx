@@ -22,16 +22,24 @@ import {
   searchForKings,
   checkForKingChecks,
 } from "./game";
+import {
+  CSSSquareProps,
+  ISquareFunction,
+  IPieceToSquare,
+  ISquare,
+  IKingChecks,
+  TBoard,
+} from "./types";
 
 const setDefaultPieces = (
-  piece: any,
   row: number,
   col: number,
-  board: any,
-  kingChecks: any,
-  setKingChecks: any
+  board: TBoard,
+  kingChecks: IKingChecks
 ) => {
+  let piece = board[row][col].piece;
   if (piece === "black_rook") {
+    console.log(piece, board[row][col]);
     return (
       <BlackRook
         row={row}
@@ -198,37 +206,17 @@ const setDefaultPieces = (
   }
 };
 
-type Props = {
-  color: string;
-  row: number;
-  col: number;
-  board: any;
-  setBoard: any;
-  setPossibleMoves: any;
-  turn: string;
-  piece: any;
-  handleTurn: any;
-  kingChecks: any;
-  setKingChecks: any;
-};
-
-type SquareProps = {
-  piece: boolean;
-  color: string;
-};
-
 export default function Square({
   board,
   color,
   row,
   col,
   setBoard,
-  piece,
   turn,
   handleTurn,
   setKingChecks,
   kingChecks,
-}: Props) {
+}: ISquareFunction) {
   const [{ isOver, canDrop }, drop]: any = useDrop(
     () => ({
       accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
@@ -236,21 +224,21 @@ export default function Square({
         if (item.piece === "white_king") {
           if (turn === "white") {
             return item.availableMovesInCheck.find(
-              (el: any) => el.row === row && el.column === col
+              (el: ISquare) => el.row === row && el.column === col
             );
           }
         }
         if (item.piece === "black_king") {
           if (turn === "black") {
             return item.availableMovesInCheck.find(
-              (el: any) => el.row === row && el.column === col
+              (el: ISquare) => el.row === row && el.column === col
             );
           }
         }
         if (kingChecks.blackKingIsChecked || kingChecks.whiteKingIsChecked) {
           if (item.availableMovesInCheck) {
             return item.availableMovesInCheck.find(
-              (el: any) => el.row === row && el.column === col
+              (el: ISquare) => el.row === row && el.column === col
             );
           }
         } else {
@@ -259,35 +247,26 @@ export default function Square({
             item.availableMovesInPinned.length > 0
           ) {
             return item.availableMovesInPinned.find(
-              (el: any) => el.row === row && el.column === col
+              (el: ISquare) => el.row === row && el.column === col
             );
           } else {
-            return checkPossibleMovesForEveryPiece(
-              item,
-              piece,
-              board,
-              row,
-              col,
-              turn
-            );
+            return checkPossibleMovesForEveryPiece(item, board, row, col, turn);
           }
         }
       },
-      drop: (item: any, monitor) => {
+      drop: (item: IPieceToSquare) => {
         let copyOfBoard = board;
         copyOfBoard[row][col].piece = item.piece;
         copyOfBoard[item.row][item.col].piece = null;
 
-        setBoard((prevState: any) => {
+        setBoard((prevState: TBoard) => {
           let copy = [...prevState];
           copy[row][col].piece = item.piece;
           board[item.row][item.col].piece = null;
           return copy;
         });
 
-        let kingColor = turn === "white" ? "black" : "white";
-
-        let kingsPositions = searchForKings(copyOfBoard, kingColor);
+        let kingsPositions = searchForKings(copyOfBoard);
         const {
           blackKingPositionsX,
           blackKingPositionsY,
@@ -295,31 +274,34 @@ export default function Square({
           whiteKingPositionsY,
         } = kingsPositions;
 
+        if (turn === "white") {
+        }
+
         const {
           numberOfChecks,
           positionsOfCheck,
           positionsOnTheDirectionOfCheck,
           kingDefendingPieces,
-        } = checkForKingChecks(
-          copyOfBoard,
-          blackKingPositionsX,
-          blackKingPositionsY,
-          "black"
-        );
+        } = checkForKingChecks({
+          board: copyOfBoard,
+          row: blackKingPositionsX,
+          col: blackKingPositionsY,
+          pieceColor: "black",
+        });
 
         const {
           numberOfChecks: numberOfChecks_white,
           positionsOfCheck: positionsOfCheck_white,
           positionsOnTheDirectionOfCheck: positionsOnTheDirectionOfCheck_white,
           kingDefendingPieces: kingDefendingPieces_white,
-        } = checkForKingChecks(
-          copyOfBoard,
-          whiteKingPositionsX,
-          whiteKingPositionsY,
-          "white"
-        );
+        } = checkForKingChecks({
+          board: copyOfBoard,
+          row: whiteKingPositionsX,
+          col: whiteKingPositionsY,
+          pieceColor: "white",
+        });
 
-        setKingChecks((prevState: any) => ({
+        setKingChecks((prevState: IKingChecks) => ({
           ...prevState,
           whiteKingIsChecked: numberOfChecks_white !== 0,
           whiteKingPositionsOfCheck: positionsOfCheck_white,
@@ -337,24 +319,14 @@ export default function Square({
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
         canDrop: !!monitor.canDrop(),
-        didDrop: !!monitor.didDrop(),
-        dropResults: monitor.getDropResult(),
-        item: monitor.getItem(),
       }),
     }),
-    [turn, kingChecks.isBlackKingChecked, kingChecks.isWhiteKingChecked, board]
+    [turn, kingChecks.blackKingIsChecked, kingChecks.whiteKingIsChecked, board]
   );
 
   return (
-    <SquareDiv color={color} piece={piece.piece !== null} ref={drop}>
-      {setDefaultPieces(
-        piece.piece,
-        row,
-        col,
-        board,
-        kingChecks,
-        setKingChecks
-      )}
+    <SquareDiv color={color} piece={board[row][col].piece !== null} ref={drop}>
+      {setDefaultPieces(row, col, board, kingChecks)}
       {isOver && !canDrop && <Overlay type={OverlayType.IllegalMoveHover} />}
       {!isOver && canDrop && <Overlay type={OverlayType.PossibleMove} />}
       {isOver && canDrop && <Overlay type={OverlayType.LegalMoveHover} />}
@@ -362,7 +334,7 @@ export default function Square({
   );
 }
 
-const SquareDiv = styled.div<SquareProps>`
+const SquareDiv = styled.div<CSSSquareProps>`
   position: relative;
   width: 80px;
   height: 80px;

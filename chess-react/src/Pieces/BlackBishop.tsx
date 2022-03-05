@@ -10,21 +10,15 @@ import {
   isKingBehindDirection,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
+import { IPiece, ISquare } from "../types";
 import BlackBishopSVG from "./black_bishop.svg";
 
-type Props = {
-  row: number;
-  col: number;
-  board: any;
-  kingsChecks: any;
-};
-
-export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
+export default function BlackBishop({ row, col, kingsChecks, board }: IPiece) {
   let item = "black_bishop";
-  let moves = canBishopMove(board, row, col, "black");
-  let returnable: any = [];
-  let canMove = false;
-  let availableMovesInPinned: any = [];
+  let moves = canBishopMove({ board, row, col, pieceColor: "black" });
+  let availableMovesInCheck: ISquare[] = [];
+  let canMove: boolean = false;
+  let availableMovesInPinned: ISquare[] = [];
   const {
     blackKingPositionsOnTheDirectionOfCheck,
     blackKingPositionsOfCheck,
@@ -48,7 +42,7 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
                 moves[i].column ===
                   blackKingPositionsOnTheDirectionOfCheck[j].column
               ) {
-                returnable.push(moves[i]);
+                availableMovesInCheck.push(moves[i]);
                 canMove = true;
               }
             }
@@ -122,15 +116,12 @@ export default function BlackBishop({ row, col, kingsChecks, board }: Props) {
         piece: "black_bishop",
         row: row,
         col: col,
-        availableMovesInCheck: returnable,
+        availableMovesInCheck,
         availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
       end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
-        didDrop: !!monitor.didDrop(),
-        dropResults: monitor.getDropResult(),
-        item: monitor.getItem(),
       }),
     }),
     [blackKingPositionsOfCheck, canMove]

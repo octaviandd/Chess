@@ -6,28 +6,25 @@ import {
   canPieceMoveInCheck,
   canQueenMove,
   checkPossibleMovesInCheck,
+  isKingBehindDirection,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
+import { IPiece, ISquare } from "../types";
 import WhiteQueenSVG from "./white_queen.svg";
 
-type Props = {
-  row: number;
-  col: number;
-  board: any;
-  kingsChecks: any;
-};
-
-export default function WhiteQueen({ row, col, board, kingsChecks }: Props) {
+export default function WhiteQueen({ row, col, board, kingsChecks }: IPiece) {
   let item = "white_queen";
-  let moves = canQueenMove(board, row, col, "white");
-  let returnable: any = [];
-  let canMove = false;
-  let availableMovesInPinned: any = [];
+  let moves = canQueenMove({ board, row, col, pieceColor: "white" });
+  let availableMovesInCheck: ISquare[] = [];
+  let canMove: boolean = false;
+  let availableMovesInPinned: ISquare[] = [];
+  let isKingBehind: boolean = false;
   const {
     whiteKingPositionsOnTheDirectionOfCheck,
     whiteKingPositionsOfCheck,
     whiteKingDefendingPieces,
   } = kingsChecks;
+
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
@@ -44,7 +41,7 @@ export default function WhiteQueen({ row, col, board, kingsChecks }: Props) {
                 moves[i].column ===
                   whiteKingPositionsOnTheDirectionOfCheck[j].column
               ) {
-                returnable.push(moves[i]);
+                availableMovesInCheck.push(moves[i]);
                 canMove = true;
               }
             }
@@ -57,12 +54,19 @@ export default function WhiteQueen({ row, col, board, kingsChecks }: Props) {
               whiteKingDefendingPieces[i].row === row &&
               whiteKingDefendingPieces[i].column === col
             ) {
-              let { isPinned, attackingPiece } = canPieceMoveInCheck(
-                board,
-                row,
-                col,
-                "white"
-              );
+              let { isPinned, attackingPiece, directionOfPinning } =
+                canPieceMoveInCheck(board, row, col, "white");
+
+              if (directionOfPinning !== "") {
+                isKingBehind = isKingBehindDirection(
+                  directionOfPinning,
+                  board,
+                  row,
+                  col,
+                  "white"
+                );
+              }
+
               if (attackingPiece.length > 0) {
                 for (let i = 0; i < moves.length; i++) {
                   for (let j = 0; j < attackingPiece.length; j++) {
@@ -74,8 +78,13 @@ export default function WhiteQueen({ row, col, board, kingsChecks }: Props) {
                     }
                   }
                 }
-              } else {
-                return !isPinned;
+              }
+              if (
+                isPinned &&
+                availableMovesInPinned.length < 1 &&
+                isKingBehind
+              ) {
+                return false;
               }
             }
           }
@@ -105,15 +114,11 @@ export default function WhiteQueen({ row, col, board, kingsChecks }: Props) {
         piece: "white_queen",
         row: row,
         col: col,
-        availableMovesInCheck: returnable,
-        availableMovesInPinned,
+        availableMovesInCheck,
+        availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
       },
-      end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
-        didDrop: !!monitor.didDrop(),
-        dropResults: monitor.getDropResult(),
-        item: monitor.getItem(),
       }),
     }),
     [canMove, whiteKingPositionsOfCheck]
