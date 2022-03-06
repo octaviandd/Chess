@@ -53,10 +53,17 @@ export const canPawnMove = ({
   row,
   col,
   pieceColor,
-}: IPieceSearch): ISquare[] => {
+}: IPieceSearch): { moves: ISquare[]; protectedSquares: ISquare[] } => {
   let moves = [];
+  let protectedSquares: ISquare[] = [];
   if (pieceColor === "black") {
     if (board[row + 1] && board[row - 1]) {
+      if (board[row + 1][col + 1]) {
+        protectedSquares.push(board[row + 1][col + 1]);
+      }
+      if (board[row + 1][col - 1]) {
+        protectedSquares.push(board[row + 1][col - 1]);
+      }
       if (row === 1) {
         if (
           board[row + 1][col + 1] &&
@@ -105,8 +112,14 @@ export const canPawnMove = ({
       }
     }
 
-    return moves;
+    return { moves, protectedSquares };
   } else {
+    if (board[row - 1][col + 1]) {
+      protectedSquares.push(board[row - 1][col + 1]);
+    }
+    if (board[row - 1][col - 1]) {
+      protectedSquares.push(board[row - 1][col - 1]);
+    }
     if (row === 6) {
       if (
         board[row - 1][col + 1] &&
@@ -153,7 +166,7 @@ export const canPawnMove = ({
         moves.push(board[row - 1][col]);
       }
     }
-    return moves;
+    return { moves, protectedSquares };
   }
 };
 
@@ -833,7 +846,7 @@ export const checkPossibleMovesForEveryPiece = (
         row: item.row,
         col: item.col,
         pieceColor,
-      }).find((el: any) => el.row === row && el.column === col);
+      }).moves.find((el: any) => el.row === row && el.column === col);
     } else if (incomingPiece === "knight") {
       return canKnightMove({
         board,

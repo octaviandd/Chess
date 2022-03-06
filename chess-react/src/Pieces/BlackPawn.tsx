@@ -14,7 +14,7 @@ import PawnSVG from "./black_pawn.svg";
 
 export default function BlackPawn({ row, col, board, kingsChecks }: IPiece) {
   let item = "black_pawn";
-  let moves = canPawnMove({ board, row, col, pieceColor: "black" });
+  let moves = canPawnMove({ board, row, col, pieceColor: "black" }).moves;
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;
   let availableMovesInPinned: ISquare[] = [];

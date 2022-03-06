@@ -39,7 +39,6 @@ const setDefaultPieces = (
 ) => {
   let piece = board[row][col].piece;
   if (piece === "black_rook") {
-    console.log(piece, board[row][col]);
     return (
       <BlackRook
         row={row}

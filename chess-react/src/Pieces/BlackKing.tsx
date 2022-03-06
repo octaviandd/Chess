@@ -11,17 +11,10 @@ import {
   canRookMove,
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
-import { ISquare } from "../types";
+import { IPiece, ISquare } from "../types";
 import BlackKingSVG from "./black_king.svg";
 
-type Props = {
-  row: number;
-  col: number;
-  board: any;
-  kingsChecks: any;
-};
-
-export default function BlackKing({ row, col, board, kingsChecks }: Props) {
+export default function BlackKing({ row, col, board, kingsChecks }: IPiece) {
   const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
     kingsChecks;
 
@@ -30,16 +23,16 @@ export default function BlackKing({ row, col, board, kingsChecks }: Props) {
 
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].piece != null && !board[i][j].piece.includes("black")) {
-        let pieceColor = board[i][j].piece.split("_")[0];
-        let incomingPiece = board[i][j].piece.split("_")[1];
+      if (board[i][j].piece != null && !board[i][j].piece?.includes("black")) {
+        let pieceColor = board[i][j].piece?.split("_")[0]!;
+        let incomingPiece = board[i][j].piece?.split("_")[1];
         if (incomingPiece === "pawn") {
           canPawnMove({
             board,
             row: board[i][j].row,
             col: board[i][j].column,
             pieceColor,
-          }).map((item) => possibleAttackingMoves.push(item));
+          }).protectedSquares.map((item) => possibleAttackingMoves.push(item));
         } else if (incomingPiece === "knight") {
           canKnightMove({
             board,

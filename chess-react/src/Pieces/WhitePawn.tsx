@@ -14,7 +14,7 @@ import WhitePawnSVG from "./white_pawn.svg";
 
 export default function WhitePawn({ row, col, board, kingsChecks }: IPiece) {
   let item = "white_pawn";
-  let moves = canPawnMove({ board, row, col, pieceColor: "white" });
+  let moves = canPawnMove({ board, row, col, pieceColor: "white" }).moves;
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;
   let availableMovesInPinned: ISquare[] = [];

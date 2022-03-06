@@ -14,31 +14,32 @@ import { ItemTypes } from "../ItemTypes";
 import { IPiece, ISquare } from "../types";
 import WhiteKingSVG from "./white_king.svg";
 
-export default function WhiteKing({ row, col, board, kingsChecks }: any) {
+export default function WhiteKing({ row, col, board, kingsChecks }: IPiece) {
   const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
     kingsChecks;
 
   let possibleMoves = canKingMove({ board, row, col, pieceColor: "white" });
   let possibleAttackingMoves: ISquare[] = [];
+  let moves: ISquare[] = [];
 
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].piece != null && !board[i][j].piece.includes("white")) {
-        let pieceColor = board[i][j].piece.split("_")[0];
-        let incomingPiece = board[i][j].piece.split("_")[1];
+      if (board[i][j].piece != null && !board[i][j].piece?.includes("white")) {
+        let pieceColor: string = board[i][j].piece?.split("_")[0]!;
+        let incomingPiece = board[i][j].piece?.split("_")[1];
         if (incomingPiece === "pawn") {
           canPawnMove({
             board,
             row: board[i][j].row,
             col: board[i][j].column,
             pieceColor,
-          }).map((item) => possibleAttackingMoves.push(item));
+          }).protectedSquares.map((item) => possibleAttackingMoves.push(item));
         } else if (incomingPiece === "knight") {
           canKnightMove({
             board,
             row: board[i][j].row,
             col: board[i][j].column,
-            pieceColor: "white",
+            pieceColor,
           }).map((item) => possibleAttackingMoves.push(item));
         } else if (incomingPiece === "bishop") {
           canBishopMove({
@@ -75,7 +76,7 @@ export default function WhiteKing({ row, col, board, kingsChecks }: any) {
 
   let newSet: ISquare[] = Array.from(new Set(possibleAttackingMoves));
 
-  let moves = possibleMoves.filter(
+  moves = possibleMoves.filter(
     (o) =>
       !newSet.some((i: ISquare) => i.row === o.row && i.column === o.column)
   );
@@ -96,7 +97,7 @@ export default function WhiteKing({ row, col, board, kingsChecks }: any) {
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [possibleMoves, possibleAttackingMoves]
+    [possibleMoves, possibleAttackingMoves, moves]
   );
   return (
     <>
