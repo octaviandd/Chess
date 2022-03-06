@@ -35,7 +35,8 @@ const setDefaultPieces = (
   row: number,
   col: number,
   board: TBoard,
-  kingChecks: IKingChecks
+  kingChecks: IKingChecks,
+  setKingChecks: any
 ) => {
   let piece = board[row][col].piece;
   if (piece === "black_rook") {
@@ -72,6 +73,7 @@ const setDefaultPieces = (
         col={col}
         board={board}
         kingsChecks={kingChecks}
+        setKingChecks={setKingChecks}
       ></BlackKing>
     );
   } else if (piece === "black_queen") {
@@ -153,6 +155,7 @@ const setDefaultPieces = (
         col={col}
         board={board}
         kingsChecks={kingChecks}
+        setKingChecks={setKingChecks}
       ></WhiteKing>
     );
   } else if (piece === "white_queen") {
@@ -325,7 +328,7 @@ export default function Square({
 
   return (
     <SquareDiv color={color} piece={board[row][col].piece !== null} ref={drop}>
-      {setDefaultPieces(row, col, board, kingChecks)}
+      {setDefaultPieces(row, col, board, kingChecks, setKingChecks)}
       {isOver && !canDrop && <Overlay type={OverlayType.IllegalMoveHover} />}
       {!isOver && canDrop && <Overlay type={OverlayType.PossibleMove} />}
       {isOver && canDrop && <Overlay type={OverlayType.LegalMoveHover} />}

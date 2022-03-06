@@ -357,6 +357,8 @@ function App() {
     blackKingPositionsOfCheck: [],
     blackKingPositionsOnTheDirectionOfCheck: [],
     blackKingDefendingPieces: [],
+    whiteCheckMated: false,
+    blackCheckMated: false,
   });
 
   const handleTurn = (): void => {
@@ -366,6 +368,12 @@ function App() {
       setTurn("white");
     }
   };
+
+  useEffect(() => {
+    if (kingChecks.whiteCheckMated || kingChecks.blackCheckMated) {
+      alert("check mate");
+    }
+  }, [kingChecks.whiteCheckMated, kingChecks.blackCheckMated]);
 
   return (
     <div className="App">

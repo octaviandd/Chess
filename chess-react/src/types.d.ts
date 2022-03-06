@@ -44,6 +44,8 @@ export interface IKingChecks {
   blackKingPositionsOfCheck: [];
   blackKingPositionsOnTheDirectionOfCheck: ISquare[];
   blackKingDefendingPieces: ISquare[];
+  blackCheckMated: boolean;
+  whiteCheckMated: boolean;
 }
 
 export interface IPiece {
@@ -51,6 +53,10 @@ export interface IPiece {
   col: number;
   board: TBoard;
   kingsChecks: IKingChecks;
+}
+
+export interface IKingPiece extends IPiece {
+  setKingChecks: any;
 }
 
 export interface IPieceSearch {
