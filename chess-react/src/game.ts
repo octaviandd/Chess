@@ -2,13 +2,6 @@
 
 import { IPieceSearch, ISquare, TBoard } from "./types";
 
-/**
- * Get the positions of both kings on the current board.
- * @param board
- * @param kingColor
- * @returns Kings positions
- */
-
 export const searchForKings = (board: TBoard) => {
   let kingsPositions = {
     blackKingPositionsX: 0,
@@ -17,36 +10,21 @@ export const searchForKings = (board: TBoard) => {
     whiteKingPositionsY: 3,
   };
 
-  // Loop through the matrix to find the Black King
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].piece === "black_king") {
-        kingsPositions.blackKingPositionsX = board[i][j].row;
-        kingsPositions.blackKingPositionsY = board[i][j].column;
-      }
+  board.forEach(row => row.forEach(col => {
+    if (col.piece === "black_king") {
+      kingsPositions.blackKingPositionsX = col.row;
+      kingsPositions.blackKingPositionsY = col.column;
     }
-  }
+  }))
 
-  // Loop through the matrix to find the White King
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].piece === "white_king") {
-        kingsPositions.whiteKingPositionsX = board[i][j].row;
-        kingsPositions.whiteKingPositionsY = board[i][j].column;
-      }
+  board.forEach(row => row.forEach(col => {
+    if (col.piece === "white_king") {
+      kingsPositions.whiteKingPositionsX = col.row;
+      kingsPositions.whiteKingPositionsY = col.column;
     }
-  }
+  }))
   return kingsPositions;
 };
-
-/**
- * Find the possible moves of the pawn irrespective of current checks or pinning.
- * @param board
- * @param i
- * @param j
- * @param pieceColor
- * @returns Pawn Moves
- */
 
 export const canPawnMove = ({
   board,
@@ -55,137 +33,51 @@ export const canPawnMove = ({
   pieceColor,
 }: IPieceSearch): { moves: ISquare[]; protectedSquares: ISquare[] } => {
   let moves = [];
-  let protectedSquares: ISquare[] = [];
-  if (pieceColor === "black") {
-    if (board[row + 1] && board[row - 1]) {
-      if (board[row + 1][col + 1]) {
-        protectedSquares.push(board[row + 1][col + 1]);
-      }
-      if (board[row + 1][col - 1]) {
-        protectedSquares.push(board[row + 1][col - 1]);
-      }
-      if (row === 1) {
-        if (
-          board[row + 1][col + 1] &&
-          board[row + 1][col + 1].piece !== null &&
-          !board[row + 1][col + 1].piece?.includes(pieceColor)
-        ) {
-          moves.push(board[row + 1][col + 1]);
-        }
-        if (
-          board[row + 1][col - 1] &&
-          board[row + 1][col - 1].piece !== null &&
-          !board[row + 1][col - 1].piece?.includes(pieceColor)
-        ) {
-          moves.push(board[row + 1][col - 1]);
-        }
+  let protectedSquares = [];
+  const isWhite = pieceColor === 'white';
+  const direction = isWhite ? -1 : 1;
+  const initialRow = isWhite ? 6 : 1;
 
-        if (board[row + 2][col] && board[row + 2][col].piece !== null) {
-          moves.push(board[row + 1][col]);
-        } else if (
-          board[row + 1][col] &&
-          board[row + 1][col].piece === null &&
-          board[row + 2][col] &&
-          board[row + 2][col].piece === null
-        ) {
-          moves.push(board[row + 1][col], board[row + 2][col]);
-        }
-      } else {
-        if (
-          board[row + 1][col + 1] &&
-          board[row + 1][col + 1].piece !== null &&
-          !board[row + 1][col + 1].piece?.includes(pieceColor)
-        ) {
-          moves.push(board[row + 1][col + 1]);
-        }
-        if (
-          board[row + 1][col - 1] &&
-          board[row + 1][col - 1].piece !== null &&
-          !board[row + 1][col - 1].piece?.includes(pieceColor)
-        ) {
-          moves.push(board[row + 1][col - 1]);
-        }
-
-        if (board[row + 1][col] && board[row + 1][col].piece === null) {
-          moves.push(board[row + 1][col]);
-        }
-      }
-    }
-
-    return { moves, protectedSquares };
-  } else {
-    if (board[row - 1][col + 1]) {
-      protectedSquares.push(board[row - 1][col + 1]);
-    }
-    if (board[row - 1][col - 1]) {
-      protectedSquares.push(board[row - 1][col - 1]);
-    }
-    if (row === 6) {
-      if (
-        board[row - 1][col + 1] &&
-        board[row - 1][col + 1].piece !== null &&
-        !board[row - 1][col + 1].piece?.includes(pieceColor)
-      ) {
-        moves.push(board[row - 1][col + 1]);
-      }
-      if (
-        board[row - 1][col - 1] &&
-        board[row - 1][col - 1].piece !== null &&
-        !board[row - 1][col - 1].piece?.includes(pieceColor)
-      ) {
-        moves.push(board[row - 1][col - 1]);
-      }
-
-      if (board[row - 2][col] && board[row - 2][col].piece !== null) {
-        moves.push(board[row - 1][col]);
-      } else if (
-        board[row - 1][col] &&
-        board[row - 1][col].piece === null &&
-        board[row - 2][col] &&
-        board[row - 2][col].piece === null
-      ) {
-        moves.push(board[row - 1][col], board[row - 2][col]);
-      }
-    } else {
-      if (
-        board[row - 1][col + 1] &&
-        board[row - 1][col + 1].piece !== null &&
-        !board[row - 1][col + 1].piece?.includes(pieceColor)
-      ) {
-        moves.push(board[row - 1][col + 1]);
-      }
-      if (
-        board[row - 1][col - 1] &&
-        board[row - 1][col - 1].piece !== null &&
-        !board[row - 1][col - 1].piece?.includes(pieceColor)
-      ) {
-        moves.push(board[row - 1][col - 1]);
-      }
-
-      if (board[row - 1][col] && board[row - 1][col].piece === null) {
-        moves.push(board[row - 1][col]);
-      }
-    }
-    return { moves, protectedSquares };
+  if (board[row + direction] && board[row + direction][col + 1]) {
+    protectedSquares.push(board[row + direction][col + 1]);
   }
+  if (board[row + direction] && board[row + direction][col - 1]) {
+    protectedSquares.push(board[row + direction][col - 1]);
+  }
+  if (row === initialRow) {
+    if (board[row + direction] && board[row + direction][col + 1] && !board[row + direction][col + 1].piece?.includes(pieceColor)) {
+      moves.push(board[row + direction][col + 1]);
+    }
+    if (board[row + direction] && board[row + direction][col - 1] && !board[row + direction][col - 1].piece?.includes(pieceColor)) {
+      moves.push(board[row + direction][col - 1]);
+    }
+
+    if (board[row + direction * 2] && board[row + direction * 2][col] && board[row + direction * 2][col].piece !== null) {
+      moves.push(board[row + direction][col]);
+    } else if (board[row + direction][col] && board[row + direction][col].piece === null && board[row + direction * 2][col] && board[row + direction * 2][col].piece === null) {
+      moves.push(board[row + direction][col], board[row + direction * 2][col]);
+    }
+  } else {
+    if (board[row + direction] && board[row + direction][col + 1] && !board[row + direction][col + 1].piece?.includes(pieceColor)) {
+      moves.push(board[row + direction][col + 1]);
+    }
+    if (board[row + direction] && board[row + direction][col - 1] && !board[row + direction][col - 1].piece?.includes(pieceColor)) {
+      moves.push(board[row + direction][col - 1]);
+    }
+
+    if (board[row + direction] && board[row + direction][col] && board[row + direction][col].piece === null) {
+      moves.push(board[row + direction][col]);
+    }
+  }
+  return { moves, protectedSquares };
 };
 
-/**
- * Find the possible moves of the king irrespective of current checks or pinning
- * @param board
- * @param i
- * @param j
- * @returns
- */
 
 export const canKnightMove = ({
   board,
   row,
   col,
-  pieceColor,
 }: IPieceSearch): ISquare[] => {
-  let moves = [];
-
   let knightMoves = [
     { x: 2, y: -1 },
     { x: 2, y: 1 },
@@ -197,104 +89,39 @@ export const canKnightMove = ({
     { x: -1, y: 2 },
   ];
 
-  for (let m of knightMoves) {
-    if (board[row + m.x] && board[row + m.x][col + m.y]) {
-      moves.push(board[row + m.x][col + m.y]);
-    }
-  }
-  return moves;
+  return knightMoves
+  .filter((move) => board[row + move.x] && board[row + move.x][col + move.y])
+  .map((move) => board[row + move.x][col + move.y]);
 };
 
-/**
- * Find the possible moves of the bishop irrespective of current checks or pinning
- * @param board
- * @param i
- * @param j
- * @param pieceColor
- * @returns
- */
 export const canBishopMove = ({
   board,
   row,
   col,
   pieceColor,
 }: IPieceSearch) => {
-  let spaceToRight = 7 - col;
-  let spaceToBottom = 7 - row;
-  let moves = [];
+  const directions = [  { x: -1, y: -1 },  { x: -1, y: 1 },  { x: 1, y: -1 },  { x: 1, y: 1 }];
 
-  let x = 0;
-
-  while (x < row && x < spaceToRight) {
-    x++;
-    moves.push(board[row - x][col + x]);
-    if (board[row - x][col + x].piece !== null) {
-      if (board[row - x][col + x].piece?.includes(pieceColor)) {
-        break;
-      }
-      if (!board[row - x][col + x].piece?.includes(pieceColor)) {
-        moves.push(board[row - x][col + x]);
-        break;
-      }
-    }
+const isValidMove = (r: number, c: number, pieceColor: string, board: any) => {
+  if (!board[r] || !board[r][c]) {
+    return false;
   }
-
-  let o = 0;
-  while (o < spaceToBottom && o < spaceToRight) {
-    o++;
-    moves.push(board[row + o][col + o]);
-    if (board[row + o][col + o].piece !== null) {
-      if (board[row + o][col + o].piece?.includes(pieceColor)) {
-        break;
-      }
-      if (!board[row + o][col + o].piece?.includes(pieceColor)) {
-        moves.push(board[row + o][col + o]);
-        break;
-      }
-    }
+  if (board[r][c].piece === null) {
+    return true;
   }
+  return !board[r][c].piece?.includes(pieceColor);
+}
 
-  let m = 0;
-  while (m < spaceToBottom && m < col) {
-    m++;
-    moves.push(board[row + m][col - m]);
-    if (board[row + m][col - m].piece !== null) {
-      if (board[row + m][col - m].piece?.includes(pieceColor)) {
-        break;
-      }
-      if (!board[row + m][col - m].piece?.includes(pieceColor)) {
-        moves.push(board[row + m][col - m]);
-        break;
-      }
-    }
+let moves = [];
+for (const {x, y} of directions) {
+  let i = 1;
+  while (isValidMove(row + (i * x), col + (i * y), pieceColor, board)) {
+    moves.push(board[row + (i * x)][col + (i * y)]);
+    i++;
   }
-
-  let n = 0;
-  while (n < row && n < col) {
-    n++;
-    moves.push(board[row - n][col - n]);
-    if (board[row - n][col - n].piece !== null) {
-      if (board[row - n][col - n].piece?.includes(pieceColor)) {
-        break;
-      }
-      if (!board[row - n][col - n].piece?.includes(pieceColor)) {
-        moves.push(board[row - n][col - n]);
-        break;
-      }
-    }
-  }
-
-  return moves;
+}
+return moves;
 };
-
-/**
- * Find the possible rooks moves irrespective of checks or pinnings
- * @param board
- * @param i
- * @param j
- * @param pieceColor
- * @returns
- */
 
 export const canRookMove = ({
   board,
@@ -302,63 +129,26 @@ export const canRookMove = ({
   col,
   pieceColor,
 }: IPieceSearch): ISquare[] => {
-  let spaceToRight = 7 - col;
-  let spaceToBottom = 7 - row;
-  let moves = [];
+  const directions = [  { x: 0, y: 1 },  { x: 0, y: -1 },  { x: 1, y: 0 },  { x: -1, y: 0 }];
 
-  for (let y = 1; y <= spaceToRight; y++) {
-    moves.push(board[row][col + y]);
-    if (board[row][col + y].piece !== null) {
-      if (board[row][col + y].piece?.includes(pieceColor)) {
-        break;
-      } else {
-        break;
-      }
-    }
+const isValidMove = (r: number, c: number, pieceColor: string, board: any) => {
+  if (!board[r] || !board[r][c]) {
+    return false;
   }
-
-  for (let y = 1; y <= col; y++) {
-    moves.push(board[row][col - y]);
-    if (board[row][col - y].piece !== null) {
-      if (board[row][col - y].piece?.includes(pieceColor)) {
-        break;
-      } else {
-        break;
-      }
-    }
+  if (board[r][c].piece === null) {
+    return true;
   }
-
-  for (let y = 1; y <= row; y++) {
-    moves.push(board[row - y][col]);
-    if (board[row - y][col].piece !== null) {
-      if (board[row - y][col].piece?.includes(pieceColor)) {
-        break;
-      } else {
-        break;
-      }
-    }
+  return !board[r][c].piece?.includes(pieceColor);
+}
+let moves = [];
+for (const {x, y} of directions) {
+  for (let i = 1; isValidMove(row + (i * x), col + (i * y), pieceColor, board); i++) {
+    moves.push(board[row + (i * x)][col + (i * y)]);
   }
-  for (let y = 1; y <= spaceToBottom; y++) {
-    moves.push(board[y + row][col]);
-    if (board[row + y][col].piece !== null) {
-      if (board[row + y][col].piece?.includes(pieceColor)) {
-        break;
-      } else {
-        break;
-      }
-    }
-  }
-  return moves;
+}
+return moves;
 };
 
-/**
- * Find the possible moves of the king irrespective of checks or pinnings.
- * @param board
- * @param i
- * @param j
- * @param pieceColor
- * @returns
- */
 export const canKingMove = ({
   board,
   row,
@@ -380,139 +170,43 @@ export const canKingMove = ({
   return moves;
 };
 
-/**
- * Find the possible moves of the queen irrespective of checks or pinnings.
- * @param board
- * @param i
- * @param j
- * @param pieceColor
- * @returns
- */
-
 export const canQueenMove = ({
   board,
   row,
   col,
   pieceColor,
-}: IPieceSearch): ISquare[] => {
-  let spaceToRight = 7 - col;
-  let spaceToBottom = 7 - row;
+}: any): ISquare[] => {
   let moves = [];
 
-  for (let y = 1; y <= spaceToRight; y++) {
-    moves.push(board[row][col + y]);
-    if (board[row][col + y] && board[row][col + y].piece !== null) {
-      if (board[row][col + y].piece?.includes(pieceColor)) {
-        break;
-      } else {
-        break;
-      }
-    }
-  }
+  let directions = [
+    { x: 0, y: 1 },
+    { x: 0, y: -1 },
+    { x: 1, y: 0 },
+    { x: -1, y: 0 },
+    { x: 1, y: 1 },
+    { x: -1, y: 1 },
+    { x: 1, y: -1 },
+    { x: -1, y: -1 },
+  ];
 
-  for (let y = 1; y <= col; y++) {
-    moves.push(board[row][col - y]);
-    if (board[row][col - y] && board[row][col - y].piece !== null) {
-      if (board[row][col - y].piece?.includes(pieceColor)) {
-        break;
-      } else {
-        break;
-      }
-    }
-  }
-
-  for (let y = 1; y <= row; y++) {
-    moves.push(board[row - y][col]);
-    if (board[row - y][col] && board[row - y][col].piece !== null) {
-      if (board[row - y][col].piece?.includes(pieceColor)) {
-        break;
-      } else {
-        break;
-      }
-    }
-  }
-  for (let y = 1; y <= spaceToBottom; y++) {
-    moves.push(board[y + row][col]);
-    if (board[y + row][col] && board[y + row][col].piece !== null) {
-      if (board[y + row][col].piece?.includes(pieceColor)) {
-        break;
-      } else {
-        break;
-      }
-    }
-  }
-
-  let x = 0;
-
-  while (x < row && x < spaceToRight) {
-    x++;
-    moves.push(board[row - x][col + x]);
-    if (board[row - x][col + x].piece !== null) {
-      if (board[row - x][col + x].piece?.includes(pieceColor)) {
-        break;
-      }
-      if (!board[row - x][col + x].piece?.includes(pieceColor)) {
-        moves.push(board[row - x][col + x]);
-        break;
-      }
-    }
-  }
-
-  let o = 0;
-  while (o < spaceToBottom && o < spaceToRight) {
-    o++;
-    moves.push(board[row + o][col + o]);
-    if (board[row + o][col + o].piece !== null) {
-      if (board[row + o][col + o].piece?.includes(pieceColor)) {
-        break;
-      }
-      if (!board[row + o][col + o].piece?.includes(pieceColor)) {
-        moves.push(board[row + o][col + o]);
-        break;
-      }
-    }
-  }
-
-  let m = 0;
-  while (m < spaceToBottom && m < col) {
-    m++;
-    moves.push(board[row + m][col - m]);
-    if (board[row + m][col - m].piece !== null) {
-      if (board[row + m][col - m].piece?.includes(pieceColor)) {
-        break;
-      }
-      if (!board[row + m][col - m].piece?.includes(pieceColor)) {
-        moves.push(board[row + m][col - m]);
-        break;
-      }
-    }
-  }
-
-  let n = 0;
-  while (n < row && n < col) {
-    n++;
-    moves.push(board[row - n][col - n]);
-    if (board[row - n][col - n].piece !== null) {
-      if (board[row - n][col - n].piece?.includes(pieceColor)) {
-        break;
-      }
-      if (!board[row - n][col - n].piece?.includes(pieceColor)) {
-        moves.push(board[row - n][col - n]);
-        break;
-      }
+  for (let direction of directions) {
+    let x = row + direction.x;
+    let y = col + direction.y;
+    while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
+        moves.push(board[x][y]);
+        if (board[x][y].piece !== null) {
+            if (board[x][y].piece.includes(pieceColor)) {
+                break;
+            } else {
+                break;
+            }
+        }
+        x += direction.x;
+        y += direction.y;
     }
   }
   return moves;
 };
-
-/**
- *
- * @param board Checks for possible direction of check, number of checks and the pieces that defend the king.
- * @param i
- * @param j
- * @param pieceColor
- * @returns
- */
 
 export const checkForKingChecks = ({
   board,
@@ -540,7 +234,6 @@ export const checkForKingChecks = ({
     { x: -1, y: 2 },
   ];
 
-  // check for knight checks
   for (let m of knightMoves) {
     if (board[row + m.x] && board[row + m.x][col + m.y]) {
       moves.push(board[row + m.x][col + m.y]);
@@ -554,7 +247,6 @@ export const checkForKingChecks = ({
     }
   }
 
-  //check for checks from horizontal right
   for (let y = 1; y <= spaceToRight; y++) {
     moves.push(board[row][col + y]);
     if (board[row][col + y].piece !== null) {
@@ -577,7 +269,6 @@ export const checkForKingChecks = ({
     }
   }
 
-  //check for checks from horizontal left
   for (let y = 1; y <= col; y++) {
     moves.push(board[row][col - y]);
     if (board[row][col - y].piece !== null) {
@@ -600,7 +291,6 @@ export const checkForKingChecks = ({
     }
   }
 
-  //check for checks from vertical top
   for (let y = 1; y <= row; y++) {
     moves.push(board[row - y][col]);
     if (board[row - y][col].piece !== null) {
@@ -623,7 +313,6 @@ export const checkForKingChecks = ({
     }
   }
 
-  //check for checks from vertical down
   for (let y = 1; y <= spaceToBottom; y++) {
     moves.push(board[y + row][col]);
     if (board[y + row][col].piece !== null) {
@@ -646,7 +335,6 @@ export const checkForKingChecks = ({
     }
   }
 
-  //check for checks from diagonal to right
   let x = 0;
 
   while (x < row && x < spaceToRight) {
@@ -662,7 +350,6 @@ export const checkForKingChecks = ({
         if (
           board[row - x][col + x].piece?.includes("bishop") ||
           board[row - x][col + x].piece?.includes("queen")
-          // board[row - x][col + x].piece.includes("pawn")
         ) {
           positionsOfCheck.push(board[row - x][col + x]);
           numberOfChecks++;
@@ -675,7 +362,6 @@ export const checkForKingChecks = ({
     }
   }
 
-  //checks from diagonal RIGHT -> LEFT/TOP
   let o = 0;
   while (o < spaceToBottom && o < spaceToRight) {
     o++;
@@ -691,7 +377,6 @@ export const checkForKingChecks = ({
         if (
           board[row + o][col + o].piece?.includes("bishop") ||
           board[row + o][col + o].piece?.includes("queen")
-          // board[row + o][col + o].piece?.includes("pawn")
         ) {
           positionsOfCheck.push(board[row + o][col + o]);
           numberOfChecks++;
@@ -718,7 +403,6 @@ export const checkForKingChecks = ({
         if (
           board[row + m][col - m].piece?.includes("bishop") ||
           board[row + m][col - m].piece?.includes("queen")
-          // board[row + m][col - m].piece.includes("pawn")
         ) {
           positionsOfCheck.push(board[row + m][col - m]);
           numberOfChecks++;
@@ -745,7 +429,6 @@ export const checkForKingChecks = ({
         if (
           board[row - n][col - n].piece?.includes("bishop") ||
           board[row - n][col - n].piece?.includes("queen")
-          // board[row - n][col - n].piece?.includes("pawn")
         ) {
           positionsOfCheck.push(board[row - n][col - n]);
           numberOfChecks++;
@@ -902,7 +585,6 @@ export const canPieceMoveInCheck = (
   let attackingPiece = [];
   let directionOfPinning = "";
 
-  //check for checks from horizontal right
   for (let y = 1; y <= spaceToRight; y++) {
     moves.push(board[i][j + y]);
     if (board[i][j + y].piece !== null) {
@@ -925,7 +607,6 @@ export const canPieceMoveInCheck = (
     }
   }
 
-  //check for checks from horizontal left
   for (let y = 1; y <= j; y++) {
     moves.push(board[i][j - y]);
     if (board[i][j - y].piece !== null) {
@@ -948,7 +629,6 @@ export const canPieceMoveInCheck = (
     }
   }
 
-  //check for checks from vertical top
   for (let y = 1; y <= i; y++) {
     moves.push(board[i - y][j]);
     if (board[i - y][j].piece !== null) {
@@ -971,7 +651,6 @@ export const canPieceMoveInCheck = (
     }
   }
 
-  //check for checks from vertical down
   for (let y = 1; y <= spaceToBottom; y++) {
     moves.push(board[y + i][j]);
     if (board[y + i][j].piece !== null) {
@@ -994,7 +673,6 @@ export const canPieceMoveInCheck = (
     }
   }
 
-  //check for checks from diagonal to right
   let x = 0;
 
   while (x < i && x < spaceToRight) {
@@ -1009,7 +687,6 @@ export const canPieceMoveInCheck = (
         if (
           board[i - x][j + x].piece.includes("bishop") ||
           board[i - x][j + x].piece.includes("queen")
-          // board[i - x][j + x].piece.includes("pawn")
         ) {
           isPinned = true;
           directionOfPinning = "diagonal_top_right_to_left";
@@ -1023,7 +700,6 @@ export const canPieceMoveInCheck = (
     }
   }
 
-  //checks from diagonal RIGHT -> LEFT/TOP
   let o = 0;
   while (o < spaceToBottom && o < spaceToRight) {
     o++;
@@ -1038,7 +714,6 @@ export const canPieceMoveInCheck = (
         if (
           board[i + o][j + o].piece.includes("bishop") ||
           board[i + o][j + o].piece.includes("queen")
-          // board[i + o][j + o].piece.includes("pawn")
         ) {
           isPinned = true;
           directionOfPinning = "diagonal_bottom_right_to_left";
@@ -1065,7 +740,6 @@ export const canPieceMoveInCheck = (
         if (
           board[i + m][j - m].piece.includes("bishop") ||
           board[i + m][j - m].piece.includes("queen")
-          // board[i + m][j - m].piece.includes("pawn")
         ) {
           isPinned = true;
           directionOfPinning = "diagonal_bottom_left_to_right";
@@ -1092,7 +766,6 @@ export const canPieceMoveInCheck = (
         if (
           board[i - n][j - n].piece.includes("bishop") ||
           board[i - n][j - n].piece.includes("queen")
-          // board[i - n][j - n].piece.includes("pawn")
         ) {
           isPinned = true;
           directionOfPinning = "diagonal_top_left_to_right";
@@ -1116,19 +789,6 @@ export const canPieceMoveInCheck = (
     numberOfChecks,
   };
 };
-
-/**
- * Function that gets the position of a piece that is protecting the king. Since the protection of the king is done by searching all
- * possible direction of attack, some pieces might be protecting the king but not from the direction that a check is being given. Therefore,
- * this function checks to see if the direction of check has on its opposite side (behind the specific piece) the king. If it does, it returns
- * a boolean recognizing the king is behind the piece on the direction of check.
- * @param direction
- * @param board
- * @param i
- * @param j
- * @param pieceColor
- * @returns
- */
 
 export const isKingBehindDirection = (
   direction: string,
@@ -1236,29 +896,23 @@ export const isKingBehindDirection = (
 export const canPieceMove = (board: any, row: any, col: any, pieceColor: string, pieceType: string) => {
   switch (pieceType) {
     case "black_rook":
-      return canRookMove({ board, row, col, pieceColor });
     case "white_rook":
       return canRookMove({ board, row, col, pieceColor });
     case "white_knight":
-      return canKnightMove({ board, row, col, pieceColor });
     case "black_knight":
       return canKnightMove({ board, row, col, pieceColor });
     case "white_bishop":
-      return canBishopMove({board, row, col, pieceColor});
     case "black_bishop":
-      return canBishopMove({ board, row, col, pieceColor });
+      return canBishopMove({board, row, col, pieceColor});
     case "black_queen":
-      return canQueenMove({ board, row, col, pieceColor });
     case "white_queen":
       return canQueenMove({ board, row, col, pieceColor });
-     case "white_king":
-      return canKingMove({ board, row, col, pieceColor });
+    case "white_king":
     case "black_king":
       return canKingMove({ board, row, col, pieceColor });
     case "black_pawn":
-      return canPawnMove({ board, row, col, pieceColor });
     case "white_pawn":
-      return canPawnMove({board, row, col, pieceColor});
+      return canPawnMove({ board, row, col, pieceColor });
     default:
       return false
   }

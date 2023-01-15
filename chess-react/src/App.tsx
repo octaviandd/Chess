@@ -1,351 +1,54 @@
 /** @format */
 // @ts-nocheck
-import React, { useState, useRef, useEffect } from "react";
-import "./App.css";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Square from "./Square";
+import "./App.css";
 
-const initialBoard = [
-  [
-    {
-      row: 0,
-      column: 0,
-      piece: "black_rook",
-    },
-    {
-      row: 0,
-      column: 1,
-      piece: "black_knight",
-    },
-    {
-      row: 0,
-      column: 2,
-      piece: "black_bishop",
-    },
-    {
-      row: 0,
-      column: 3,
-      piece: "black_king",
-    },
-    {
-      row: 0,
-      column: 4,
-      piece: "black_queen",
-    },
-    {
-      row: 0,
-      column: 5,
-      piece: "black_bishop",
-    },
-    {
-      row: 0,
-      column: 6,
-      piece: "black_knight",
-    },
-    {
-      row: 0,
-      column: 7,
-      piece: "black_rook",
-    },
-  ],
-  [
-    {
-      row: 1,
-      column: 0,
-      piece: "black_pawn",
-    },
-    {
-      row: 1,
-      column: 1,
-      piece: "black_pawn",
-    },
-    {
-      row: 1,
-      column: 2,
-      piece: "black_pawn",
-    },
-    {
-      row: 1,
-      column: 3,
-      piece: "black_pawn",
-    },
-    {
-      row: 1,
-      column: 4,
-      piece: "black_pawn",
-    },
-    {
-      row: 1,
-      column: 5,
-      piece: "black_pawn",
-    },
-    {
-      row: 1,
-      column: 6,
-      piece: "black_pawn",
-    },
-    {
-      row: 1,
-      column: 7,
-      piece: "black_pawn",
-    },
-  ],
-  [
-    {
-      row: 2,
-      column: 0,
-      piece: null,
-    },
-    {
-      row: 2,
-      column: 1,
-      piece: null,
-    },
-    {
-      row: 2,
-      column: 2,
-      piece: null,
-    },
-    {
-      row: 2,
-      column: 3,
-      piece: null,
-    },
-    {
-      row: 2,
-      column: 4,
-      piece: null,
-    },
-    {
-      row: 2,
-      column: 5,
-      piece: null,
-    },
-    {
-      row: 2,
-      column: 6,
-      piece: null,
-    },
-    {
-      row: 2,
-      column: 7,
-      piece: null,
-    },
-  ],
-  [
-    {
-      row: 3,
-      column: 0,
-      piece: null,
-    },
-    {
-      row: 3,
-      column: 1,
-      piece: null,
-    },
-    {
-      row: 3,
-      column: 2,
-      piece: null,
-    },
-    {
-      row: 3,
-      column: 3,
-      piece: null,
-    },
-    {
-      row: 3,
-      column: 4,
-      piece: null,
-    },
-    {
-      row: 3,
-      column: 5,
-      piece: null,
-    },
-    {
-      row: 3,
-      column: 6,
-      piece: null,
-    },
-    {
-      row: 3,
-      column: 7,
-      piece: null,
-    },
-  ],
-  [
-    {
-      row: 4,
-      column: 0,
-      piece: null,
-    },
-    {
-      row: 4,
-      column: 1,
-      piece: null,
-    },
-    {
-      row: 4,
-      column: 2,
-      piece: null,
-    },
-    {
-      row: 4,
-      column: 3,
-      piece: null,
-    },
-    {
-      row: 4,
-      column: 4,
-      piece: null,
-    },
-    {
-      row: 4,
-      column: 5,
-      piece: null,
-    },
-    {
-      row: 4,
-      column: 6,
-      piece: null,
-    },
-    {
-      row: 4,
-      column: 7,
-      piece: null,
-    },
-  ],
-  [
-    {
-      row: 5,
-      column: 0,
-      piece: null,
-    },
-    {
-      row: 5,
-      column: 1,
-      piece: null,
-    },
-    {
-      row: 5,
-      column: 2,
-      piece: null,
-    },
-    {
-      row: 5,
-      column: 3,
-      piece: null,
-    },
-    {
-      row: 5,
-      column: 4,
-      piece: null,
-    },
-    {
-      row: 5,
-      column: 5,
-      piece: null,
-    },
-    {
-      row: 5,
-      column: 6,
-      piece: null,
-    },
-    {
-      row: 5,
-      column: 7,
-      piece: null,
-    },
-  ],
-  [
-    {
-      row: 6,
-      column: 0,
-      piece: "white_pawn",
-    },
-    {
-      row: 6,
-      column: 1,
-      piece: "white_pawn",
-    },
-    {
-      row: 6,
-      column: 2,
-      piece: "white_pawn",
-    },
-    {
-      row: 6,
-      column: 3,
-      piece: "white_pawn",
-    },
-    {
-      row: 6,
-      column: 4,
-      piece: "white_pawn",
-    },
-    {
-      row: 6,
-      column: 5,
-      piece: "white_pawn",
-    },
-    {
-      row: 6,
-      column: 6,
-      piece: "white_pawn",
-    },
-    {
-      row: 6,
-      column: 7,
-      piece: "white_pawn",
-    },
-  ],
-  [
-    {
-      row: 7,
-      column: 0,
-      piece: "white_rook",
-    },
-    {
-      row: 7,
-      column: 1,
-      piece: "white_knight",
-    },
-    {
-      row: 7,
-      column: 2,
-      piece: "white_bishop",
-    },
-    {
-      row: 7,
-      column: 3,
-      piece: "white_king",
-    },
-    {
-      row: 7,
-      column: 4,
-      piece: "white_queen",
-    },
-    {
-      row: 7,
-      column: 5,
-      piece: "white_bishop",
-    },
-    {
-      row: 7,
-      column: 6,
-      piece: "white_knight",
-    },
-    {
-      row: 7,
-      column: 7,
-      piece: "white_rook",
-    },
-  ],
-];
+function createInitialBoard() {
+  const board = [];
+  for (let i = 0; i < 8; i++) {
+    board[i] = [];
+    for (let j = 0; j < 8; j++) {
+      if (i === 1) {
+        board[i][j] = {row: i, column: j, piece: "black_pawn"};
+      } else if (i === 0) {
+        if (j === 0 || j === 7) {
+          board[i][j] = {row: i, column: j, piece: "black_rook"};
+        } else if (j === 1 || j === 6) {
+          board[i][j] = {row: i, column: j, piece: "black_knight"};
+        } else if (j === 2 || j === 5) {
+          board[i][j] = {row: i, column: j, piece: "black_bishop"};
+        } else if (j === 3) {
+          board[i][j] = {row: i, column: j, piece: "black_queen"};
+        } else if (j === 4) {
+          board[i][j] = {row: i, column: j, piece: "black_king"};
+        }
+      } else if(i === 6){
+        board[i][j] = {row: i, column: j, piece: "white_pawn"};
+      } else if (i === 7) {
+        if (j === 0 || j === 7) {
+          board[i][j] = {row: i, column: j, piece: "white_rook"};
+        } else if (j === 1 || j === 6) {
+          board[i][j] = {row: i, column: j, piece: "white_knight"};
+        } else if (j === 2 || j === 5) {
+          board[i][j] = {row: i, column: j, piece: "white_bishop"};
+        } else if (j === 3) {
+          board[i][j] = {row: i, column: j, piece: "white_queen"};
+        } else if (j === 4) {
+          board[i][j] = {row: i, column: j, piece: "white_king"};
+        }
+      }else {
+        board[i][j] = {row: i, column: j, piece: null};
+      }
+    }
+  }
+  return board;
+}
+
 
 function App() {
-  const [board, setBoard] = useState(initialBoard);
+  const [board, setBoard] = useState(createInitialBoard());
   const [turn, setTurn] = useState("white");
 
   const [kingChecks, setKingChecks] = useState({
@@ -362,17 +65,12 @@ function App() {
   });
 
   const handleTurn = (): void => {
-    if (turn === "white") {
-      setTurn("black");
-    } else if (turn === "black") {
-      setTurn("white");
-    }
+    if (turn === "white") setTurn("black");
+    else if (turn === "black") setTurn("white");
   };
 
   useEffect(() => {
-    if (kingChecks.whiteCheckMated || kingChecks.blackCheckMated) {
-      alert("check mate");
-    }
+    if (kingChecks.whiteCheckMated || kingChecks.blackCheckMated) alert("check mate");
   }, [kingChecks.whiteCheckMated, kingChecks.blackCheckMated]);
 
   return (
