@@ -2,18 +2,22 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import BlackBishop from "./Pieces/BlackBishop";
 import BlackKing from "./Pieces/BlackKing";
-import BlackKnight from "./Pieces/BlackKnight";
 import BlackPawn from "./Pieces/BlackPawn";
-import BlackQueen from "./Pieces/BlackQueen";
-import BlackRook from "./Pieces/BlackRook";
-import WhiteBishop from "./Pieces/WhiteBishop";
 import WhiteKing from "./Pieces/WhiteKing";
-import WhiteKnight from "./Pieces/WhiteKnight";
 import WhitePawn from "./Pieces/WhitePawn";
-import WhiteQueen from "./Pieces/WhiteQueen";
-import WhiteRook from "./Pieces/WhiteRook";
+import BlackPiece from "./Pieces/BlackPiece"
+import WhitePiece from "./Pieces/WhitePiece"
+import BlackRookSVG from "../src/Pieces/black_rook.svg";
+import BlackKnightSVG from "../src/Pieces/black_knight.svg";
+import BlackBishopSVG from "../src/Pieces/black_bishop.svg";
+import BlackQueenSVG from "../src/Pieces/black_bishop.svg";
+import BlackKingSVG from "../src/Pieces/black_bishop.svg";
+import BlackPawnSVG from "../src/Pieces/black_bishop.svg";
+import WhiteRookSVG from "./Pieces/white_rook.svg";
+import WhiteBishopSVG from "./Pieces/white_bishop.svg";
+import WhiteKnightSVG from "./Pieces/white_knight.svg";
+import WhiteQueenSVG from "./Pieces/white_queen.svg";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes";
 import { Overlay, OverlayType } from "./Overlay";
@@ -39,33 +43,19 @@ const setDefaultPieces = (
   setKingChecks: any
 ) => {
   let piece = board[row][col].piece;
-  if (piece === "black_rook") {
+  if (piece === "black_rook" || piece === "black_queen" || piece === "black_knight" || piece === "black_bishop") {
     return (
-      <BlackRook
+      <BlackPiece
         row={row}
         col={col}
         board={board}
         kingsChecks={kingChecks}
-      ></BlackRook>
-    );
-  } else if (piece === "black_knight") {
-    return (
-      <BlackKnight
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></BlackKnight>
-    );
-  } else if (piece === "black_bishop") {
-    return (
-      <BlackBishop
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></BlackBishop>
-    );
+        pieceColor="black"
+        pieceType={piece}
+        pieceSVG={piece === "black_rook" ? BlackRookSVG : piece === "black_knight" ? BlackKnightSVG : piece === "black_bishop" ? BlackBishopSVG : BlackQueenSVG}
+      >
+      </BlackPiece>
+    )
   } else if (piece === "black_king") {
     return (
       <BlackKing
@@ -76,42 +66,6 @@ const setDefaultPieces = (
         setKingChecks={setKingChecks}
       ></BlackKing>
     );
-  } else if (piece === "black_queen") {
-    return (
-      <BlackQueen
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></BlackQueen>
-    );
-  } else if (piece === "black_bishop") {
-    return (
-      <BlackBishop
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></BlackBishop>
-    );
-  } else if (piece === "black_knight") {
-    return (
-      <BlackKnight
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></BlackKnight>
-    );
-  } else if (piece === "black_rook") {
-    return (
-      <BlackRook
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></BlackRook>
-    );
   } else if (piece === "black_pawn") {
     return (
       <BlackPawn
@@ -121,32 +75,17 @@ const setDefaultPieces = (
         kingsChecks={kingChecks}
       ></BlackPawn>
     );
-  } else if (piece === "white_rook") {
+  } else if (piece === "white_rook" || piece === "white_queen" || piece === "white_knight" || piece === "white_bishop") {
     return (
-      <WhiteRook
+      <WhitePiece
         row={row}
         col={col}
         board={board}
         kingsChecks={kingChecks}
-      ></WhiteRook>
-    );
-  } else if (piece === "white_knight") {
-    return (
-      <WhiteKnight
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></WhiteKnight>
-    );
-  } else if (piece === "white_bishop") {
-    return (
-      <WhiteBishop
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></WhiteBishop>
+        pieceColor="white"
+        pieceType={piece}
+        pieceSVG={piece === "white_rook" ? WhiteRookSVG : piece === "white_knight" ? WhiteKnightSVG : piece === "white_bishop" ? WhiteBishopSVG : WhiteQueenSVG}
+      ></WhitePiece>
     );
   } else if (piece === "white_king") {
     return (
@@ -157,42 +96,6 @@ const setDefaultPieces = (
         kingsChecks={kingChecks}
         setKingChecks={setKingChecks}
       ></WhiteKing>
-    );
-  } else if (piece === "white_queen") {
-    return (
-      <WhiteQueen
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></WhiteQueen>
-    );
-  } else if (piece === "white_bishop") {
-    return (
-      <WhiteBishop
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></WhiteBishop>
-    );
-  } else if (piece === "white_knight") {
-    return (
-      <WhiteKnight
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></WhiteKnight>
-    );
-  } else if (piece === "white_rook") {
-    return (
-      <WhiteRook
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-      ></WhiteRook>
     );
   } else if (piece === "white_pawn") {
     return (
@@ -223,19 +126,15 @@ export default function Square({
     () => ({
       accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
       canDrop: (item: any) => {
-        if (item.piece === "white_king") {
-          if (turn === "white") {
-            return item.availableMovesInCheck.find(
-              (el: ISquare) => el.row === row && el.column === col
-            );
-          }
+        if (item.piece === "white_king" && turn === "white") {
+          return item.availableMovesInCheck.find(
+            (el: ISquare) => el.row === row && el.column === col
+          );
         }
-        if (item.piece === "black_king") {
-          if (turn === "black") {
-            return item.availableMovesInCheck.find(
-              (el: ISquare) => el.row === row && el.column === col
-            );
-          }
+        if (item.piece === "black_king" && turn === "black") {
+          return item.availableMovesInCheck.find(
+            (el: ISquare) => el.row === row && el.column === col
+          );
         }
         if (kingChecks.blackKingIsChecked || kingChecks.whiteKingIsChecked) {
           if (item.availableMovesInCheck) {
@@ -275,9 +174,6 @@ export default function Square({
           whiteKingPositionsX,
           whiteKingPositionsY,
         } = kingsPositions;
-
-        if (turn === "white") {
-        }
 
         const {
           numberOfChecks,

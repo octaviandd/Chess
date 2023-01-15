@@ -1231,3 +1231,35 @@ export const isKingBehindDirection = (
   }
   return isKingBehind;
 };
+
+
+export const canPieceMove = (board: any, row: any, col: any, pieceColor: string, pieceType: string) => {
+  switch (pieceType) {
+    case "black_rook":
+      return canRookMove({ board, row, col, pieceColor });
+    case "white_rook":
+      return canRookMove({ board, row, col, pieceColor });
+    case "white_knight":
+      return canKnightMove({ board, row, col, pieceColor });
+    case "black_knight":
+      return canKnightMove({ board, row, col, pieceColor });
+    case "white_bishop":
+      return canBishopMove({board, row, col, pieceColor});
+    case "black_bishop":
+      return canBishopMove({ board, row, col, pieceColor });
+    case "black_queen":
+      return canQueenMove({ board, row, col, pieceColor });
+    case "white_queen":
+      return canQueenMove({ board, row, col, pieceColor });
+     case "white_king":
+      return canKingMove({ board, row, col, pieceColor });
+    case "black_king":
+      return canKingMove({ board, row, col, pieceColor });
+    case "black_pawn":
+      return canPawnMove({ board, row, col, pieceColor });
+    case "white_pawn":
+      return canPawnMove({board, row, col, pieceColor});
+    default:
+      return false
+  }
+}

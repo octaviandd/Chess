@@ -1,4 +1,6 @@
-  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 80 80">
+export const BlackQueenSVG = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 80 80">
       <g
         opacity="1"
         fill="000000"
@@ -49,3 +51,6 @@
         />
       </g>
     </svg>
+  )
+}
+

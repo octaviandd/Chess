@@ -1,4 +1,6 @@
- <svg
+export default function BlackBishopSVG() {
+  return (
+    <svg
           xmlns="http://www.w3.org/2000/svg"
           version="1.1"
           viewBox="0 0 80 80"
@@ -15,7 +17,7 @@
             strokeMiterlimit="4"
             strokeDasharray="none"
             strokeOpacity="1"
-            transform="translate(3,1) scale(1)"
+            transform="translate(3,1) scale(1.5)"
           >
             <g fill="#000000" stroke="#000000" strokeLinecap="butt">
               <path d="M 9,36 C 12.39,35.03 19.11,36.43 22.5,34 C 25.89,36.43 32.61,35.03 36,36 C 36,36 37.65,36.54 39,38 C 38.32,38.97 37.35,38.99 36,38.5 C 32.61,37.53 25.89,38.96 22.5,37.5 C 19.11,38.96 12.39,37.53 9,38.5 C 7.646,38.99 6.677,38.97 6,38 C 7.354,36.06 9,36 9,36 z" />
@@ -30,3 +32,5 @@
             />
           </g>
         </svg>
+  )
+}

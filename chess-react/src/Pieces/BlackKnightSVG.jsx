@@ -1,4 +1,6 @@
- <svg
+export const BlackKnightSVG = () => {
+  return (
+      <svg
           xmlns="http://www.w3.org/2000/svg"
           version="1.1"
           width="100%"
@@ -17,7 +19,7 @@
             strokeMiterlimit="4"
             strokeDasharray="none"
             strokeOpacity="1"
-            transform="scale(1) translate(3, 1)"
+            transform="scale(1.5) translate(3, 1)"
           >
             <path
               d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18"
@@ -47,3 +49,5 @@
             />
           </g>
         </svg>
+  )
+}
