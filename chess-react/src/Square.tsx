@@ -1,6 +1,5 @@
 /** @format */
 
-import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import BlackKing from "./Pieces/BlackKing";
 import BlackPawn from "./Pieces/BlackPawn";
@@ -12,8 +11,6 @@ import BlackRookSVG from "../src/Pieces/black_rook.svg";
 import BlackKnightSVG from "../src/Pieces/black_knight.svg";
 import BlackBishopSVG from "../src/Pieces/black_bishop.svg";
 import BlackQueenSVG from "../src/Pieces/black_bishop.svg";
-import BlackKingSVG from "../src/Pieces/black_bishop.svg";
-import BlackPawnSVG from "../src/Pieces/black_bishop.svg";
 import WhiteRookSVG from "./Pieces/white_rook.svg";
 import WhiteBishopSVG from "./Pieces/white_bishop.svg";
 import WhiteKnightSVG from "./Pieces/white_knight.svg";

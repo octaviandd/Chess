@@ -241,7 +241,7 @@ export default function BlackKing({
         col: col,
         availableMovesInCheck: moves,
       },
-       
+      end: (item, monitor) => {},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
