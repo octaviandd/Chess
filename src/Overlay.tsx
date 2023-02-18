@@ -1,12 +1,6 @@
 /** @format */
 
-export var OverlayType;
-(function (OverlayType) {
-  OverlayType["IllegalMoveHover"] = "Illegal";
-  OverlayType["LegalMoveHover"] = "Legal";
-  OverlayType["PossibleMove"] = "Possible";
-})(OverlayType || (OverlayType = {}));
-export const Overlay = ({ type }) => {
+export const Overlay = ({ type } : {type: string}) => {
   const color = getOverlayColor(type);
   return (
     <div
@@ -25,13 +19,14 @@ export const Overlay = ({ type }) => {
     />
   );
 };
-function getOverlayColor(type) {
+
+function getOverlayColor(type: string) {
   switch (type) {
-    case OverlayType.IllegalMoveHover:
+    case 'illegal-move-hover':
       return "red";
-    case OverlayType.LegalMoveHover:
+    case 'legal-move-hover':
       return "green";
-    case OverlayType.PossibleMove:
+    case 'possible-move':
       return "yellow";
   }
 }

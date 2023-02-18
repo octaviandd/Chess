@@ -17,7 +17,7 @@ import WhiteKnightSVG from "./Pieces/white_knight.svg";
 import WhiteQueenSVG from "./Pieces/white_queen.svg";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes";
-import { Overlay, OverlayType } from "./Overlay";
+import { Overlay } from "./Overlay";
 import {
   checkPossibleMovesForEveryPiece,
   searchForKings,
@@ -222,9 +222,9 @@ export default function Square({
   return (
     <SquareDiv color={color} piece={board[row][col].piece !== null} ref={drop}>
       {setDefaultPieces(row, col, board, kingChecks, setKingChecks)}
-      {isOver && !canDrop && <Overlay type={OverlayType.IllegalMoveHover} />}
-      {!isOver && canDrop && <Overlay type={OverlayType.PossibleMove} />}
-      {isOver && canDrop && <Overlay type={OverlayType.LegalMoveHover} />}
+      {isOver && !canDrop && <Overlay type='illegal-move-hover' />}
+      {!isOver && canDrop && <Overlay type='legal-move-hover' />}
+      {isOver && canDrop && <Overlay type='possible-move' />}
     </SquareDiv>
   );
 }

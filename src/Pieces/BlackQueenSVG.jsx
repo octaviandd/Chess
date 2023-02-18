@@ -13,7 +13,7 @@ export const BlackQueenSVG = () => {
         strokeMiterlimit="4"
         strokeDasharray="none"
         strokeOpacity="1"
-        transform="scale(1) translate(3, 1)"
+        transform="scale(1.5) translate(3, 1)"
       >
         <g fill="#000000" stroke="none">
           <circle cx="6" cy="12" r="2.75" />
