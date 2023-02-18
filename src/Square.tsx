@@ -8,6 +8,8 @@ import WhitePawn from "./Pieces/WhitePawn";
 import BlackPiece from "./Pieces/BlackPiece"
 import WhitePiece from "./Pieces/WhitePiece"
 import BlackRookSVG from "../src/Pieces/black_rook.svg";
+import BlackPawnSVG from "../src/Pieces/black_pawn.svg"
+import BlackKingSVG from "../src/Pieces/black_king.svg";
 import BlackKnightSVG from "../src/Pieces/black_knight.svg";
 import BlackBishopSVG from "../src/Pieces/black_bishop.svg";
 import BlackQueenSVG from "../src/Pieces/black_bishop.svg";
@@ -15,6 +17,9 @@ import WhiteRookSVG from "./Pieces/white_rook.svg";
 import WhiteBishopSVG from "./Pieces/white_bishop.svg";
 import WhiteKnightSVG from "./Pieces/white_knight.svg";
 import WhiteQueenSVG from "./Pieces/white_queen.svg";
+import WhitePawnSVG from "./Pieces/white_pawn.svg";
+import WhiteKingSVG from "./Pieces/white_king.svg";
+
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes";
 import { Overlay } from "./Overlay";
@@ -61,6 +66,8 @@ const setDefaultPieces = (
         board={board}
         kingsChecks={kingChecks}
         setKingChecks={setKingChecks}
+        pieceType={piece}
+        pieceSVG={BlackKingSVG}
       ></BlackKing>
     );
   } else if (piece === "black_pawn") {
@@ -70,6 +77,8 @@ const setDefaultPieces = (
         col={col}
         board={board}
         kingsChecks={kingChecks}
+        pieceType={piece}
+        pieceSVG={BlackPawnSVG}
       ></BlackPawn>
     );
   } else if (piece === "white_rook" || piece === "white_queen" || piece === "white_knight" || piece === "white_bishop") {
@@ -90,8 +99,10 @@ const setDefaultPieces = (
         row={row}
         col={col}
         board={board}
+        pieceType={piece}
         kingsChecks={kingChecks}
         setKingChecks={setKingChecks}
+        pieceSVG={WhiteKingSVG}
       ></WhiteKing>
     );
   } else if (piece === "white_pawn") {
@@ -100,7 +111,9 @@ const setDefaultPieces = (
         row={row}
         col={col}
         board={board}
+        pieceType={piece}
         kingsChecks={kingChecks}
+        pieceSVG={WhitePawnSVG}
       ></WhitePawn>
     );
   } else {

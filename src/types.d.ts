@@ -53,6 +53,8 @@ export interface IPiece {
   col: number;
   board: TBoard;
   kingsChecks: IKingChecks;
+  pieceType: string
+  pieceSVG: string
 }
 
 export interface IKingPiece extends IPiece {
