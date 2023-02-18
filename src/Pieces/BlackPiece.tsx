@@ -16,7 +16,6 @@ export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, p
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;
   let availableMovesInPinned: ISquare[] = [];
-  const { blackKingPositionsOfCheck} = kingsChecks;
   let isKingBehind: boolean = false;
 
   const handleCanDrag = () => {
@@ -82,7 +81,7 @@ export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, p
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [canMove, blackKingPositionsOfCheck]
+    [canMove, kingsChecks.blackKingPositionsOfCheck]
   );
 
   return (

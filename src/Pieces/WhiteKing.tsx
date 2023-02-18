@@ -12,7 +12,6 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { IKingChecks, IKingPiece, IPiece, ISquare } from "../types";
-import WhiteKingSVG from "./svgs/white_king.svg";
 
 export default function WhiteKing({
   row,
@@ -24,7 +23,6 @@ export default function WhiteKing({
   pieceColor,
   pieceSVG
 }: IKingPiece) {
-  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } = kingsChecks;
   let possibleMoves = canKingMove({ board, row, col, pieceColor });
   let possibleAttackingMoves: ISquare[] = [];
   let moves: ISquare[] = [];
@@ -42,9 +40,9 @@ export default function WhiteKing({
             col: board[i][j].column,
             pieceColor,
           }).moves;
-          if (pawnMoves && whiteKingPositionsOfCheck) {
+          if (pawnMoves && kingsChecks.whiteKingPositionsOfCheck) {
             possibleInterveningMoves.push(...pawnMoves.filter(move =>
-              whiteKingPositionsOnTheDirectionOfCheck.some(position =>
+              kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.some(position =>
                 move.row === position.row && move.column === position.column
               )
             ));
@@ -57,9 +55,9 @@ export default function WhiteKing({
             pieceColor,
           });
 
-          if (knightMoves && whiteKingPositionsOfCheck) {
+          if (knightMoves && kingsChecks.whiteKingPositionsOfCheck) {
             possibleInterveningMoves = knightMoves.filter(move =>
-              whiteKingPositionsOnTheDirectionOfCheck.some(pos =>
+              kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.some(pos =>
                 move.row === pos.row && move.column === pos.column
               )
             );
@@ -72,10 +70,10 @@ export default function WhiteKing({
             pieceColor,
           });
 
-          if (bishopMoves && whiteKingPositionsOfCheck) {
+          if (bishopMoves && kingsChecks.whiteKingPositionsOfCheck) {
             possibleInterveningMoves.push(
               ...bishopMoves.filter(move =>
-                whiteKingPositionsOnTheDirectionOfCheck.some(pos =>
+                kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.some(pos =>
                   move.row === pos.row && move.column === pos.column
                 )
               )
@@ -89,9 +87,9 @@ export default function WhiteKing({
             pieceColor,
           });
 
-          if (rookMoves && whiteKingPositionsOfCheck) {
+          if (rookMoves && kingsChecks.whiteKingPositionsOfCheck) {
              possibleInterveningMoves = rookMoves.filter(move => {
-              return whiteKingPositionsOnTheDirectionOfCheck.some(kingPos => {
+              return kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.some(kingPos => {
                 return move.row === kingPos.row && move.column === kingPos.column;
               });
             });
@@ -104,9 +102,9 @@ export default function WhiteKing({
             pieceColor,
           });
 
-          if (queenMoves && whiteKingPositionsOfCheck) {
+          if (queenMoves && kingsChecks.whiteKingPositionsOfCheck) {
             possibleInterveningMoves = queenMoves.filter(move => {
-              return whiteKingPositionsOnTheDirectionOfCheck.some(kingPos => {
+              return kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.some(kingPos => {
                 return move.row === kingPos.row && move.column === kingPos.column;
               });
             });
@@ -198,7 +196,7 @@ export default function WhiteKing({
   );
   return (
     <>
-      <DragPreviewImage connect={preview} src={WhiteKingSVG}></DragPreviewImage>
+      <DragPreviewImage connect={preview} src={pieceSVG}></DragPreviewImage>
       <div
         ref={drag}
         style={{ opacity: collectedProps.isDragging ? 0.5 : 1, cursor: "move" }}

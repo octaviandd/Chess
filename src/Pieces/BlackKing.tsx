@@ -12,7 +12,6 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { IKingChecks, IKingPiece, ISquare } from "../types";
-import BlackKingSVG from "./svgs/black_king.svg";
 
 export default function BlackKing({
   row,
@@ -20,17 +19,17 @@ export default function BlackKing({
   board,
   kingsChecks,
   setKingChecks,
+  pieceColor,
+  pieceType,
   pieceSVG
 }: IKingPiece) {
-  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } = kingsChecks;
-
-  let possibleMoves = canKingMove({ board, row, col, pieceColor: "black" });
+  let possibleMoves = canKingMove({ board, row, col, pieceColor });
   let possibleAttackingMoves: ISquare[] = [];
   let possibleInterveningMoves: ISquare[] = [];
 
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].piece !== null && board[i][j].piece?.includes("black")) {
+      if (board[i][j].piece !== null && board[i][j].piece?.includes(pieceColor)) {
         let pieceColor: string = board[i][j].piece?.split("_")[0]!;
         let incomingPiece = board[i][j].piece?.split("_")[1];
         if (incomingPiece === "pawn") {
@@ -40,9 +39,9 @@ export default function BlackKing({
             col: board[i][j].column,
             pieceColor,
           }).moves;
-          if (pawnMoves && blackKingPositionsOfCheck) {
+          if (pawnMoves && kingsChecks.blackKingPositionsOfCheck) {
             possibleInterveningMoves.push(...pawnMoves.filter(move =>
-              blackKingPositionsOnTheDirectionOfCheck.some(position =>
+              kingsChecks.blackKingPositionsOnTheDirectionOfCheck.some(position =>
                 move.row === position.row && move.column === position.column
               )
             ));
@@ -55,9 +54,9 @@ export default function BlackKing({
             pieceColor,
           });
 
-          if (knightMoves && blackKingPositionsOfCheck) {
+          if (knightMoves && kingsChecks.blackKingPositionsOfCheck) {
             possibleInterveningMoves = knightMoves.filter(move =>
-              blackKingPositionsOnTheDirectionOfCheck.some(pos =>
+              kingsChecks.blackKingPositionsOnTheDirectionOfCheck.some(pos =>
                 move.row === pos.row && move.column === pos.column
               )
             );
@@ -70,10 +69,10 @@ export default function BlackKing({
             pieceColor,
           });
 
-          if (bishopMoves && blackKingPositionsOfCheck) {
+          if (bishopMoves && kingsChecks.blackKingPositionsOfCheck) {
             possibleInterveningMoves.push(
               ...bishopMoves.filter(move =>
-                blackKingPositionsOnTheDirectionOfCheck.some(pos =>
+                kingsChecks.blackKingPositionsOnTheDirectionOfCheck.some(pos =>
                   move.row === pos.row && move.column === pos.column
                 )
               )
@@ -87,9 +86,9 @@ export default function BlackKing({
             pieceColor,
           });
 
-          if (rookMoves && blackKingPositionsOfCheck) {
+          if (rookMoves && kingsChecks.blackKingPositionsOfCheck) {
             possibleInterveningMoves = rookMoves.filter(move => {
-              return blackKingPositionsOnTheDirectionOfCheck.some(kingPos => {
+              return kingsChecks.blackKingPositionsOnTheDirectionOfCheck.some(kingPos => {
                 return move.row === kingPos.row && move.column === kingPos.column;
               });
             });
@@ -102,16 +101,16 @@ export default function BlackKing({
             pieceColor,
           });
 
-          if (queenMoves && blackKingPositionsOfCheck) {
+          if (queenMoves && kingsChecks.blackKingPositionsOfCheck) {
             possibleInterveningMoves = queenMoves.filter(move => {
-              return blackKingPositionsOnTheDirectionOfCheck.some(kingPos => {
+              return kingsChecks.blackKingPositionsOnTheDirectionOfCheck.some(kingPos => {
                 return move.row === kingPos.row && move.column === kingPos.column;
               });
             });
           }
         }
       }
-      if (board[i][j].piece != null && !board[i][j].piece?.includes("black")) {
+      if (board[i][j].piece != null && !board[i][j].piece?.includes(pieceColor)) {
         let pieceColor = board[i][j].piece?.split("_")[0]!;
         let incomingPiece = board[i][j].piece?.split("_")[1];
         if (incomingPiece === "pawn") {
@@ -183,7 +182,7 @@ export default function BlackKing({
       },
       type: ItemTypes.KING,
       item: {
-        piece: "black_king",
+        piece: pieceType,
         row: row,
         col: col,
         availableMovesInCheck: moves,
@@ -197,12 +196,12 @@ export default function BlackKing({
   );
   return (
     <>
-      <DragPreviewImage connect={preview} src={BlackKingSVG}></DragPreviewImage>
+      <DragPreviewImage connect={preview} src={pieceSVG}></DragPreviewImage>
       <div
         ref={drag}
         style={{ opacity: collectedProps.isDragging ? 0.5 : 1, cursor: "move" }}
       >
-       <img src={pieceSVG} alt="black king" />
+       <img src={pieceSVG} />
       </div>
     </>
   );

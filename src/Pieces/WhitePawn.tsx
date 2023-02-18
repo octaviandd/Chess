@@ -10,7 +10,6 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { IPiece, ISquare } from "../types";
-import WhitePawnSVG from "./svgs/white_pawn.svg";
 
 export default function WhitePawn({ row, col, board, kingsChecks, pieceColor, pieceType, pieceSVG }: IPiece) {
   let moves = canPawnMove({ board, row, col, pieceColor }).moves;
@@ -39,29 +38,29 @@ export default function WhitePawn({ row, col, board, kingsChecks, pieceColor, pi
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-       if (whiteKingDefendingPieces) {
-        for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
-          const defendingPiece = whiteKingDefendingPieces[i];
-          if (defendingPiece.row === row && defendingPiece.column === col) {
-            const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, pieceColor);
+        if (whiteKingDefendingPieces) {
+          for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
+            const defendingPiece = whiteKingDefendingPieces[i];
+            if (defendingPiece.row === row && defendingPiece.column === col) {
+              const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, pieceColor);
 
-            if (directionOfPinning !== "") {
-              isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, pieceColor);
-            }
+              if (directionOfPinning !== "") {
+                isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, pieceColor);
+              }
 
-            if (attackingPiece.length > 0) {
-              availableMovesInPinned = moves.filter(move => attackingPiece.some(piece => piece.row === move.row && piece.column === move.column));
-            }
+              if (attackingPiece.length > 0) {
+                availableMovesInPinned = moves.filter(move => attackingPiece.some(piece => piece.row === move.row && piece.column === move.column));
+              }
 
-            if (isPinned && availableMovesInPinned.length === 0 && isKingBehind) {
-              return false;
+              if (isPinned && availableMovesInPinned.length === 0 && isKingBehind) {
+                return false;
+              }
             }
           }
         }
-      }
 
-      if (whiteKingPositionsOfCheck?.length) {
-        return checkPossibleMovesInCheck(pieceType, board, row, col, whiteKingPositionsOfCheck).length > 0 || canMove;
+        if (whiteKingPositionsOfCheck?.length) {
+          return checkPossibleMovesInCheck(pieceType, board, row, col, whiteKingPositionsOfCheck).length > 0 || canMove;
         } else {
           return true;
         }
@@ -83,7 +82,7 @@ export default function WhitePawn({ row, col, board, kingsChecks, pieceColor, pi
   );
   return (
     <>
-      <DragPreviewImage connect={preview} src={WhitePawnSVG}></DragPreviewImage>
+      <DragPreviewImage connect={preview} src={pieceSVG}></DragPreviewImage>
       <div
         style={{ cursor: "move", opacity: collectedProps.isDragging ? 0.5 : 1 }}
         ref={drag}
