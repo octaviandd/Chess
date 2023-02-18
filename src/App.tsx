@@ -73,79 +73,28 @@ function App() {
   }, [kingChecks.whiteCheckMated, kingChecks.blackCheckMated]);
 
   return (
-    <div className="App">
-      <Grid>
-        {board.map((row: any, i: any) =>
-          row.map((col: any, j: any) => {
-            if (i % 2 !== 0) {
-              if (j % 2 !== 0) {
-                return (
-                  <Square
-                    board={board}
-                    setBoard={setBoard}
-                    color="dark"
-                    col={j}
-                    row={i}
-                    key={`${j + i}`}
-                    turn={turn}
-                    handleTurn={handleTurn}
-                    kingChecks={kingChecks}
-                    setKingChecks={setKingChecks}
-                  ></Square>
-                );
-              } else {
-                return (
-                  <Square
-                    board={board}
-                    setBoard={setBoard}
-                    color="light"
-                    col={j}
-                    row={i}
-                    key={`${j + i}`}
-                    turn={turn}
-                    handleTurn={handleTurn}
-                    kingChecks={kingChecks}
-                    setKingChecks={setKingChecks}
-                  ></Square>
-                );
-              }
-            } else if (i % 2 == 0) {
-              if (j % 2 !== 0) {
-                return (
-                  <Square
-                    board={board}
-                    setBoard={setBoard}
-                    color="light"
-                    col={j}
-                    row={i}
-                    key={`${j + i}`}
-                    turn={turn}
-                    handleTurn={handleTurn}
-                    kingChecks={kingChecks}
-                    setKingChecks={setKingChecks}
-                  ></Square>
-                );
-              } else {
-                return (
-                  <Square
-                    board={board}
-                    setBoard={setBoard}
-                    color="dark"
-                    col={j}
-                    row={i}
-                    key={`${j + i}`}
-                    turn={turn}
-                    handleTurn={handleTurn}
-                    kingChecks={kingChecks}
-                    setKingChecks={setKingChecks}
-                  ></Square>
-                );
-              }
-            }
-          })
-        )}
-      </Grid>
-    </div>
+    <Grid>
+      {board.map((row: any, i: any) =>
+        row.map((col: any, j: any) => {
+          const isDark = (i % 2 !== 0) === (j % 2 !== 0);
+          const color = isDark ? 'dark' : 'light';
+          return (
+            <Square
+              board={board}
+              setBoard={setBoard}
+              color={color}
+              col={j}
+              row={i}
+              key={`${j + i}`}
+              turn={turn}
+              handleTurn={handleTurn}
+              kingChecks={kingChecks}
+              setKingChecks={setKingChecks}
+            ></Square>
+          );
+        })
+      )}
+    </Grid>
   );
 }
 
