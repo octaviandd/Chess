@@ -26,93 +26,51 @@ export default function WhitePawn({ row, col, board, kingsChecks, pieceSVG }: IP
     whiteKingDefendingPieces,
   } = kingsChecks;
 
+   if (moves && whiteKingPositionsOfCheck) {
+    for (const move of moves) {
+      if (whiteKingPositionsOnTheDirectionOfCheck.some(
+        position => move.row === position.row && move.column === position.column
+      )) {
+        availableMovesInCheck.push(move);
+        canMove = true;
+      }
+    }
+  }
+
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        if (moves && whiteKingPositionsOfCheck) {
-          for (let i = 0; i < moves.length; i++) {
-            for (
-              let j = 0;
-              j < whiteKingPositionsOnTheDirectionOfCheck.length;
-              j++
-            ) {
-              if (
-                moves[i].row ===
-                  whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-                moves[i].column ===
-                  whiteKingPositionsOnTheDirectionOfCheck[j].column
-              ) {
-                availableMovesInCheck.push(moves[i]);
-                canMove = true;
-              }
+       if (whiteKingDefendingPieces) {
+        for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
+          const defendingPiece = whiteKingDefendingPieces[i];
+          if (defendingPiece.row === row && defendingPiece.column === col) {
+            const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, "white");
+
+            if (directionOfPinning !== "") {
+              isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, "white");
+            }
+
+            if (attackingPiece.length > 0) {
+              availableMovesInPinned = moves.filter(move => attackingPiece.some(piece => piece.row === move.row && piece.column === move.column));
+            }
+
+            if (isPinned && availableMovesInPinned.length === 0 && isKingBehind) {
+              return false;
             }
           }
         }
+      }
 
-        if (whiteKingDefendingPieces) {
-          for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
-            if (
-              whiteKingDefendingPieces[i].row === row &&
-              whiteKingDefendingPieces[i].column === col
-            ) {
-              let { isPinned, attackingPiece, directionOfPinning } =
-                canPieceMoveInCheck(board, row, col, "white");
-
-              if (directionOfPinning !== "") {
-                isKingBehind = isKingBehindDirection(
-                  directionOfPinning,
-                  board,
-                  row,
-                  col,
-                  "white"
-                );
-              }
-              if (attackingPiece.length > 0) {
-                for (let i = 0; i < moves.length; i++) {
-                  for (let j = 0; j < attackingPiece.length; j++) {
-                    if (
-                      moves[i].row === attackingPiece[j].row &&
-                      moves[i].column === attackingPiece[j].column
-                    ) {
-                      availableMovesInPinned.push(moves[i]);
-                    }
-                  }
-                }
-              }
-
-              if (
-                isPinned &&
-                availableMovesInPinned.length < 1 &&
-                isKingBehind
-              ) {
-                return false;
-              }
-            }
-          }
-        }
-
-        if (whiteKingPositionsOfCheck && whiteKingPositionsOfCheck.length > 0) {
-          if (
-            checkPossibleMovesInCheck(
-              item,
-              board,
-              row,
-              col,
-              whiteKingPositionsOfCheck
-            ).length > 0 ||
-            canMove
-          ) {
-            return true;
-          } else {
-            return false;
-          }
+      if (whiteKingPositionsOfCheck?.length) {
+        return checkPossibleMovesInCheck(item, board, row, col, whiteKingPositionsOfCheck).length > 0 || canMove;
         } else {
           return true;
         }
       },
+
       type: ItemTypes.PAWN,
       item: {
-        piece: "white_pawn",
+        piece: item,
         row: row,
         col: col,
         availableMovesInCheck,

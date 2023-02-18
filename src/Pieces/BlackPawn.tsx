@@ -42,66 +42,33 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG }: IP
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        let isKingBehind: any = false;
         if (blackKingDefendingPieces) {
           for (let i = 0; i < blackKingDefendingPieces.length; i++) {
-            if (
-              blackKingDefendingPieces[i].row === row &&
-              blackKingDefendingPieces[i].column === col
-            ) {
-              let { isPinned, attackingPiece, directionOfPinning } =
-                canPieceMoveInCheck(board, row, col, "black");
+            const defendingPiece = blackKingDefendingPieces[i];
+            if (defendingPiece.row === row && defendingPiece.column === col) {
+              const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, "black");
 
               if (directionOfPinning !== "") {
-                isKingBehind = isKingBehindDirection(
-                  directionOfPinning,
-                  board,
-                  row,
-                  col,
-                  "black"
-                );
+                isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, "black");
               }
 
               if (attackingPiece.length > 0) {
-                for (let i = 0; i < moves.length; i++) {
-                  if (
-                    moves[i].row === attackingPiece[0].row &&
-                    moves[i].column === attackingPiece[0].column
-                  ) {
-                    availableMovesInPinned.push(moves[i]);
-                  }
-                }
+                availableMovesInPinned = moves.filter(move => attackingPiece.some(piece => piece.row === move.row && piece.column === move.column));
               }
-              if (
-                isPinned &&
-                availableMovesInPinned.length < 1 &&
-                isKingBehind
-              ) {
+
+              if (isPinned && availableMovesInPinned.length === 0 && isKingBehind) {
                 return false;
               }
             }
           }
         }
 
-        if (blackKingPositionsOfCheck && blackKingPositionsOfCheck.length > 0) {
-          if (
-            checkPossibleMovesInCheck(
-              item,
-              board,
-              row,
-              col,
-              blackKingPositionsOfCheck
-            ).length > 0 ||
-            canMove
-          ) {
-            return true;
+        if (blackKingPositionsOfCheck?.length) {
+          return checkPossibleMovesInCheck(item, board, row, col, blackKingPositionsOfCheck).length > 0 || canMove;
           } else {
-            return false;
+            return true;
           }
-        } else {
-          return true;
-        }
-      },
+        },
       type: ItemTypes.PAWN,
       item: {
         piece: "black_pawn",
