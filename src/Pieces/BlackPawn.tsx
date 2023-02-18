@@ -18,20 +18,12 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG, piec
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;
   let availableMovesInPinned: ISquare[] = [];
-  const {
-    blackKingPositionsOnTheDirectionOfCheck,
-    blackKingPositionsOfCheck,
-    blackKingDefendingPieces,
-  } = kingsChecks;
   let isKingBehind: boolean = false;
 
-  if (moves && blackKingPositionsOfCheck) {
+  if (moves && kingsChecks.blackKingPositionsOfCheck) {
     for (let i = 0; i < moves.length; i++) {
-      for (let j = 0; j < blackKingPositionsOnTheDirectionOfCheck.length; j++) {
-        if (
-          moves[i].row === blackKingPositionsOnTheDirectionOfCheck[j].row &&
-          moves[i].column === blackKingPositionsOnTheDirectionOfCheck[j].column
-        ) {
+      for (let j = 0; j < kingsChecks.blackKingPositionsOnTheDirectionOfCheck.length; j++) {
+        if (moves[i].row === kingsChecks.blackKingPositionsOnTheDirectionOfCheck[j].row && moves[i].column === kingsChecks.blackKingPositionsOnTheDirectionOfCheck[j].column) {
           availableMovesInCheck.push(moves[i]);
           canMove = true;
         }
@@ -42,9 +34,9 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG, piec
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        if (blackKingDefendingPieces) {
-          for (let i = 0; i < blackKingDefendingPieces.length; i++) {
-            const defendingPiece = blackKingDefendingPieces[i];
+        if (kingsChecks.blackKingDefendingPieces) {
+          for (let i = 0; i < kingsChecks.blackKingDefendingPieces.length; i++) {
+            const defendingPiece = kingsChecks.blackKingDefendingPieces[i];
             if (defendingPiece.row === row && defendingPiece.column === col) {
               const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, "black");
 
@@ -63,8 +55,8 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG, piec
           }
         }
 
-        if (blackKingPositionsOfCheck?.length) {
-          return checkPossibleMovesInCheck(item, board, row, col, blackKingPositionsOfCheck).length > 0 || canMove;
+        if (kingsChecks.blackKingPositionsOfCheck?.length) {
+          return checkPossibleMovesInCheck(item, board, row, col, kingsChecks.blackKingPositionsOfCheck).length > 0 || canMove;
           } else {
             return true;
           }
@@ -81,7 +73,7 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG, piec
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [blackKingPositionsOfCheck, canMove]
+    [kingsChecks.blackKingPositionsOfCheck, canMove]
   );
 
   return (

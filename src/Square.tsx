@@ -12,7 +12,7 @@ import BlackPawnSVG from "./Pieces/svgs/black_pawn.svg"
 import BlackKingSVG from "./Pieces/svgs/black_king.svg";
 import BlackKnightSVG from "./Pieces/svgs/black_knight.svg";
 import BlackBishopSVG from "./Pieces/svgs/black_bishop.svg";
-import BlackQueenSVG from "./Pieces/svgs/black_bishop.svg";
+import BlackQueenSVG from "./Pieces/svgs/black_queen.svg";
 import WhiteRookSVG from "./Pieces/svgs/white_rook.svg";
 import WhiteBishopSVG from "./Pieces/svgs/white_bishop.svg";
 import WhiteKnightSVG from "./Pieces/svgs/white_knight.svg";
@@ -64,6 +64,7 @@ const setDefaultPieces = (
         row={row}
         col={col}
         board={board}
+        pieceColor="black"
         kingsChecks={kingChecks}
         setKingChecks={setKingChecks}
         pieceType={piece}
@@ -76,6 +77,7 @@ const setDefaultPieces = (
         row={row}
         col={col}
         board={board}
+        pieceColor="black"
         kingsChecks={kingChecks}
         pieceType={piece}
         pieceSVG={BlackPawnSVG}
@@ -99,6 +101,7 @@ const setDefaultPieces = (
         row={row}
         col={col}
         board={board}
+        pieceColor="white"
         pieceType={piece}
         kingsChecks={kingChecks}
         setKingChecks={setKingChecks}
@@ -111,6 +114,7 @@ const setDefaultPieces = (
         row={row}
         col={col}
         board={board}
+        pieceColor="white"
         pieceType={piece}
         kingsChecks={kingChecks}
         pieceSVG={WhitePawnSVG}

@@ -20,11 +20,6 @@ export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, p
   let isKingBehind: boolean = false;
 
   const handleCanDrag = () => {
-    let availableMovesInCheck = [];
-    let canMove = false;
-    let availableMovesInPinned = [];
-    let isKingBehind = false;
-
     if (moves && kingsChecks.blackKingPositionsOfCheck) {
       for (let i = 0; i < moves.length; i++) {
         for (let j = 0; j < kingsChecks.blackKingPositionsOnTheDirectionOfCheck.length; j++) {
@@ -40,7 +35,6 @@ export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, p
       for (let i = 0; i < kingsChecks.blackKingDefendingPieces.length; i++) {
         if (kingsChecks.blackKingDefendingPieces[i].row === row && kingsChecks.blackKingDefendingPieces[i].column === col) {
           let { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, pieceColor);
-
           if (directionOfPinning !== "") {
             isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, pieceColor);
           }

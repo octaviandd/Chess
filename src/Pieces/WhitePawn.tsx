@@ -12,9 +12,8 @@ import { ItemTypes } from "../ItemTypes";
 import { IPiece, ISquare } from "../types";
 import WhitePawnSVG from "./svgs/white_pawn.svg";
 
-export default function WhitePawn({ row, col, board, kingsChecks, pieceSVG }: IPiece) {
-  let item = "white_pawn";
-  let moves = canPawnMove({ board, row, col, pieceColor: "white" }).moves;
+export default function WhitePawn({ row, col, board, kingsChecks, pieceColor, pieceType, pieceSVG }: IPiece) {
+  let moves = canPawnMove({ board, row, col, pieceColor }).moves;
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;
   let availableMovesInPinned: ISquare[] = [];
@@ -44,10 +43,10 @@ export default function WhitePawn({ row, col, board, kingsChecks, pieceSVG }: IP
         for (let i = 0; i < whiteKingDefendingPieces.length; i++) {
           const defendingPiece = whiteKingDefendingPieces[i];
           if (defendingPiece.row === row && defendingPiece.column === col) {
-            const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, "white");
+            const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, pieceColor);
 
             if (directionOfPinning !== "") {
-              isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, "white");
+              isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, pieceColor);
             }
 
             if (attackingPiece.length > 0) {
@@ -62,7 +61,7 @@ export default function WhitePawn({ row, col, board, kingsChecks, pieceSVG }: IP
       }
 
       if (whiteKingPositionsOfCheck?.length) {
-        return checkPossibleMovesInCheck(item, board, row, col, whiteKingPositionsOfCheck).length > 0 || canMove;
+        return checkPossibleMovesInCheck(pieceType, board, row, col, whiteKingPositionsOfCheck).length > 0 || canMove;
         } else {
           return true;
         }
@@ -70,7 +69,7 @@ export default function WhitePawn({ row, col, board, kingsChecks, pieceSVG }: IP
 
       type: ItemTypes.PAWN,
       item: {
-        piece: item,
+        piece: pieceType,
         row: row,
         col: col,
         availableMovesInCheck,

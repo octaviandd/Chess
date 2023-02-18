@@ -52,6 +52,7 @@ export interface IPiece {
   row: number;
   col: number;
   board: TBoard;
+  pieceColor: string
   kingsChecks: IKingChecks;
   pieceType: string
   pieceSVG: string

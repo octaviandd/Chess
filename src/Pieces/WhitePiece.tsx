@@ -21,11 +21,6 @@ export default function WhitePiece({ row, col, board, kingsChecks , pieceType, p
   const { whiteKingPositionsOfCheck } = kingsChecks;
 
   const handleCanDrag = () => {
-    let availableMovesInCheck = [];
-    let canMove = false;
-    let availableMovesInPinned = [];
-    let isKingBehind = false;
-
     if (moves && kingsChecks.whiteKingPositionsOfCheck) {
       for (let i = 0; i < moves.length; i++) {
         for (let j = 0; j < kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.length; j++) {

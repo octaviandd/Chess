@@ -7,7 +7,6 @@ import {
   canKingMove,
   canKnightMove,
   canPawnMove,
-  canPieceMoveInCheck,
   canQueenMove,
   canRookMove,
 } from "../game";
@@ -22,17 +21,18 @@ export default function WhiteKing({
   kingsChecks,
   setKingChecks,
   pieceType,
+  pieceColor,
   pieceSVG
 }: IKingPiece) {
   const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } = kingsChecks;
-  let possibleMoves = canKingMove({ board, row, col, pieceColor: "white" });
+  let possibleMoves = canKingMove({ board, row, col, pieceColor });
   let possibleAttackingMoves: ISquare[] = [];
   let moves: ISquare[] = [];
   let possibleInterveningMoves: ISquare[] = [];
 
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].piece !== null && board[i][j].piece?.includes("white")) {
+      if (board[i][j].piece !== null && board[i][j].piece?.includes(pieceColor)) {
         let pieceColor: string = board[i][j].piece?.split("_")[0]!;
         let incomingPiece = board[i][j].piece?.split("_")[1];
         if (incomingPiece === "pawn") {
@@ -113,7 +113,7 @@ export default function WhiteKing({
           }
         }
       }
-      if (board[i][j].piece != null && !board[i][j].piece?.includes("white")) {
+      if (board[i][j].piece != null && !board[i][j].piece?.includes(pieceColor)) {
         let pieceColor: string = board[i][j].piece?.split("_")[0]!;
         let incomingPiece = board[i][j].piece?.split("_")[1];
         if (incomingPiece === "pawn") {
@@ -185,7 +185,7 @@ export default function WhiteKing({
       },
       type: ItemTypes.KING,
       item: {
-        piece: "white_king",
+        piece: pieceType,
         row: row,
         col: col,
         availableMovesInCheck: moves,
