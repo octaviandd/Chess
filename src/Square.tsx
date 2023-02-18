@@ -34,6 +34,21 @@ import {
   TBoard,
 } from "./types";
 
+const pieceSVGs = {
+  black_rook: BlackRookSVG,
+  black_knight: BlackKnightSVG,
+  black_bishop: BlackBishopSVG,
+  black_queen: BlackQueenSVG,
+  black_king: BlackKingSVG,
+  black_pawn: BlackPawnSVG,
+  white_rook: WhiteRookSVG,
+  white_knight: WhiteKnightSVG,
+  white_bishop: WhiteBishopSVG,
+  white_queen: WhiteQueenSVG,
+  white_king: WhiteKingSVG,
+  white_pawn: WhitePawnSVG,
+};
+
 const setDefaultPieces = (
   piece: any,
   row: number,
@@ -43,7 +58,8 @@ const setDefaultPieces = (
   setKingChecks: any,
 ) => {
   let color = piece?.split("_")[0];
-  if (piece === "black_king" || piece === "white_king") {
+  const pieceSVG = pieceSVGs[piece as keyof typeof pieceSVGs];
+  if (piece?.includes('king')) {
     return (
       <King
         row={row}
@@ -53,10 +69,10 @@ const setDefaultPieces = (
         kingsChecks={kingChecks}
         setKingChecks={setKingChecks}
         pieceType={piece}
-        pieceSVG={color === "black" ? BlackKingSVG : WhiteKingSVG}
+        pieceSVG={pieceSVG}
       ></King>
     );
-  } else if (piece === "black_pawn" || piece === "white_pawn") {
+  } else if (piece?.includes('pawn')) {
     return (
       <Pawn
         row={row}
@@ -65,7 +81,7 @@ const setDefaultPieces = (
         pieceColor={color}
         kingsChecks={kingChecks}
         pieceType={piece}
-        pieceSVG={color === "black" ? BlackPawnSVG : WhitePawnSVG}
+        pieceSVG={pieceSVG}
       ></Pawn>
     );
   } else if (piece) {
@@ -77,13 +93,11 @@ const setDefaultPieces = (
         kingsChecks={kingChecks}
         pieceColor={color}
         pieceType={piece}
-        pieceSVG={piece === "black_rook" ? BlackRookSVG : piece === "black_knight" ? BlackKnightSVG : piece === "black_bishop" ? BlackBishopSVG : piece === "black_queen" ? BlackQueenSVG : piece === "white_rook" ? WhiteRookSVG : piece === "white_knight" ? WhiteKnightSVG : piece === "white_bishop" ? WhiteBishopSVG : piece === "white_queen" ? WhiteQueenSVG : null}
+        pieceSVG={pieceSVG}
       >
       </Piece>
     )
-  } else {
-    return null;
-  }
+  } else return null
 };
 
 export default function Square({
