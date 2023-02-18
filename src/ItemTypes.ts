@@ -1,5 +1,3 @@
-/** @format */
-
 export const ItemTypes: any = {
   KNIGHT: "knight",
   ROOK: "rook",

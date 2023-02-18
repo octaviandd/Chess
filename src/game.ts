@@ -917,3 +917,28 @@ export const canPieceMove = (board: any, row: any, col: any, pieceColor: string,
       return false
   }
 }
+
+export const findMatchingSquare = (item: any, turn: string, kingChecks : any, row: number, col: number, board: any) => {
+    const kingPiece = turn === "white" ? "white_king" : "black_king";
+    if (item.piece === kingPiece) {
+      return item.availableMovesInCheck?.find(
+        (el: ISquare) => el.row === row && el.column === col
+      );
+    }
+
+    if (kingChecks.blackKingIsChecked || kingChecks.whiteKingIsChecked) {
+      if (item.availableMovesInCheck) {
+        return item.availableMovesInCheck?.find(
+          (el: ISquare) => el.row === row && el.column === col
+        );
+      }
+    } else {
+      if (item.availableMovesInPinned?.length) {
+        return item.availableMovesInPinned?.find(
+          (el: ISquare) => el.row === row && el.column === col
+        );
+      } else {
+        return checkPossibleMovesForEveryPiece(item, board, row, col, turn);
+      }
+    }
+  }

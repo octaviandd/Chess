@@ -10,12 +10,6 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { IPiece, ISquare } from "../types";
-import { WhiteBishopSVG } from "./WhiteBishopSVG";
-import { WhiteQueenSVG } from "./WhiteQueenSVG";
-import { WhiteKingSVG } from "./WhiteKingSVG";
-import { WhiteRookSVG } from "./WhiteRookSVG";
-import { WhitePawnSVG } from "./WhitePawnSVG";
-import {WhiteKnightSVG} from "./WhiteKnightSVG";
 
 
 export default function WhitePiece({ row, col, board, kingsChecks , pieceType, pieceColor, pieceSVG}: any) {
@@ -99,29 +93,11 @@ export default function WhitePiece({ row, col, board, kingsChecks , pieceType, p
     [canMove, whiteKingPositionsOfCheck]
   );
 
-  const decidePiece = () => {
-    switch (pieceType) {
-      case "white_rook":
-        return <WhiteRookSVG />;
-      case "white_knight":
-        return <WhiteKnightSVG />;
-      case "white_bishop":
-        return <WhiteBishopSVG />;
-      case "white_queen":
-        return <WhiteQueenSVG />;
-      case "white_king":
-        return <WhiteKingSVG />;
-      case "white_pawn":
-        return <WhitePawnSVG />;
-      default:
-        return false
-      }
-    }
   return (
     <>
       <DragPreviewImage connect={preview} src={pieceSVG}></DragPreviewImage>
       <div ref={drag} style={{ cursor: "move", opacity: collectedProps.isDragging ? 0.5 : 1 }}>
-        {decidePiece()}
+        <img src={pieceSVG} />
       </div>
     </>
   );

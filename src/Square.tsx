@@ -19,8 +19,8 @@ import { useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes";
 import { Overlay } from "./Overlay";
 import {
-  checkPossibleMovesForEveryPiece,
   searchForKings,
+  findMatchingSquare,
   checkForKingChecks,
 } from "./game";
 import {
@@ -33,13 +33,13 @@ import {
 } from "./types";
 
 const setDefaultPieces = (
+  piece: any,
   row: number,
   col: number,
   board: TBoard,
   kingChecks: IKingChecks,
   setKingChecks: any
 ) => {
-  let piece = board[row][col].piece;
   if (piece === "black_rook" || piece === "black_queen" || piece === "black_knight" || piece === "black_bishop") {
     return (
       <BlackPiece
@@ -119,39 +119,11 @@ export default function Square({
   setKingChecks,
   kingChecks,
 }: ISquareFunction) {
+
   const [{ isOver, canDrop }, drop]: any = useDrop(
     () => ({
       accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
-      canDrop: (item: any) => {
-        if (item.piece === "white_king" && turn === "white") {
-          return item.availableMovesInCheck.find(
-            (el: ISquare) => el.row === row && el.column === col
-          );
-        }
-        if (item.piece === "black_king" && turn === "black") {
-          return item.availableMovesInCheck.find(
-            (el: ISquare) => el.row === row && el.column === col
-          );
-        }
-        if (kingChecks.blackKingIsChecked || kingChecks.whiteKingIsChecked) {
-          if (item.availableMovesInCheck) {
-            return item.availableMovesInCheck.find(
-              (el: ISquare) => el.row === row && el.column === col
-            );
-          }
-        } else {
-          if (
-            item.availableMovesInPinned &&
-            item.availableMovesInPinned.length > 0
-          ) {
-            return item.availableMovesInPinned.find(
-              (el: ISquare) => el.row === row && el.column === col
-            );
-          } else {
-            return checkPossibleMovesForEveryPiece(item, board, row, col, turn);
-          }
-        }
-      },
+      canDrop: (item: any) => findMatchingSquare(item, turn, kingChecks, row, col, board),
       drop: (item: IPieceToSquare) => {
         let copyOfBoard = board;
         copyOfBoard[row][col].piece = item.piece;
@@ -164,32 +136,15 @@ export default function Square({
           return copy;
         });
 
-        let kingsPositions = searchForKings(copyOfBoard);
-        const {
-          blackKingPositionsX,
-          blackKingPositionsY,
-          whiteKingPositionsX,
-          whiteKingPositionsY,
-        } = kingsPositions;
-
-        const {
-          numberOfChecks,
-          positionsOfCheck,
-          positionsOnTheDirectionOfCheck,
-          kingDefendingPieces,
-        } = checkForKingChecks({
+        let {blackKingPositionsX, blackKingPositionsY, whiteKingPositionsX, whiteKingPositionsY} = searchForKings(copyOfBoard);
+        let { numberOfChecks, positionsOfCheck, positionsOnTheDirectionOfCheck, kingDefendingPieces} = checkForKingChecks({
           board: copyOfBoard,
           row: blackKingPositionsX,
           col: blackKingPositionsY,
           pieceColor: "black",
         });
 
-        const {
-          numberOfChecks: numberOfChecks_white,
-          positionsOfCheck: positionsOfCheck_white,
-          positionsOnTheDirectionOfCheck: positionsOnTheDirectionOfCheck_white,
-          kingDefendingPieces: kingDefendingPieces_white,
-        } = checkForKingChecks({
+        let { numberOfChecks: numberOfChecksWhite, positionsOfCheck: positionsOfCheckWhite, positionsOnTheDirectionOfCheck: positionsOnTheDirectionOfCheckWhite, kingDefendingPieces: kingDefendingPiecesWhite} = checkForKingChecks({
           board: copyOfBoard,
           row: whiteKingPositionsX,
           col: whiteKingPositionsY,
@@ -198,11 +153,11 @@ export default function Square({
 
         setKingChecks((prevState: IKingChecks) => ({
           ...prevState,
-          whiteKingIsChecked: numberOfChecks_white !== 0,
-          whiteKingPositionsOfCheck: positionsOfCheck_white,
+          whiteKingIsChecked: numberOfChecksWhite !== 0,
+          whiteKingPositionsOfCheck: positionsOfCheckWhite,
           whiteKingPositionsOnTheDirectionOfCheck:
-            positionsOnTheDirectionOfCheck_white,
-          whiteKingDefendingPieces: kingDefendingPieces_white,
+            positionsOnTheDirectionOfCheckWhite,
+          whiteKingDefendingPieces: kingDefendingPiecesWhite,
           blackKingIsChecked: numberOfChecks !== 0,
           blackKingPositionsOfCheck: positionsOfCheck,
           blackKingPositionsOnTheDirectionOfCheck:
@@ -221,7 +176,7 @@ export default function Square({
 
   return (
     <SquareDiv color={color} piece={board[row][col].piece !== null} ref={drop}>
-      {setDefaultPieces(row, col, board, kingChecks, setKingChecks)}
+      {setDefaultPieces(board[row][col].piece, row, col, board, kingChecks, setKingChecks)}
       {isOver && !canDrop && <Overlay type='illegal-move-hover' />}
       {!isOver && canDrop && <Overlay type='legal-move-hover' />}
       {isOver && canDrop && <Overlay type='possible-move' />}

@@ -21,8 +21,7 @@ export default function BlackKing({
   kingsChecks,
   setKingChecks,
 }: IKingPiece) {
-  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } =
-    kingsChecks;
+  const { blackKingPositionsOnTheDirectionOfCheck, blackKingPositionsOfCheck } = kingsChecks;
 
   let possibleMoves = canKingMove({ board, row, col, pieceColor: "black" });
   let possibleAttackingMoves: ISquare[] = [];

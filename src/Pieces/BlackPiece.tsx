@@ -2,7 +2,6 @@
 
 import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import { BlackRookSVG } from "./BlackRookSVG";
 import {
   canPieceMoveInCheck,
   checkPossibleMovesInCheck,
@@ -11,13 +10,9 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { ISquare } from "../types";
-import { BlackQueenSVG } from "./BlackQueenSVG";
-import BlackPawnSVG from "./BlackPawnSVG";
-import { BlackKnightSVG } from "./BlackKnightSVG";
-import { BlackKingSVG } from "./BlackKingSVG";
-import BlackBishopSVG from "./BlackBishopSVG";
 
 export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, pieceType, pieceSVG }: any) {
+  console.log(pieceSVG);
   let moves : any = canPieceMove(board, row, col, pieceColor, pieceType);
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;
@@ -97,30 +92,11 @@ export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, p
     [canMove, blackKingPositionsOfCheck]
   );
 
-  const decidePiece = () => {
-    switch (pieceType) {
-      case "black_rook":
-        return <BlackRookSVG />;
-      case "black_knight":
-        return <BlackKnightSVG />;
-      case "black_bishop":
-        return <BlackBishopSVG />;
-      case "black_queen":
-        return <BlackQueenSVG />;
-      case "black_king":
-        return <BlackKingSVG />;
-      case "black_pawn":
-        return <BlackPawnSVG />;
-      default:
-        return false
-      }
-    }
-
   return (
     <>
       <DragPreviewImage connect={preview} src={pieceSVG}></DragPreviewImage>
       <div ref={drag} style={{ opacity: collectedProps.isDragging ? 0.5 : 1 }}>
-        {decidePiece()}
+        <img src={pieceSVG}/>
       </div>
     </>
   );

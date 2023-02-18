@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Square from "./Square";
-import "./App.css";
 
 function createInitialBoard() {
   const board = [];
