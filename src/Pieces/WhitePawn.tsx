@@ -10,7 +10,7 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { IPiece, ISquare } from "../types";
-import WhitePawnSVG from "./white_pawn.svg";
+import WhitePawnSVG from "./svgs/white_pawn.svg";
 
 export default function WhitePawn({ row, col, board, kingsChecks, pieceSVG }: IPiece) {
   let item = "white_pawn";

@@ -13,7 +13,7 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { IKingChecks, IKingPiece, IPiece, ISquare } from "../types";
-import WhiteKingSVG from "./white_king.svg";
+import WhiteKingSVG from "./svgs/white_king.svg";
 
 export default function WhiteKing({
   row,
@@ -24,9 +24,7 @@ export default function WhiteKing({
   pieceType,
   pieceSVG
 }: IKingPiece) {
-  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } =
-    kingsChecks;
-
+  const { whiteKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOfCheck } = kingsChecks;
   let possibleMoves = canKingMove({ board, row, col, pieceColor: "white" });
   let possibleAttackingMoves: ISquare[] = [];
   let moves: ISquare[] = [];

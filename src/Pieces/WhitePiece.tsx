@@ -18,7 +18,7 @@ export default function WhitePiece({ row, col, board, kingsChecks , pieceType, p
   let canMove: boolean = false;
   let availableMovesInPinned: ISquare[] = [];
   let isKingBehind: boolean = false;
-  const {whiteKingPositionsOfCheck} = kingsChecks;
+  const { whiteKingPositionsOfCheck } = kingsChecks;
 
   const handleCanDrag = () => {
     let availableMovesInCheck = [];

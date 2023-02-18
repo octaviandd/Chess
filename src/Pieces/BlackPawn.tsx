@@ -10,7 +10,7 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { IPiece, ISquare } from "../types";
-import PawnSVG from "./black_pawn.svg";
+import PawnSVG from "./svgs/black_pawn.svg";
 
 export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG, pieceType }: IPiece) {
   let item = "black_pawn";

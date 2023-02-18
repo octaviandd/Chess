@@ -12,7 +12,7 @@ import {
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
 import { IKingChecks, IKingPiece, ISquare } from "../types";
-import BlackKingSVG from "./black_king.svg";
+import BlackKingSVG from "./svgs/black_king.svg";
 
 export default function BlackKing({
   row,

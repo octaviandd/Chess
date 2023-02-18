@@ -7,18 +7,18 @@ import WhiteKing from "./Pieces/WhiteKing";
 import WhitePawn from "./Pieces/WhitePawn";
 import BlackPiece from "./Pieces/BlackPiece"
 import WhitePiece from "./Pieces/WhitePiece"
-import BlackRookSVG from "../src/Pieces/black_rook.svg";
-import BlackPawnSVG from "../src/Pieces/black_pawn.svg"
-import BlackKingSVG from "../src/Pieces/black_king.svg";
-import BlackKnightSVG from "../src/Pieces/black_knight.svg";
-import BlackBishopSVG from "../src/Pieces/black_bishop.svg";
-import BlackQueenSVG from "../src/Pieces/black_bishop.svg";
-import WhiteRookSVG from "./Pieces/white_rook.svg";
-import WhiteBishopSVG from "./Pieces/white_bishop.svg";
-import WhiteKnightSVG from "./Pieces/white_knight.svg";
-import WhiteQueenSVG from "./Pieces/white_queen.svg";
-import WhitePawnSVG from "./Pieces/white_pawn.svg";
-import WhiteKingSVG from "./Pieces/white_king.svg";
+import BlackRookSVG from "./Pieces/svgs/black_rook.svg";
+import BlackPawnSVG from "./Pieces/svgs/black_pawn.svg"
+import BlackKingSVG from "./Pieces/svgs/black_king.svg";
+import BlackKnightSVG from "./Pieces/svgs/black_knight.svg";
+import BlackBishopSVG from "./Pieces/svgs/black_bishop.svg";
+import BlackQueenSVG from "./Pieces/svgs/black_bishop.svg";
+import WhiteRookSVG from "./Pieces/svgs/white_rook.svg";
+import WhiteBishopSVG from "./Pieces/svgs/white_bishop.svg";
+import WhiteKnightSVG from "./Pieces/svgs/white_knight.svg";
+import WhiteQueenSVG from "./Pieces/svgs/white_queen.svg";
+import WhitePawnSVG from "./Pieces/svgs/white_pawn.svg";
+import WhiteKingSVG from "./Pieces/svgs/white_king.svg";
 
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes";
