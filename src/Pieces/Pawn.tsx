@@ -47,7 +47,7 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceColor, pi
               }
 
               if (attackingPiece.length > 0) {
-                availableMovesInPinned = moves.filter(move => attackingPiece.some(piece => piece.row === move.row && piece.column === move.column));
+                availableMovesInPinned = moves.filter(move => attackingPiece.some((piece: any) => piece.row === move.row && piece.column === move.column));
               }
 
               if (isPinned && availableMovesInPinned.length === 0 && isKingBehind) {

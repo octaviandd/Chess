@@ -571,222 +571,73 @@ export const checkPossibleMovesForEveryPiece = (
   }
 };
 
-export const canPieceMoveInCheck = (
-  board: any,
-  i: number,
-  j: number,
-  pieceColor: string
-) => {
-  let spaceToRight = 7 - j;
-  let spaceToBottom = 7 - i;
-  let moves = [];
-  let numberOfChecks = 0;
+export const canPieceMoveInCheck = (board: any, i: number, j: number, pieceColor: string) => {
+  const spaceToRight = 7 - j;
+  const spaceToBottom = 7 - i;
+  const moves: any = [];
   let isPinned = false;
-  let attackingPiece = [];
+  let attackingPiece: any = [];
   let directionOfPinning = "";
 
-  for (let y = 1; y <= spaceToRight; y++) {
-    moves.push(board[i][j + y]);
-    if (board[i][j + y].piece !== null) {
-      if (board[i][j + y].piece.includes(pieceColor)) {
-        break;
-      } else {
-        if (
-          board[i][j + y].piece.includes("rook") ||
-          board[i][j + y].piece.includes("queen")
-        ) {
-          isPinned = true;
-          directionOfPinning = "horizontal_right_to_left";
-          attackingPiece.push(board[i][j + y]);
-          for (let q = y; q > 0; q--) {
-            attackingPiece.push(board[i][j + q]);
-          }
+  const checkAndPush = (piece: any, direction: any) => {
+    if (piece === null) {
+      moves.push(piece);
+    } else if (piece.piece.includes(pieceColor)) {
+      return true;
+    } else {
+      if (
+        piece.piece.includes("rook") ||
+        piece.piece.includes("queen")
+      ) {
+        isPinned = true;
+        directionOfPinning = direction;
+        attackingPiece.push(piece);
+        for (let q = moves.length - 1; q >= 0; q--) {
+          const movedPiece = moves[q];
+          attackingPiece.push(movedPiece);
+          if (movedPiece === piece) break;
         }
-        break;
       }
+      moves.push(piece);
+      return true;
     }
+    return false;
+  };
+
+  for (let y = 1; y <= spaceToRight; y++) {
+    if (checkAndPush(board[i][j + y], "horizontal_right_to_left")) break;
   }
 
   for (let y = 1; y <= j; y++) {
-    moves.push(board[i][j - y]);
-    if (board[i][j - y].piece !== null) {
-      if (board[i][j - y].piece.includes(pieceColor)) {
-        break;
-      } else {
-        if (
-          board[i][j - y].piece.includes("rook") ||
-          board[i][j - y].piece.includes("queen")
-        ) {
-          isPinned = true;
-          directionOfPinning = "horizontal_left_to_right";
-          attackingPiece.push(board[i][j - y]);
-          for (let q = y; q > 0; q--) {
-            attackingPiece.push(board[i][j - q]);
-          }
-        }
-        break;
-      }
-    }
+    if (checkAndPush(board[i][j - y], "horizontal_left_to_right")) break;
   }
 
   for (let y = 1; y <= i; y++) {
-    moves.push(board[i - y][j]);
-    if (board[i - y][j].piece !== null) {
-      if (board[i - y][j].piece.includes(pieceColor)) {
-        break;
-      } else {
-        if (
-          board[i - y][j].piece.includes("rook") ||
-          board[i - y][j].piece.includes("queen")
-        ) {
-          isPinned = true;
-          directionOfPinning = "vertical_bottom_to_top";
-          attackingPiece.push(board[i - y][j]);
-          for (let q = y; q > 0; q--) {
-            attackingPiece.push(board[i - q][j]);
-          }
-        }
-        break;
-      }
-    }
+    if (checkAndPush(board[i - y][j], "vertical_bottom_to_top")) break;
   }
 
   for (let y = 1; y <= spaceToBottom; y++) {
-    moves.push(board[y + i][j]);
-    if (board[y + i][j].piece !== null) {
-      if (board[y + i][j].piece.includes(pieceColor)) {
-        break;
-      } else {
-        if (
-          board[y + i][j].piece.includes("rook") ||
-          board[y + i][j].piece.includes("queen")
-        ) {
-          isPinned = true;
-          directionOfPinning = "vertical_top_to_bottom";
-          attackingPiece.push(board[y + i][j]);
-          for (let q = y; q > 0; q--) {
-            attackingPiece.push(board[i + q][j]);
-          }
-        }
-        break;
-      }
-    }
+    if (checkAndPush(board[y + i][j], "vertical_top_to_bottom")) break;
   }
 
   let x = 0;
-
   while (x < i && x < spaceToRight) {
     x++;
-    moves.push(board[i - x][j + x]);
-    if (board[i - x][j + x].piece !== null) {
-      if (board[i - x][j + x].piece.includes(pieceColor)) {
-        break;
-      }
-      if (!board[i - x][j + x].piece.includes(pieceColor)) {
-        moves.push(board[i - x][j + x]);
-        if (
-          board[i - x][j + x].piece.includes("bishop") ||
-          board[i - x][j + x].piece.includes("queen")
-        ) {
-          isPinned = true;
-          directionOfPinning = "diagonal_top_right_to_left";
-          attackingPiece.push(board[i - x][j + x]);
-          for (let q = x; q > 0; q--) {
-            attackingPiece.push(board[i - q][j + q]);
-          }
-        }
-        break;
-      }
-    }
+    if (checkAndPush(board[i - x][j + x], "diagonal_top_right_to_left")) break;
   }
 
   let o = 0;
   while (o < spaceToBottom && o < spaceToRight) {
     o++;
-    moves.push(board[i + o][j + o]);
-
-    if (board[i + o][j + o].piece !== null) {
-      if (board[i + o][j + o].piece.includes(pieceColor)) {
-        break;
-      }
-      if (!board[i + o][j + o].piece.includes(pieceColor)) {
-        moves.push(board[i + o][j + o]);
-        if (
-          board[i + o][j + o].piece.includes("bishop") ||
-          board[i + o][j + o].piece.includes("queen")
-        ) {
-          isPinned = true;
-          directionOfPinning = "diagonal_bottom_right_to_left";
-          attackingPiece.push(board[i + o][j + o]);
-          for (let q = o; q > 0; q--) {
-            attackingPiece.push(board[i + q][j + q]);
-          }
-        }
-        break;
-      }
-    }
+    if (checkAndPush(board[i + o][j + o], "diagonal_bottom_right_to_left")) break;
   }
-
-  let m = 0;
-  while (m < spaceToBottom && m < j) {
-    m++;
-    moves.push(board[i + m][j - m]);
-    if (board[i + m][j - m].piece !== null) {
-      if (board[i + m][j - m].piece.includes(pieceColor)) {
-        break;
-      }
-      if (!board[i + m][j - m].piece.includes(pieceColor)) {
-        moves.push(board[i + m][j - m]);
-        if (
-          board[i + m][j - m].piece.includes("bishop") ||
-          board[i + m][j - m].piece.includes("queen")
-        ) {
-          isPinned = true;
-          directionOfPinning = "diagonal_bottom_left_to_right";
-          attackingPiece.push(board[i + m][j - m]);
-          for (let q = m; q > 0; q--) {
-            attackingPiece.push(board[i + q][j - q]);
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  let n = 0;
-  while (n < i && n < j) {
-    n++;
-    moves.push(board[i - n][j - n]);
-    if (board[i - n][j - n].piece !== null) {
-      if (board[i - n][j - n].piece.includes(pieceColor)) {
-        break;
-      }
-      if (!board[i - n][j - n].piece.includes(pieceColor)) {
-        moves.push(board[i - n][j - n]);
-        if (
-          board[i - n][j - n].piece.includes("bishop") ||
-          board[i - n][j - n].piece.includes("queen")
-        ) {
-          isPinned = true;
-          directionOfPinning = "diagonal_top_left_to_right";
-          attackingPiece.push(board[i - n][j - n]);
-          for (let q = n; q > 0; q--) {
-            attackingPiece.push(board[i - n][j - n]);
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  let cleanArray = Array.from(new Set(attackingPiece));
 
   return {
-    attackingPiece: cleanArray,
-    directionOfPinning,
+    moves,
+    numberOfChecks: attackingPiece.length,
     isPinned,
-    moves: Array.from(new Set(moves)),
-    numberOfChecks,
+    attackingPiece,
+    directionOfPinning
   };
 };
 
@@ -797,99 +648,32 @@ export const isKingBehindDirection = (
   j: number,
   pieceColor: string
 ) => {
-  let spaceToRight = 7 - j;
-  let spaceToBottom = 7 - i;
-  let isKingBehind = false;
-  if (direction === "diagonal_bottom_left_to_right") {
-    let x = 0;
-    while (x < i && x < spaceToRight) {
-      x++;
-      if (board[i - x][j + x].piece !== null) {
-        if (board[i - x][j + x].piece.includes(pieceColor)) {
-          if (board[i - x][j + x].piece === `${pieceColor}_king`) {
-            isKingBehind = true;
-          }
-        }
+  const delta = {
+    diagonal_bottom_left_to_right: [1, -1],
+    diagonal_bottom_right_to_left: [1, 1],
+    diagonal_top_left_to_right: [-1, -1],
+    diagonal_top_right_to_left: [-1, 1],
+    vertical_top_to_bottom: [-1, 0],
+    vertical_bottom_to_top: [1, 0],
+    horizontal_left_to_right: [0, 1],
+    horizontal_right_to_left: [0, -1]
+  };
+
+  //@ts-ignore
+  let [dx, dy] = delta[direction];
+  let x = i + dx, y = j + dy;
+  while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
+    if (board[x][y].piece !== null) {
+      if (board[x][y].piece.includes(pieceColor) && board[x][y].piece === `${pieceColor}_king`) {
+        return true;
+      } else {
+        break;
       }
     }
-  } else if (direction === "diagonal_bottom_right_to_left") {
-    let x = 0;
-    while (x < i && x < j) {
-      x++;
-      if (board[i - x][j - x].piece !== null) {
-        if (board[i - x][j - x].piece.includes(pieceColor)) {
-          if (board[i - x][j - x].piece === `${pieceColor}_king`) {
-            isKingBehind = true;
-          }
-        }
-      }
-    }
-  } else if (direction === "diagonal_top_left_to_right") {
-    let x = 0;
-    while (x < spaceToBottom && x < spaceToRight) {
-      x++;
-      if (board[i + x][j + x].piece !== null) {
-        if (board[i + x][j + x].piece.includes(pieceColor)) {
-          if (board[i + x][j + x].piece === `${pieceColor}_king`) {
-            isKingBehind = true;
-          }
-        }
-      }
-    }
-  } else if (direction === "diagonal_top_right_to_left") {
-    let x = 0;
-    while (x < spaceToBottom && x < spaceToRight) {
-      x++;
-      if (board[i + x][j - x].piece !== null) {
-        if (board[i + x][j - x].piece.includes(pieceColor)) {
-          if (board[i + x][j - x].piece === `${pieceColor}_king`) {
-            isKingBehind = true;
-          }
-        }
-      }
-    }
-  } else if (direction === "vertical_top_to_bottom") {
-    for (let y = 1; y <= i; y++) {
-      if (board[i - y][j].piece !== null) {
-        if (board[i - y][j].piece.includes(pieceColor)) {
-          if (board[i - y][j].piece === `${pieceColor}_king`) {
-            isKingBehind = true;
-          }
-        }
-      }
-    }
-  } else if (direction === "vertical_bottom_to_top") {
-    for (let y = 1; y <= i; y++) {
-      if (board[i + y][j].piece !== null) {
-        if (board[i + y][j].piece.includes(pieceColor)) {
-          if (board[i + y][j].piece === `${pieceColor}_king`) {
-            isKingBehind = true;
-          }
-        }
-      }
-    }
-  } else if (direction === "horizontal_left_to_right") {
-    for (let y = 1; y <= spaceToRight; y++) {
-      if (board[i][j + y].piece !== null) {
-        if (board[i][j + y].piece.includes(pieceColor)) {
-          if (board[i][j + y].piece === `${pieceColor}_king`) {
-            isKingBehind = true;
-          }
-        }
-      }
-    }
-  } else if (direction === "horizontal_right_to_left") {
-    for (let y = 1; y <= j; y++) {
-      if (board[i][j - y].piece !== null) {
-        if (board[i][j - y].piece.includes(pieceColor)) {
-          if (board[i][j - y].piece === `${pieceColor}_king`) {
-            isKingBehind = true;
-          }
-        }
-      }
-    }
+    x += dx;
+    y += dy;
   }
-  return isKingBehind;
+  return false;
 };
 
 
