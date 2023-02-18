@@ -1,6 +1,5 @@
 /** @format */
 
-import React, { useState } from "react";
 import { useDrag, DragPreviewImage } from "react-dnd";
 import {
   canPawnMove,
@@ -18,10 +17,15 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceColor, pi
   let availableMovesInPinned: ISquare[] = [];
   let isKingBehind: boolean = false;
 
-  if (moves && kingsChecks.blackKingPositionsOfCheck) {
+  const kingPositionsOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOfCheck : kingsChecks.whiteKingPositionsOfCheck;
+  const kingPositionsOnTheDirectionOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOnTheDirectionOfCheck : kingsChecks.whiteKingPositionsOnTheDirectionOfCheck;
+  const kingDefendingPieces = pieceColor === 'black' ? kingsChecks.blackKingDefendingPieces : kingsChecks.whiteKingDefendingPieces;
+
+
+  if (moves && kingPositionsOfCheck) {
     for (let i = 0; i < moves.length; i++) {
-      for (let j = 0; j < kingsChecks.blackKingPositionsOnTheDirectionOfCheck.length; j++) {
-        if (moves[i].row === kingsChecks.blackKingPositionsOnTheDirectionOfCheck[j].row && moves[i].column === kingsChecks.blackKingPositionsOnTheDirectionOfCheck[j].column) {
+      for (let j = 0; j < kingPositionsOnTheDirectionOfCheck.length; j++) {
+        if (moves[i].row === kingPositionsOnTheDirectionOfCheck[j].row && moves[i].column === kingPositionsOnTheDirectionOfCheck[j].column) {
           availableMovesInCheck.push(moves[i]);
           canMove = true;
         }
@@ -32,9 +36,9 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceColor, pi
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: () => {
-        if (kingsChecks.blackKingDefendingPieces) {
-          for (let i = 0; i < kingsChecks.blackKingDefendingPieces.length; i++) {
-            const defendingPiece = kingsChecks.blackKingDefendingPieces[i];
+        if (kingDefendingPieces) {
+          for (let i = 0; i < kingDefendingPieces.length; i++) {
+            const defendingPiece = kingDefendingPieces[i];
             if (defendingPiece.row === row && defendingPiece.column === col) {
               const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, pieceColor);
 
@@ -53,8 +57,8 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceColor, pi
           }
         }
 
-        if (kingsChecks.blackKingPositionsOfCheck?.length) {
-          return checkPossibleMovesInCheck(pieceType, board, row, col, kingsChecks.blackKingPositionsOfCheck).length > 0 || canMove;
+        if (kingPositionsOfCheck?.length) {
+          return checkPossibleMovesInCheck(pieceType, board, row, col, kingPositionsOfCheck).length > 0 || canMove;
         } else {
           return true;
         }
@@ -71,7 +75,7 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceColor, pi
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [kingsChecks.blackKingPositionsOfCheck, canMove]
+    [kingPositionsOfCheck, canMove]
   );
 
   return (

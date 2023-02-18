@@ -1,30 +1,31 @@
 /** @format */
 
-import React from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
 import {
-  canPieceMove,
   canPieceMoveInCheck,
   checkPossibleMovesInCheck,
   isKingBehindDirection,
+  canPieceMove
 } from "../game";
 import { ItemTypes } from "../ItemTypes";
-import { IPiece, ISquare } from "../types";
+import { ISquare } from "../types";
 
-
-export default function WhitePiece({ row, col, board, kingsChecks , pieceType, pieceColor, pieceSVG}: any) {
-  let moves: any = canPieceMove(board, row, col, pieceColor, pieceType);
+export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, pieceType, pieceSVG }: any) {
+  let moves : any = canPieceMove(board, row, col, pieceColor, pieceType);
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;
   let availableMovesInPinned: ISquare[] = [];
   let isKingBehind: boolean = false;
-  const { whiteKingPositionsOfCheck } = kingsChecks;
+
+  const kingPositionsOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOfCheck : kingsChecks.whiteKingPositionsOfCheck;
+  const kingPositionsOnTheDirectionOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOnTheDirectionOfCheck : kingsChecks.whiteKingPositionsOnTheDirectionOfCheck;
+  const kingDefendingPieces = pieceColor === 'black' ? kingsChecks.blackKingDefendingPieces : kingsChecks.whiteKingDefendingPieces;
 
   const handleCanDrag = () => {
-    if (moves && kingsChecks.whiteKingPositionsOfCheck) {
+    if (moves && kingPositionsOfCheck) {
       for (let i = 0; i < moves.length; i++) {
-        for (let j = 0; j < kingsChecks.whiteKingPositionsOnTheDirectionOfCheck.length; j++) {
-          if (moves[i].row === kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].row && moves[i].column === kingsChecks.whiteKingPositionsOnTheDirectionOfCheck[j].column) {
+        for (let j = 0; j < kingPositionsOnTheDirectionOfCheck.length; j++) {
+          if (moves[i].row === kingPositionsOnTheDirectionOfCheck[j].row && moves[i].column === kingPositionsOnTheDirectionOfCheck[j].column) {
             availableMovesInCheck.push(moves[i]);
             canMove = true;
           }
@@ -32,11 +33,10 @@ export default function WhitePiece({ row, col, board, kingsChecks , pieceType, p
       }
     }
 
-    if (kingsChecks.whiteKingDefendingPieces) {
-      for (let i = 0; i < kingsChecks.whiteKingDefendingPieces.length; i++) {
-        if (kingsChecks.whiteKingDefendingPieces[i].row === row && kingsChecks.whiteKingDefendingPieces[i].column === col) {
+    if (kingDefendingPieces) {
+      for (let i = 0; i < kingDefendingPieces.length; i++) {
+        if (kingDefendingPieces[i].row === row && kingDefendingPieces[i].column === col) {
           let { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, pieceColor);
-
           if (directionOfPinning !== "") {
             isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, pieceColor);
           }
@@ -58,8 +58,8 @@ export default function WhitePiece({ row, col, board, kingsChecks , pieceType, p
       }
     }
 
-    if (kingsChecks.whiteKingPositionsOfCheck && kingsChecks.whiteKingPositionsOfCheck.length > 0) {
-      if (checkPossibleMovesInCheck(pieceType, board, row, col, kingsChecks.whiteKingPositionsOfCheck).length > 0 || canMove) {
+    if (kingPositionsOfCheck && kingPositionsOfCheck.length > 0) {
+      if (checkPossibleMovesInCheck(pieceType, board, row, col, kingPositionsOfCheck).length > 0 || canMove) {
         return true;
       } else {
         return false;
@@ -69,11 +69,10 @@ export default function WhitePiece({ row, col, board, kingsChecks , pieceType, p
     }
   };
 
-
   const [collectedProps, drag, preview] = useDrag(
     () => ({
       canDrag: handleCanDrag,
-      type: ItemTypes.PAWN,
+      type: ItemTypes.ROOK,
       item: {
         piece: pieceType,
         row: row,
@@ -85,14 +84,14 @@ export default function WhitePiece({ row, col, board, kingsChecks , pieceType, p
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [canMove, whiteKingPositionsOfCheck]
+    [canMove, kingPositionsOfCheck]
   );
 
   return (
     <>
       <DragPreviewImage connect={preview} src={pieceSVG}></DragPreviewImage>
-      <div ref={drag} style={{ cursor: "move", opacity: collectedProps.isDragging ? 0.5 : 1 }}>
-        <img src={pieceSVG} />
+      <div ref={drag} style={{ opacity: collectedProps.isDragging ? 0.5 : 1 }}>
+        <img src={pieceSVG}/>
       </div>
     </>
   );
