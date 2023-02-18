@@ -45,22 +45,11 @@ export default function WhiteKing({
             pieceColor,
           }).moves;
           if (pawnMoves && whiteKingPositionsOfCheck) {
-            for (let i = 0; i < pawnMoves.length; i++) {
-              for (
-                let j = 0;
-                j < whiteKingPositionsOnTheDirectionOfCheck.length;
-                j++
-              ) {
-                if (
-                  pawnMoves[i].row ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-                  pawnMoves[i].column ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].column
-                ) {
-                  possibleInterveningMoves.push(pawnMoves[i]);
-                }
-              }
-            }
+            possibleInterveningMoves.push(...pawnMoves.filter(move =>
+              whiteKingPositionsOnTheDirectionOfCheck.some(position =>
+                move.row === position.row && move.column === position.column
+              )
+            ));
           }
         } else if (incomingPiece === "knight") {
           let knightMoves = canKnightMove({
@@ -71,22 +60,11 @@ export default function WhiteKing({
           });
 
           if (knightMoves && whiteKingPositionsOfCheck) {
-            for (let i = 0; i < knightMoves.length; i++) {
-              for (
-                let j = 0;
-                j < whiteKingPositionsOnTheDirectionOfCheck.length;
-                j++
-              ) {
-                if (
-                  knightMoves[i].row ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-                  knightMoves[i].column ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].column
-                ) {
-                  possibleInterveningMoves.push(knightMoves[i]);
-                }
-              }
-            }
+            possibleInterveningMoves = knightMoves.filter(move =>
+              whiteKingPositionsOnTheDirectionOfCheck.some(pos =>
+                move.row === pos.row && move.column === pos.column
+              )
+            );
           }
         } else if (incomingPiece === "bishop") {
           let bishopMoves = canBishopMove({
@@ -97,22 +75,13 @@ export default function WhiteKing({
           });
 
           if (bishopMoves && whiteKingPositionsOfCheck) {
-            for (let i = 0; i < bishopMoves.length; i++) {
-              for (
-                let j = 0;
-                j < whiteKingPositionsOnTheDirectionOfCheck.length;
-                j++
-              ) {
-                if (
-                  bishopMoves[i].row ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-                  bishopMoves[i].column ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].column
-                ) {
-                  possibleInterveningMoves.push(bishopMoves[i]);
-                }
-              }
-            }
+            possibleInterveningMoves.push(
+              ...bishopMoves.filter(move =>
+                whiteKingPositionsOnTheDirectionOfCheck.some(pos =>
+                  move.row === pos.row && move.column === pos.column
+                )
+              )
+            );
           }
         } else if (incomingPiece === "rook") {
           let rookMoves = canRookMove({
@@ -123,22 +92,11 @@ export default function WhiteKing({
           });
 
           if (rookMoves && whiteKingPositionsOfCheck) {
-            for (let i = 0; i < rookMoves.length; i++) {
-              for (
-                let j = 0;
-                j < whiteKingPositionsOnTheDirectionOfCheck.length;
-                j++
-              ) {
-                if (
-                  rookMoves[i].row ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-                  rookMoves[i].column ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].column
-                ) {
-                  possibleInterveningMoves.push(rookMoves[i]);
-                }
-              }
-            }
+             possibleInterveningMoves = rookMoves.filter(move => {
+              return whiteKingPositionsOnTheDirectionOfCheck.some(kingPos => {
+                return move.row === kingPos.row && move.column === kingPos.column;
+              });
+            });
           }
         } else if (incomingPiece === "queen") {
           let queenMoves = canQueenMove({
@@ -149,22 +107,11 @@ export default function WhiteKing({
           });
 
           if (queenMoves && whiteKingPositionsOfCheck) {
-            for (let i = 0; i < queenMoves.length; i++) {
-              for (
-                let j = 0;
-                j < whiteKingPositionsOnTheDirectionOfCheck.length;
-                j++
-              ) {
-                if (
-                  queenMoves[i].row ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].row &&
-                  queenMoves[i].column ===
-                    whiteKingPositionsOnTheDirectionOfCheck[j].column
-                ) {
-                  possibleInterveningMoves.push(queenMoves[i]);
-                }
-              }
-            }
+            possibleInterveningMoves = queenMoves.filter(move => {
+              return whiteKingPositionsOnTheDirectionOfCheck.some(kingPos => {
+                return move.row === kingPos.row && move.column === kingPos.column;
+              });
+            });
           }
         }
       }

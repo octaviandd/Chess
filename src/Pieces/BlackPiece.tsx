@@ -12,7 +12,6 @@ import { ItemTypes } from "../ItemTypes";
 import { ISquare } from "../types";
 
 export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, pieceType, pieceSVG }: any) {
-  console.log(pieceSVG);
   let moves : any = canPieceMove(board, row, col, pieceColor, pieceType);
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;

@@ -12,7 +12,7 @@ import { ItemTypes } from "../ItemTypes";
 import { IPiece, ISquare } from "../types";
 import PawnSVG from "./black_pawn.svg";
 
-export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG }: IPiece) {
+export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG, pieceType }: IPiece) {
   let item = "black_pawn";
   let moves = canPawnMove({ board, row, col, pieceColor: "black" }).moves;
   let availableMovesInCheck: ISquare[] = [];
@@ -71,7 +71,7 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceSVG }: IP
         },
       type: ItemTypes.PAWN,
       item: {
-        piece: "black_pawn",
+        piece: pieceType,
         row: row,
         col: col,
         availableMovesInCheck,
