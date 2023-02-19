@@ -221,25 +221,16 @@ export const checkForKingChecks = ({
   col,
   pieceColor,
 }: IPieceSearch) => {
-  let spaceToRight = 7 - col;
-  let spaceToBottom = 7 - row;
-  let moves = [];
-  let numberOfChecks = 0;
-  let positionsOfCheck: any = [];
-  let positionsOnTheDirectionOfCheck: any = [];
-  let kingDefendingPieces: any = [];
-  let oppositeColor = pieceColor === "white" ? "black" : "white";
+  let moves = [], numberOfChecks = 0;
+  let positionsOfCheck = [], positionsOnTheDirectionOfCheck = [], kingDefendingPieces = [];
+  const oppositeColor = pieceColor === "white" ? "black" : "white";
+  const spaceToRight = 7 - col, spaceToBottom = 7 - row;
 
-  let knightMoves = [
-    { x: 2, y: -1 },
-    { x: 2, y: 1 },
-    { x: 1, y: -2 },
-    { x: 1, y: 2 },
-    { x: -2, y: -1 },
-    { x: -2, y: 1 },
-    { x: -1, y: -2 },
-    { x: -1, y: 2 },
+   const knightMoves = [
+    { x: 2, y: -1 }, { x: 2, y: 1 }, { x: 1, y: -2 }, { x: 1, y: 2 },
+    { x: -2, y: -1 }, { x: -2, y: 1 }, { x: -1, y: -2 }, { x: -1, y: 2 },
   ];
+
 
   for (let m of knightMoves) {
     if (board[row + m.x] && board[row + m.x][col + m.y]) {
