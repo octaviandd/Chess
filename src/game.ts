@@ -582,12 +582,12 @@ export const canPieceMoveInCheck = (board: any, i: number, j: number, pieceColor
   const checkAndPush = (piece: any, direction: any) => {
     if (piece === null) {
       moves.push(piece);
-    } else if (piece.piece.includes(pieceColor)) {
+    } else if (piece?.piece?.includes(pieceColor)) {
       return true;
     } else {
       if (
-        piece.piece.includes("rook") ||
-        piece.piece.includes("queen")
+        piece?.piece?.includes("rook") ||
+        piece?.piece?.includes("queen")
       ) {
         isPinned = true;
         directionOfPinning = direction;
