@@ -21,7 +21,6 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceColor, pi
   const kingPositionsOnTheDirectionOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOnTheDirectionOfCheck : kingsChecks.whiteKingPositionsOnTheDirectionOfCheck;
   const kingDefendingPieces = pieceColor === 'black' ? kingsChecks.blackKingDefendingPieces : kingsChecks.whiteKingDefendingPieces;
 
-console.log(kingPositionsOfCheck, kingPositionsOnTheDirectionOfCheck, kingDefendingPieces)
   if (moves && kingPositionsOfCheck) {
     for (let i = 0; i < moves.length; i++) {
       for (let j = 0; j < kingPositionsOnTheDirectionOfCheck.length; j++) {

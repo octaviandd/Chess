@@ -45,24 +45,31 @@ export const canPawnMove = ({
     protectedSquares.push(board[row + direction][col - 1]);
   }
   if (row === initialRow) {
-    if (board[row + direction] && board[row + direction][col + 1] && !board[row + direction][col + 1].piece?.includes(pieceColor)) {
-      moves.push(board[row + direction][col + 1]);
+    if (board[row + direction] && board[row + direction][col + 1] && board[row + direction][col + 1].piece) {
+      if (!board[row + direction][col + 1].piece?.includes(pieceColor)) {
+       moves.push(board[row + direction][col + 1]);
+      }
     }
-    if (board[row + direction] && board[row + direction][col - 1] && !board[row + direction][col - 1].piece?.includes(pieceColor)) {
-      moves.push(board[row + direction][col - 1]);
+    if (board[row + direction] && board[row + direction][col - 1] && board[row + direction][col - 1].piece) {
+      if (!board[row + direction][col - 1].piece?.includes(pieceColor)) {
+        moves.push(board[row + direction][col - 1]);
+      }
     }
-
     if (board[row + direction * 2] && board[row + direction * 2][col] && board[row + direction * 2][col].piece !== null) {
       moves.push(board[row + direction][col]);
     } else if (board[row + direction][col] && board[row + direction][col].piece === null && board[row + direction * 2][col] && board[row + direction * 2][col].piece === null) {
       moves.push(board[row + direction][col], board[row + direction * 2][col]);
     }
   } else {
-    if (board[row + direction] && board[row + direction][col + 1] && !board[row + direction][col + 1].piece?.includes(pieceColor)) {
-      moves.push(board[row + direction][col + 1]);
+    if (board[row + direction] && board[row + direction][col + 1] && board[row + direction][col + 1].piece) {
+      if (!board[row + direction][col + 1].piece?.includes(pieceColor)) {
+        moves.push(board[row + direction][col + 1]);
+      }
     }
-    if (board[row + direction] && board[row + direction][col - 1] && !board[row + direction][col - 1].piece?.includes(pieceColor)) {
-      moves.push(board[row + direction][col - 1]);
+    if (board[row + direction] && board[row + direction][col - 1] && board[row + direction][col - 1].piece) {
+      if (!board[row + direction][col - 1].piece?.includes(pieceColor)) {
+        moves.push(board[row + direction][col - 1]);
+      }
     }
 
     if (board[row + direction] && board[row + direction][col] && board[row + direction][col].piece === null) {
