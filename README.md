@@ -5,6 +5,9 @@
 ## Description
 Chess (excluding en-passant) built in JavaScript / React / React-Dnd.
 
+## Live (please use Firefox):
+[AWS EC2](https://chess.octaviandd.com)
+
 ## Features
 - Full-fledged Chess game implementation.
 - Drag and drop functionality using React-Dnd.
