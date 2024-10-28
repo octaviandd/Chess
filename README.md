@@ -1,5 +1,3 @@
-Based on the existing README content and the gathered repository information, here is a comprehensive README draft for your Chess project:
-
 # Chess
 
 ![Chess GIF](public/chessgif.gif)
