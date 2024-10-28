@@ -1,4 +1,4 @@
-![](https://github.com/octaviandd/Chess/blob/master/chessgif.gif)
+![CHESS GIF](public/chessgif.gif)
 
 # NPM INSTALL
 # NPM RUN START
