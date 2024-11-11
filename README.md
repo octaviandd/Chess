@@ -3,7 +3,7 @@
 ![Chess GIF](public/chessgif.gif)
 
 ## Description
-Chess (excluding en-passant) built in JavaScript / React / React-Dnd.
+Chess (excluding en-passant) built in TypeScript / React / React-Dnd.
 
 ## Live (please use Firefox):
 [AWS EC2](https://chess.octaviandd.com)
@@ -11,7 +11,7 @@ Chess (excluding en-passant) built in JavaScript / React / React-Dnd.
 ## Features
 - Full-fledged Chess game implementation.
 - Drag and drop functionality using React-Dnd.
-- Built with modern JavaScript and React.
+- Built with modern TypeScript and React.
 
 ## Installation
 
