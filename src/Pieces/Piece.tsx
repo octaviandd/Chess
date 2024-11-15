@@ -10,7 +10,7 @@ import {
 import { ItemTypes } from "../types";
 import { ISquare } from "../types";
 
-export default function BlackPiece({ row, col, board, kingsChecks, pieceColor, pieceType, pieceSVG }: any) {
+export default function Piece({ row, col, board, kingsChecks, pieceColor, pieceType, pieceSVG }: any) {
   let moves : any = canPieceMove(board, row, col, pieceColor, pieceType);
   let availableMovesInCheck: ISquare[] = [];
   let canMove: boolean = false;

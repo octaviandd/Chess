@@ -5,44 +5,17 @@ import styled from "styled-components";
 import Square from "./Square";
 
 function createInitialBoard() {
-  const board = [];
-  for (let i = 0; i < 8; i++) {
-    board[i] = [];
-    for (let j = 0; j < 8; j++) {
-      if (i === 1) {
-        board[i][j] = {row: i, column: j, piece: "black_pawn"};
-      } else if (i === 0) {
-        if (j === 0 || j === 7) {
-          board[i][j] = {row: i, column: j, piece: "black_rook"};
-        } else if (j === 1 || j === 6) {
-          board[i][j] = {row: i, column: j, piece: "black_knight"};
-        } else if (j === 2 || j === 5) {
-          board[i][j] = {row: i, column: j, piece: "black_bishop"};
-        } else if (j === 3) {
-          board[i][j] = {row: i, column: j, piece: "black_queen"};
-        } else if (j === 4) {
-          board[i][j] = {row: i, column: j, piece: "black_king"};
-        }
-      } else if(i === 6){
-        board[i][j] = {row: i, column: j, piece: "white_pawn"};
-      } else if (i === 7) {
-        if (j === 0 || j === 7) {
-          board[i][j] = {row: i, column: j, piece: "white_rook"};
-        } else if (j === 1 || j === 6) {
-          board[i][j] = {row: i, column: j, piece: "white_knight"};
-        } else if (j === 2 || j === 5) {
-          board[i][j] = {row: i, column: j, piece: "white_bishop"};
-        } else if (j === 3) {
-          board[i][j] = {row: i, column: j, piece: "white_queen"};
-        } else if (j === 4) {
-          board[i][j] = {row: i, column: j, piece: "white_king"};
-        }
-      }else {
-        board[i][j] = {row: i, column: j, piece: null};
-      }
-    }
-  }
-  return board;
+  const initialSetup = [
+    ["black_rook", "black_knight", "black_bishop", "black_queen", "black_king", "black_bishop", "black_knight", "black_rook"],
+    Array(8).fill("black_pawn"),
+    ...Array(4).fill(Array(8).fill(null)),
+    Array(8).fill("white_pawn"),
+    ["white_rook", "white_knight", "white_bishop", "white_queen", "white_king", "white_bishop", "white_knight", "white_rook"]
+  ];
+
+  return initialSetup.map((row, i) =>
+    row.map((piece, j) => ({ row: i, column: j, piece }))
+  );
 }
 
 
