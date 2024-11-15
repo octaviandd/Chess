@@ -18,7 +18,6 @@ import WhitePawnSVG from "./Pieces/svgs/white_pawn.svg";
 import WhiteKingSVG from "./Pieces/svgs/white_king.svg";
 
 import { useDrop } from "react-dnd";
-import { ItemTypes } from "./ItemTypes";
 import { Overlay } from "./Overlay";
 import {
   searchForKings,
@@ -29,7 +28,7 @@ import {
   CSSSquareProps,
   ISquareFunction,
   IPieceToSquare,
-  ISquare,
+  ItemTypes,
   IKingChecks,
   TBoard,
 } from "./types";
@@ -50,54 +49,31 @@ const pieceSVGs = {
 };
 
 const setDefaultPieces = (
-  piece: any,
+  piece: string | null,
   row: number,
   col: number,
   board: TBoard,
   kingChecks: IKingChecks,
   setKingChecks: any,
 ) => {
-  let color = piece?.split("_")[0];
+  if (!piece) return null;
+
+  const color = piece.split("_")[0];
   const pieceSVG = pieceSVGs[piece as keyof typeof pieceSVGs];
-  if (piece?.includes('king')) {
-    return (
-      <King
-        row={row}
-        col={col}
-        board={board}
-        pieceColor={color}
-        kingsChecks={kingChecks}
-        setKingChecks={setKingChecks}
-        pieceType={piece}
-        pieceSVG={pieceSVG}
-      ></King>
-    );
-  } else if (piece?.includes('pawn')) {
-    return (
-      <Pawn
-        row={row}
-        col={col}
-        board={board}
-        pieceColor={color}
-        kingsChecks={kingChecks}
-        pieceType={piece}
-        pieceSVG={pieceSVG}
-      ></Pawn>
-    );
-  } else if (piece) {
-    return (
-      <Piece
-        row={row}
-        col={col}
-        board={board}
-        kingsChecks={kingChecks}
-        pieceColor={color}
-        pieceType={piece}
-        pieceSVG={pieceSVG}
-      >
-      </Piece>
-    )
-  } else return null
+  const pieceProps = {
+    row,
+    col,
+    board,
+    pieceColor: color,
+    kingsChecks: kingChecks,
+    setKingChecks,
+    pieceType: piece,
+    pieceSVG,
+  };
+
+  if (piece.includes('king')) return <King {...pieceProps} />;
+  if (piece.includes('pawn')) return <Pawn {...pieceProps} />;
+  return <Piece {...pieceProps} />;
 };
 
 export default function Square({
@@ -112,59 +88,56 @@ export default function Square({
   kingChecks,
 }: ISquareFunction) {
 
-  const [{ isOver, canDrop }, drop]: any = useDrop(
-    () => ({
-      accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
-      canDrop: (item: any) => !!findMatchingSquare(item, turn, kingChecks, row, col, board),
-      drop: (item: IPieceToSquare) => {
-        let copyOfBoard = board;
-        copyOfBoard[row][col].piece = item.piece;
-        copyOfBoard[item.row][item.col].piece = null;
+  const [{ isOver, canDrop }, drop] = useDrop({
+    accept: Object.values(ItemTypes),
+    canDrop: (item) => !!findMatchingSquare(item, turn, kingChecks, row, col, board),
+    drop: (item: IPieceToSquare) => {
+      const updatedBoard: TBoard = [...board];
+      updatedBoard[row][col].piece = item.piece;
+      updatedBoard[item.row][item.col].piece = null;
 
-        setBoard((prevState: TBoard) => {
-          let copy = [...prevState];
-          copy[row][col].piece = item.piece;
-          board[item.row][item.col].piece = null;
-          return copy;
-        });
+      setBoard(updatedBoard);
 
-        let {blackKingPositionsX, blackKingPositionsY, whiteKingPositionsX, whiteKingPositionsY} = searchForKings(copyOfBoard);
-        let { numberOfChecks, positionsOfCheck, positionsOnTheDirectionOfCheck, kingDefendingPieces} = checkForKingChecks({
-          board: copyOfBoard,
-          row: blackKingPositionsX,
-          col: blackKingPositionsY,
-          pieceColor: "black",
-        });
+      const {
+        blackKingPositionsX,
+        blackKingPositionsY,
+        whiteKingPositionsX,
+        whiteKingPositionsY,
+      } = searchForKings(updatedBoard);
 
-        let { numberOfChecks: numberOfChecksWhite, positionsOfCheck: positionsOfCheckWhite, positionsOnTheDirectionOfCheck: positionsOnTheDirectionOfCheckWhite, kingDefendingPieces: kingDefendingPiecesWhite} = checkForKingChecks({
-          board: copyOfBoard,
-          row: whiteKingPositionsX,
-          col: whiteKingPositionsY,
-          pieceColor: "white",
-        });
+      const blackKingCheck = checkForKingChecks({
+        board: updatedBoard,
+        row: blackKingPositionsX,
+        col: blackKingPositionsY,
+        pieceColor: "black",
+      });
 
-        setKingChecks((prevState: IKingChecks) => ({
-          ...prevState,
-          whiteKingIsChecked: numberOfChecksWhite !== 0,
-          whiteKingPositionsOfCheck: positionsOfCheckWhite,
-          whiteKingPositionsOnTheDirectionOfCheck:
-            positionsOnTheDirectionOfCheckWhite,
-          whiteKingDefendingPieces: kingDefendingPiecesWhite,
-          blackKingIsChecked: numberOfChecks !== 0,
-          blackKingPositionsOfCheck: positionsOfCheck,
-          blackKingPositionsOnTheDirectionOfCheck:
-            positionsOnTheDirectionOfCheck,
-          blackKingDefendingPieces: kingDefendingPieces,
-        }));
-        handleTurn();
-      },
-      collect: (monitor) => ({
-        isOver: !!monitor.isOver(),
-        canDrop: !!monitor.canDrop(),
-      }),
+      const whiteKingCheck = checkForKingChecks({
+        board: updatedBoard,
+        row: whiteKingPositionsX,
+        col: whiteKingPositionsY,
+        pieceColor: "white",
+      });
+
+      setKingChecks((prevState: any) => ({
+        ...prevState,
+        whiteKingIsChecked: whiteKingCheck.numberOfChecks !== 0,
+        whiteKingPositionsOfCheck: whiteKingCheck.positionsOfCheck,
+        whiteKingPositionsOnTheDirectionOfCheck: whiteKingCheck.positionsOnTheDirectionOfCheck,
+        whiteKingDefendingPieces: whiteKingCheck.kingDefendingPieces,
+        blackKingIsChecked: blackKingCheck.numberOfChecks !== 0,
+        blackKingPositionsOfCheck: blackKingCheck.positionsOfCheck,
+        blackKingPositionsOnTheDirectionOfCheck: blackKingCheck.positionsOnTheDirectionOfCheck,
+        blackKingDefendingPieces: blackKingCheck.kingDefendingPieces,
+      }));
+
+      handleTurn();
+    },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop(),
     }),
-    [turn, kingChecks.blackKingIsChecked, kingChecks.whiteKingIsChecked, board]
-  );
+  });
 
   return (
     <SquareDiv color={color} piece={board[row][col].piece !== null} ref={drop}>

@@ -9,7 +9,7 @@ import {
   canQueenMove,
   canRookMove,
 } from "../game";
-import { ItemTypes } from "../ItemTypes";
+import { ItemTypes } from "../types";
 import { IKingChecks, IKingPiece, ISquare } from "../types";
 
 export default function BlackKing({
@@ -27,12 +27,13 @@ export default function BlackKing({
   let possibleInterveningMoves: ISquare[] = [];
   let moves: ISquare[] = [];
 
-  const addPossibleMoves = (moves: any) => {
-    const kingPositionsOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOfCheck : kingsChecks.whiteKingPositionsOfCheck;
-    const kingPositionsOnTheDirectionOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOnTheDirectionOfCheck : kingsChecks.whiteKingPositionsOnTheDirectionOfCheck;
+  const addPossibleMoves = (moves: ISquare[]) => {
+    const { blackKingPositionsOfCheck, whiteKingPositionsOfCheck, blackKingPositionsOnTheDirectionOfCheck, whiteKingPositionsOnTheDirectionOfCheck } = kingsChecks;
+    const kingPositionsOfCheck = pieceColor === 'black' ? blackKingPositionsOfCheck : whiteKingPositionsOfCheck;
+    const kingPositionsOnTheDirectionOfCheck = pieceColor === 'black' ? blackKingPositionsOnTheDirectionOfCheck : whiteKingPositionsOnTheDirectionOfCheck;
 
     if (moves && kingPositionsOfCheck) {
-      possibleInterveningMoves.push(...moves.filter((move: any) =>
+      possibleInterveningMoves.push(...moves.filter(move =>
         kingPositionsOnTheDirectionOfCheck.some(position =>
           move.row === position.row && move.column === position.column
         )
@@ -40,39 +41,28 @@ export default function BlackKing({
     }
   }
 
+  const pieceMoves = {
+    pawn: canPawnMove,
+    knight: canKnightMove,
+    bishop: canBishopMove,
+    rook: canRookMove,
+    queen: canQueenMove,
+    king: canKingMove,
+  };
+
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].piece && board[i][j].piece?.includes(pieceColor)) {
-        let pieceColor = board[i][j].piece?.split("_")[0]!;
-        let incomingPiece = board[i][j].piece?.split("_")[1];
-        if (incomingPiece === "pawn") {
-          addPossibleMoves(canPawnMove({board, row: board[i][j].row, col: board[i][j].column, pieceColor}).moves);
-        } else if (incomingPiece === "knight") {
-          addPossibleMoves(canKnightMove({board, row: board[i][j].row, col: board[i][j].column, pieceColor}));
-        } else if (incomingPiece === "bishop") {
-          addPossibleMoves(canBishopMove({board, row: board[i][j].row, col: board[i][j].column, pieceColor}));
-        } else if (incomingPiece === "rook") {
-          addPossibleMoves(canRookMove({board, row: board[i][j].row, col: board[i][j].column, pieceColor}));
-        } else if (incomingPiece === "queen") {
-          addPossibleMoves(canQueenMove({ board, row: board[i][j].row, col: board[i][j].column, pieceColor}));
-        }
-      }
-
-      if (board[i][j].piece && !board[i][j].piece?.includes(pieceColor)) {
-        let pieceColor = board[i][j].piece?.split("_")[0]!;
-        let incomingPiece = board[i][j].piece?.split("_")[1];
-        if (incomingPiece === "pawn") {
-          canPawnMove({board, row: board[i][j].row, col: board[i][j].column, pieceColor}).protectedSquares.map((item) => possibleAttackingMoves.push(item));
-        } else if (incomingPiece === "knight") {
-          canKnightMove({ board, row: board[i][j].row, col: board[i][j].column, pieceColor}).map((item) => possibleAttackingMoves.push(item));
-        } else if (incomingPiece === "bishop") {
-          canBishopMove({ board, row: board[i][j].row, col: board[i][j].column, pieceColor}).map((item) => possibleAttackingMoves.push(item));
-        } else if (incomingPiece === "rook") {
-          canRookMove({board, row: board[i][j].row, col: board[i][j].column, pieceColor}).map((item) => possibleAttackingMoves.push(item));
-        } else if (incomingPiece === "king") {
-          canKingMove({board, row: board[i][j].row, col: board[i][j].column, pieceColor}).map((item) => possibleAttackingMoves.push(item));
-        } else if (incomingPiece === "queen") {
-          canQueenMove({board, row: board[i][j].row, col: board[i][j].column, pieceColor}).map((item) => possibleAttackingMoves.push(item));
+      const piece = board[i][j].piece;
+      if (piece) {
+        const [color, type] = piece.split("_");
+        const moveFunction = pieceMoves[type as keyof typeof pieceMoves];
+        if (moveFunction) {
+          const moves = moveFunction({ board, row: board[i][j].row, col: board[i][j].column, pieceColor: color });
+          if (color === pieceColor) {
+            addPossibleMoves(Array.isArray(moves) ? moves : moves.moves || []);
+          } else {
+            (Array.isArray(moves) ? moves : moves.protectedSquares).forEach((item: ISquare) => possibleAttackingMoves.push(item));
+          }
         }
       }
     }

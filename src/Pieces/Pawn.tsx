@@ -7,7 +7,7 @@ import {
   checkPossibleMovesInCheck,
   isKingBehindDirection,
 } from "../game";
-import { ItemTypes } from "../ItemTypes";
+import { ItemTypes } from "../types";
 import { IPiece, ISquare } from "../types";
 
 export default function BlackPawn({ row, col, board, kingsChecks, pieceColor, pieceSVG, pieceType }: IPiece) {
@@ -17,68 +17,56 @@ export default function BlackPawn({ row, col, board, kingsChecks, pieceColor, pi
   let availableMovesInPinned: ISquare[] = [];
   let isKingBehind: boolean = false;
 
-  const kingPositionsOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOfCheck : kingsChecks.whiteKingPositionsOfCheck;
-  const kingPositionsOnTheDirectionOfCheck = pieceColor === 'black' ? kingsChecks.blackKingPositionsOnTheDirectionOfCheck : kingsChecks.whiteKingPositionsOnTheDirectionOfCheck;
-  const kingDefendingPieces = pieceColor === 'black' ? kingsChecks.blackKingDefendingPieces : kingsChecks.whiteKingDefendingPieces;
+  const { 
+    [pieceColor === 'black' ? 'blackKingPositionsOfCheck' : 'whiteKingPositionsOfCheck']: kingPositionsOfCheck,
+    [pieceColor === 'black' ? 'blackKingPositionsOnTheDirectionOfCheck' : 'whiteKingPositionsOnTheDirectionOfCheck']: kingPositionsOnTheDirectionOfCheck,
+    [pieceColor === 'black' ? 'blackKingDefendingPieces' : 'whiteKingDefendingPieces']: kingDefendingPieces
+  } = kingsChecks;
 
   if (moves && kingPositionsOfCheck) {
-    for (let i = 0; i < moves.length; i++) {
-      for (let j = 0; j < kingPositionsOnTheDirectionOfCheck.length; j++) {
-        if (moves[i].row === kingPositionsOnTheDirectionOfCheck[j].row && moves[i].column === kingPositionsOnTheDirectionOfCheck[j].column) {
-          availableMovesInCheck.push(moves[i]);
-          canMove = true;
-        }
-      }
-    }
+    availableMovesInCheck = moves.filter(move => 
+      kingPositionsOnTheDirectionOfCheck.some(pos => 
+        pos.row === move.row && pos.column === move.column
+      )
+    );
+    canMove = availableMovesInCheck.length > 0;
   }
 
-  const [collectedProps, drag, preview] = useDrag(
-    () => ({
-      canDrag: () => {
-        if (kingDefendingPieces) {
-          for (let i = 0; i < kingDefendingPieces.length; i++) {
-            const defendingPiece = kingDefendingPieces[i];
-            if (defendingPiece.row === row && defendingPiece.column === col) {
-              const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, pieceColor);
-
-              console.log(directionOfPinning);
-
-              if (directionOfPinning !== "") {
-                isKingBehind = isKingBehindDirection(directionOfPinning, board, row, col, pieceColor);
-              }
-
-              if (attackingPiece.length > 0) {
-                availableMovesInPinned = moves.filter(move => attackingPiece.some((piece: any) => piece.row === move.row && piece.column === move.column));
-              }
-
-
-              if (isPinned && availableMovesInPinned.length === 0 && isKingBehind) {
-                return false;
-              }
-            }
-          }
+  const [collectedProps, drag, preview] = useDrag(() => ({
+    type: ItemTypes.PAWN,
+    canDrag: () => {
+      // Check if piece is pinned
+      if (kingDefendingPieces?.some(piece => piece.row === row && piece.column === col)) {
+        const { isPinned, attackingPiece, directionOfPinning } = canPieceMoveInCheck(board, row, col, pieceColor);
+        isKingBehind = typeof directionOfPinning === 'string' && isKingBehindDirection(directionOfPinning, board, row, col, pieceColor);
+        
+        if (attackingPiece.length > 0) {
+          availableMovesInPinned = moves.filter(move => 
+            attackingPiece.some(piece => piece.row === move.row && piece.column === move.column)
+          );
         }
 
-        if (kingPositionsOfCheck?.length) {
-          return checkPossibleMovesInCheck(pieceType, board, row, col, kingPositionsOfCheck).length > 0 || canMove;
-        } else {
-          return true;
+        if (isPinned && availableMovesInPinned.length === 0 && isKingBehind) {
+          return false;
         }
-      },
-      type: ItemTypes.PAWN,
-      item: {
-        piece: pieceType,
-        row: row,
-        col: col,
-        availableMovesInCheck,
-        availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
-      },
-      collect: (monitor) => ({
-        isDragging: !!monitor.isDragging(),
-      }),
+      }
+
+      // Check if king is in check
+      return kingPositionsOfCheck?.length
+        ? checkPossibleMovesInCheck(pieceType, board, row, col, kingPositionsOfCheck).length > 0 || canMove
+        : true;
+    },
+    item: {
+      piece: pieceType,
+      row,
+      col,
+      availableMovesInCheck,
+      availableMovesInPinned: isKingBehind ? availableMovesInPinned : [],
+    },
+    collect: monitor => ({
+      isDragging: !!monitor.isDragging(),
     }),
-    [kingPositionsOfCheck, canMove]
-  );
+  }), [kingPositionsOfCheck, canMove]);
 
   return (
     <>

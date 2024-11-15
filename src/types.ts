@@ -1,6 +1,6 @@
 /** @format */
 
-interface ISquare {
+export interface ISquare {
   row: number;
   column: number;
   piece: null | string;
@@ -68,3 +68,12 @@ export interface IPieceSearch {
   col: number;
   pieceColor: string;
 }
+
+export const ItemTypes: any = {
+  KNIGHT: "knight",
+  ROOK: "rook",
+  BISHOP: "bishop",
+  QUEEN: "queen",
+  KING: "king",
+  PAWN: "pawn",
+};
