@@ -115,7 +115,7 @@ export default function Square({
   const [{ isOver, canDrop }, drop]: any = useDrop(
     () => ({
       accept: Object.keys(ItemTypes).map((k) => ItemTypes[k]),
-      canDrop: (item: any) => findMatchingSquare(item, turn, kingChecks, row, col, board),
+      canDrop: (item: any) => !!findMatchingSquare(item, turn, kingChecks, row, col, board),
       drop: (item: IPieceToSquare) => {
         let copyOfBoard = board;
         copyOfBoard[row][col].piece = item.piece;
